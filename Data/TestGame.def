@@ -1,0 +1,265 @@
+<?xml version="1.0" standalone="yes"?>
+<DefFile>
+	<!-- FreeStars Defination File -->
+	<MetaInfo>
+		<FileVersion>0.1</FileVersion>
+		<FreeStarsVersion>0.1</FreeStarsVersion>
+	<!-- Client should gracefully fail if version is greater than client, and hopefully import [if practical] if version is less. -->
+	</MetaInfo>
+    <GameID>-1085627818</GameID>
+	<Name>Tour of Duty</Name>
+	<Rules>
+		<File>MyModRules.xml</File>
+	</Rules>
+	<PlanetNames>Planets.txt</PlanetNames>
+	<Turn>2400</Turn>
+	<Seed>1</Seed>
+	<Creation>
+		<GameName>A Hobnailed Jaywalk</GameName>
+		<TechAdvances>1.5</TechAdvances>
+		<RandomEvents>
+			<Start>100</Start>
+			<Event>Mystery Trader</Event>
+			<Event>Artifacts</Event>
+			<Event>Comets</Event>
+			<Event>Wormholes</Event>
+			<Event>All</Event>
+			<Wormholes>
+				<MinimumPairs>2</MinimumPairs>
+				<MaximumPairs>4</MaximumPairs>
+				<MinDistance>10</MinDistance>
+			</Wormholes>
+		</RandomEvents>
+		<PublicScores>
+			<Start>100</Start>
+			<Category>Planets</Category>
+			<Category>Bases</Category>
+			<Category>Unarmed Ships</Category>
+			<Category>Escort Ships</Category>
+			<Category>Capital Ships</Category>
+			<Category>Tech Levels</Category>
+			<Category>Resources</Category>
+			<Category>Score</Category>
+			<Category>Rank</Category>
+			<Category>All</Category>
+		</PublicScores>
+		<MineralSettings>
+	<!-- AKA BMM -->
+			<AllWorlds>
+				<Minimum>
+					<Mineral Name="Ironium">1</Mineral>
+					<Mineral Name="Boranium">1</Mineral>
+					<Mineral Name="Germanium">1</Mineral>
+				</Minimum>
+				<Maximum>
+					<Mineral Name="Ironium">120</Mineral>
+					<Mineral Name="Boranium">120</Mineral>
+					<Mineral Name="Germanium">120</Mineral>
+				</Maximum>
+			</AllWorlds>
+			<HomeWorlds>
+				<Minimum>
+					<Mineral Name="Ironium">30</Mineral>
+					<Mineral Name="Boranium">30</Mineral>
+					<Mineral Name="Germanium">30</Mineral>
+				</Minimum>
+				<Maximum>
+					<Mineral Name="Ironium">120</Mineral>
+					<Mineral Name="Boranium">120</Mineral>
+					<Mineral Name="Germanium">120</Mineral>
+				</Maximum>
+			</HomeWorlds>
+			<HWFloor>
+				<Mineral Name="Ironium">30</Mineral>
+				<Mineral Name="Boranium">30</Mineral>
+				<Mineral Name="Germanium">30</Mineral>
+			</HWFloor>
+		</MineralSettings>
+		<Size>
+			<MinX>1000</MinX>
+			<MaxX>1200</MaxX>
+			<MinY>1000</MinY>
+			<MaxY>1200</MaxY>
+		</Size>
+		<UniverseSetup>
+			<Worlds>100</Worlds>
+			<MinDistance>16</MinDistance>
+			<ClusterOdds>.5</ClusterOdds>
+			<ClusterOddsDegrade>.1</ClusterOddsDegrade>
+			<ClusterMaxDistance>200</ClusterMaxDistance>
+			<PlayerPositions>Distant</PlayerPositions>
+	<!-- Close, Moderate, Farther, Distant -->
+			<StartPositionCount>10</StartPositionCount>
+			<StartPositionMin>150</StartPositionMin>
+			<StartPositionMax>1000</StartPositionMax>
+			<MapFile>UniverseMap.xml</MapFile>
+			<HomeWorld>
+				<BasePop>25000</BasePop>
+				<BonusTimesGR>500000</BonusTimesGR>
+				<Factories>10</Factories>
+				<Mines>10</Mines>
+				<Defenses>10</Defenses>
+			</HomeWorld>
+			<SecondWorld>
+				<PopMultiplierFor2nd>.8</PopMultiplierFor2nd>
+				<SecondaryPop>.5</SecondaryPop>
+				<Factories>4</Factories>
+				<Mines>10</Mines>
+				<Defenses>0</Defenses>
+				<MaxMinerals>300</MaxMinerals>
+				<MinMinerals>100</MinMinerals>
+				<MinDistance>100</MinDistance>
+				<MaxDistance>300</MaxDistance>
+			</SecondWorld>
+		</UniverseSetup>
+		<VictoryConditions>
+			<ControledWorlds>20</ControledWorlds>
+			<TechLevels>
+				<Number>4</Number>
+				<Level>22</Level>
+			</TechLevels>
+			<Score>11000</Score>
+			<-- OverSecond means winner must have a score more then 2nd place times this -->
+			<OverSecond>2.0</OverSecond>
+			<Resources>100000</Resources>
+			<CapShips>100</CapShips>
+			<HighestScoreAt>100</HighestScoreAt>
+			<WinnerConditions>1</WinnerConditions>
+			<MinimumYears>50</MinimumYears>
+		</VictoryConditions>
+	</Creation>
+	<!-- Galaxy>
+			<Planet IDNumber="1">
+				<Name>X-Ray</Name>
+				<Location>
+					<XCoord>1197</XCoord>
+					<YCoord>1112</YCoord>
+				</Location>
+				<Owner>1</Owner>
+				<Contains>
+					<Mineral Name="Ironium">3754</Mineral>
+					<Mineral Name="Boranium">4189</Mineral>
+					<Mineral Name="Germanium">4450</Mineral>
+					<Population>20000</Population>
+				</Contains>
+				<HomeWorld>true</HomeWorld>
+				<Concentrations>
+					<Mineral Name="Ironium">42</Mineral>
+					<Mineral Name="Boranium">47</Mineral>
+					<Mineral Name="Germanium">50</Mineral>
+				</Concentrations>
+				<MineProgress>
+					<Mineral Name="Ironium">0</Mineral>
+					<Mineral Name="Boranium">0</Mineral>
+					<Mineral Name="Germanium">0</Mineral>
+				</MineProgress>
+				<StartingHab>
+					<Hab Name="Gravity">10</Hab>
+					<Hab Name="Temperature">90</Hab>
+					<Hab Name="Radiation">90</Hab>
+				</StartingHab>
+				<CurrentHab>
+					<Hab Name="Gravity">10</Hab>
+					<Hab Name="Temperature">90</Hab>
+					<Hab Name="Radiation">90</Hab>
+				</CurrentHab>
+				<Factories>10</Factories>
+				<Mines>10</Mines>
+				<Scanner>true</Scanner>
+				<Defenses>10</Defenses>
+				<PacketSpeed>0</PacketSpeed>
+				<PayTax>false</PayTax>
+				<ArtifactType>-1</ArtifactType>
+				<ArtifactAmount>0</ArtifactAmount>
+			</Planet>
+			<Planet IDNumber="2">
+				<Name>Shannon</Name>
+				<Location>
+					<XCoord>1119</XCoord>
+					<YCoord>1167</YCoord>
+				</Location>
+				<Owner>2</Owner>
+				<Contains>
+					<Mineral Name="Ironium">3754</Mineral>
+					<Mineral Name="Boranium">4189</Mineral>
+					<Mineral Name="Germanium">4450</Mineral>
+					<Population>20000</Population>
+				</Contains>
+				<HomeWorld>true</HomeWorld>
+				<Concentrations>
+					<Mineral Name="Ironium">42</Mineral>
+					<Mineral Name="Boranium">47</Mineral>
+					<Mineral Name="Germanium">50</Mineral>
+				</Concentrations>
+				<MineProgress>
+					<Mineral Name="Ironium">0</Mineral>
+					<Mineral Name="Boranium">0</Mineral>
+					<Mineral Name="Germanium">0</Mineral>
+				</MineProgress>
+				<StartingHab>
+					<Hab Name="Gravity">10</Hab>
+					<Hab Name="Temperature">90</Hab>
+					<Hab Name="Radiation">90</Hab>
+				</StartingHab>
+				<CurrentHab>
+					<Hab Name="Gravity">10</Hab>
+					<Hab Name="Temperature">90</Hab>
+					<Hab Name="Radiation">90</Hab>
+				</CurrentHab>
+				<Factories>10</Factories>
+				<Mines>10</Mines>
+				<Scanner>true</Scanner>
+				<Defenses>10</Defenses>
+				<PacketSpeed>0</PacketSpeed>
+				<PayTax>false</PayTax>
+				<ArtifactType>-1</ArtifactType>
+				<ArtifactAmount>0</ArtifactAmount>
+			</Planet>
+			<Planet IDNumber="3">
+				<Name>Applegate</Name>
+				<Location>
+					<XCoord>1115</XCoord>
+					<YCoord>1143</YCoord>
+				</Location>
+				<Owner>3</Owner>
+				<Contains>
+					<Mineral Name="Ironium">3754</Mineral>
+					<Mineral Name="Boranium">4189</Mineral>
+					<Mineral Name="Germanium">4450</Mineral>
+					<Population>20000</Population>
+				</Contains>
+				<HomeWorld>true</HomeWorld>
+				<Concentrations>
+					<Mineral Name="Ironium">42</Mineral>
+					<Mineral Name="Boranium">47</Mineral>
+					<Mineral Name="Germanium">50</Mineral>
+				</Concentrations>
+				<MineProgress>
+					<Mineral Name="Ironium">0</Mineral>
+					<Mineral Name="Boranium">0</Mineral>
+					<Mineral Name="Germanium">0</Mineral>
+				</MineProgress>
+				<StartingHab>
+					<Hab Name="Gravity">10</Hab>
+					<Hab Name="Temperature">90</Hab>
+					<Hab Name="Radiation">90</Hab>
+				</StartingHab>
+				<CurrentHab>
+					<Hab Name="Gravity">10</Hab>
+					<Hab Name="Temperature">90</Hab>
+					<Hab Name="Radiation">90</Hab>
+				</CurrentHab>
+				<Factories>10</Factories>
+				<Mines>10</Mines>
+				<Scanner>true</Scanner>
+				<Defenses>10</Defenses>
+				<PacketSpeed>0</PacketSpeed>
+				<PayTax>false</PayTax>
+				<ArtifactType>-1</ArtifactType>
+				<ArtifactAmount>0</ArtifactAmount>
+			</Planet>
+	</Galaxy -->
+	<RaceFile>TestGame.r1</RaceFile>
+	<RaceFile>TestGame.r2</RaceFile>
+	<RaceFile>TestGame.r3</RaceFile>
+</DefFile>

@@ -1,0 +1,122 @@
+
+* To: stars-l...@umich.edu
+<Jeff_McBr...@msn.com>
+* Date: Thu, 27 Jun 96 08:13:46 UT
+* Cc: s...@webmap.com
+----------
+
+Is this how it works for everyone? Or are there people who can
+click and drag immediately??
+
+### Okay, let me see if I can explain this. If you click on an
+object in the Scanner pane you select that object into the
+Summary pane. If you want to add a waypoint at that object you
+hold down the SHIFT key, changing the cursor to a + and click.
+There is no way to suppress the snapping on the initial ADD of
+the waypoint. Once the waypoint exists the cursor changes to a
+hand when over the waypoint. Clicking and dragging will move the
+waypoint. While moving waypoints you can suppress snapping by
+holding down the SHIFT key. I will review all of the scanner
+keyboard functions between now and version 3 to see if I can
+make things a little more consistent.
+
+### Them that don't learn from history....
+
+it's only possible to steal one tech each turn ### Yup. This was
+being seriously abused in 2.0 by friends sending single ship
+fleets to each other by the dozen to be slaughtered in order to
+give each other tech.
+
+What post movement tasks are we talking about? ### Ah. It is
+time for the "how does turn generation work and in what order
+are things done in?" talk. I'm leaving out some of the nitty
+gritty details but here we go.... I'll fill it in some more and
+put it on our web site soon.
+
+Each turn the host loads the .hst file setting everything to
+exactly the condition it was in at the end of the last turn. It
+then loads the .x# file for each player and applies their change
+orders. The only interesting part of this is what happens if two
+or more players try to grab the same stuff. For example if two
+players are both at the location of some salvage and each one
+tries to transfer all of the minerals to their freighter by
+hand. When each player was taking their turn we could not know
+what the other players were going to be doing so we had to
+pretend the by-hand transfer was going to succeed. During turn
+gen we flip a coin when multiple players are going for the same
+thing. This is why sometimes things that you were SURE you did
+by hand turn out to have been day dreams by the next year.
+
+At this point we allow all waypoint zero tasks to be completed.
+This is whatever task each fleet has at its current location.
+When processing transport orders we fulfill all unload
+operations before any load operations to ensure that exchanges
+work correctly. If you sent a colonization fleet to a planet and
+forgot to give a Colonize task at that the destination waypoint
+your fleet will be in orbit of that planet waiting for orders.
+I'm sure you all have done this at least once. So, when you give
+a Colonize task at the current location it is a Waypoint Zero
+task. It happens at the beginning of the year. Waypoint zero
+tasks can not be prevented by battle (this was not true in
+version 1 as we had a pre-movement battle phase and a post
+movement battle phase). There is no difference between using the
+Cargo dialog to load up with stuff by hand and giving a
+Transport task at waypoint zero.
+
+Now the Mystery Traders and existing mass packets move. All
+fleets with waypoints on a mass packet or MT get their orders
+updated to point to the new locations.
+
+All fleets move if not blocked by waypoint zero tasks that could
+not be completed (Wait for...). If fleet A has fleet B as its
+destination waypoint and fleet B is moving then the movement of
+fleet A is postponed until fleet B is done moving. If fleet B is
+following fleet C then it too is postponed until fleet C has
+moved. If fleet C is chasing fleet A then (we detect a circular
+case) and allow each fleet to move 1/10th of it's total movement
+value and repeat 10 times. This causes these fleets that are
+chasing each other in a circle to spiral in on each other. This
+is also where fleets hit minefields, run out of fuel, go through
+wormholes, stargates and so on.
+
+Inner Strength colonists grow in fleets. In theory, this was
+happening while the fleets were moving. Mass packets and salvage
+decays.
+
+Mining. Production. It is assumed that production takes all year
+and that the minerals are not needed all up front but "on
+demand" throughout the year. This means that all minerals mined
+one year can be used in production that same year. Population
+growth. Research. Random Events (like comet strikes...)
+
+Battles occur now. Notice that the destination waypoint tasks
+have not yet occurred. For example you have a remote mining
+planet with some fighters in orbit and I send a fleet to
+colonize that planet. When I arrive at the planet you get a
+chance to kill me before I can fulfill my colonize orders. These
+are the "post movement" tasks that Rogier was confused by. All
+tasks assigned at destination waypoints are post movement tasks.
+They sure can't happen before you arrive. Contrast this to the
+case where my colonizer was already in orbit and you send a
+fighter after me. I give my fleet a colonize task at the current
+location (waypoint zero). The waypoint zero tasks happen before
+movement (I'm already there) so by the time your fleet shows up
+(post movement) the planet is already mine. Indeed this is where
+battle MUST happen for many many reasons.
+
+Any attacking fleets with bombers or troops to be unloaded can
+do so if not blocked by starbases. Note: people have asked why
+fleets in orbit can't prevent bombing and invasions. That' s
+because the starbase is actually in orbit of your major
+population center and can stop all incoming bombs and shuttles.
+Fleets in the system are considered to be anywhere (or
+everywhere) in the star system. Only the starbase is guaranteed
+to be in the right place to prevent bombing and invasion. Your
+fleet captains jobs are to kill the damned things before they
+get close.
+
+Post movement (destination) waypoint tasks. Minesweeping.
+Ship/Starbase repair.
+
+All old files get copied or moved to the backup directory and
+the new .m# files and .hst file get written out. Done.

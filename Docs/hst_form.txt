@@ -1,0 +1,207 @@
+gamename.hst- Host file. Contains all the player and game setup info. 
+Used to generate new turns.
+
+This is to help to get and idea of how the general tree of how the hst file looks like
+*     - means for 0 or more
+!     - means for 1 or more
+?     - means for optional
+<>    - means its a attribute
+
+MetaInfo
+	FileVersion
+	FreeStarsVersion
+HostFile
+	Turn
+	NumberOfPlayers
+	Player!
+		Number
+		RaceDefinition
+			SingularName
+			PluralName
+			Password
+			RaceEmblem
+			PrimaryRacialTrait
+			LesserRacialTrait*
+			HabSettings
+				Hab! <Name>
+					Center
+					Width
+			GrowthRate
+			PopEfficiency
+			FactoryRate
+			FactoryCost
+				Resources
+				Mineral! <Name>
+				Crew
+			FactoriesRun
+			MineRate
+			MineCost
+				Resources
+				Mineral! <Name>
+				Crew
+			MinesRun
+			TechFactor
+				Tech
+					<Name>
+					StartMinerals
+		ResearchTax
+		ResearchField
+		ResearchNext
+		TechLevels
+			Tech <Name>
+		TechProgress
+			Tech <Name>
+		PlanetarySpaceScan
+		PlanetaryPenScan
+		DefenseValue
+		Relations
+			Race <Number>
+		BattlePlan!
+			Number
+			Name
+			PrimaryTarget
+			SecondaryTarget
+			Tactic
+			AttackWho
+			DumpCargo
+		TerraformLimit
+			Hab! <Name>
+		ProductionQueue
+			Planet
+			AutoMine
+			AutoFactory
+			AutoDefense
+			AutoAlchemy
+			AutoMinTerra
+			AutoMaxTerra
+			AutoPacket
+		ShipDesign*
+			Number
+			Built
+			Hull
+			GraphicNumber
+			Name
+			Gift
+			Slot!
+		Minefield*
+			Location
+				XCoord
+				YCoord
+			Type
+			Number
+			Detonating
+			SeenBy
+				Race <Number>
+		Fleet*
+			Number
+			Owner
+			Name
+			Location
+				XCoord
+				YCoord
+			Contains
+				Fuel
+				Mineral* <Name>
+				Population
+			SeenBy?
+				Race* <Number>
+			CanLoadBy?
+				Race* <Number>
+			BattlePlan
+			Stack!
+			Repeat
+			Waypoint*
+				Planet
+				Speed
+				Order*
+	Galaxy
+		Planet!
+			Name
+			Location
+			Owner
+			Number
+			Contains
+				Fuel
+				Mineral* <Name>
+				Population
+			SeenBy?
+				Race* <Number>
+			HomeWorld
+			CanLoadBy?
+				Race* <Number>
+			Concentrations
+				Mineral! <Name>
+			MineProgress
+				Mineral! <Name>
+			AdjustPopulation
+			BaseDesign
+			BaseDamage
+			Factories
+			Mines
+			Defenses
+			Scanner
+			PacketDestination
+			PacketSpeed
+			RouteDestination
+			StartingHab
+				Hab! <Name>
+			CurrentHab
+				Hab! <Name>
+			EverColonized
+			PayTax
+			ProductionQueue
+				Ship*
+					Design
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Base*
+					Design
+					Partial?
+						Resources
+						Mineral* <Name>
+				Factories*
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Mines
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Defenses
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Alchemy
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Scanner
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Packet
+					Type
+					Number
+					Partial?
+						Resources
+						Mineral* <Name>
+				Terraform
+					Type
+					Partial?
+						Resources
+						Mineral* <Name>
+				AutoMine
+				AutoFactory
+				AutoDefense
+				AutoAlchemy
+				AutoMinTerra
+				AutoMaxTerra
+				AutoPacket
+	Score

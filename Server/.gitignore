@@ -1,0 +1,5 @@
+.vimsession
+CMakeFiles
+cmake_install.cmake
+fs-server
+libfsserver.a

@@ -1,0 +1,246 @@
+<?xml version="1.0" standalone="yes"?>
+<OrdersFile>
+	<MetaInfo>
+		<FreeStarsVersion>0.1</FreeStarsVersion>
+		<FileVersion>0.1</FileVersion>
+	</MetaInfo>
+    <GameID>-1085627818</GameID>
+    <Turn>2400</Turn>
+    <PlayerNo>1</PlayerNo>
+	<StartMultipleOrder />
+	<ResearchTax>0.1</ResearchTax>
+	<ResearchField>Energy</ResearchField>
+    <ResearchNext>Same field</ResearchNext>
+	<EndMultipleOrder />
+    <BattlePlan IDNumber="2">
+        <Name>Maximize Damage</Name>
+        <PrimaryTarget>Armed</PrimaryTarget>
+        <SecondaryTarget>Any</SecondaryTarget>
+        <Tactic>MaximizeDamage</Tactic>
+        <AttackWho>Enemies</AttackWho>
+    </BattlePlan>
+    <Relations>
+        <Race IDNumber="1">4</Race>
+        <Race IDNumber="2">1</Race>
+        <Race IDNumber="3">1</Race>
+    </Relations>
+    <SetPayTax>
+        <Planet>Heart</Planet>
+        <PayTax>true</PayTax>
+	</SetPayTax>
+    <SetRepeat>
+        <Fleet>1</Fleet>
+        <Repeat>true</Repeat>
+	</SetRepeat>
+	<Transfer>
+		<Owned>
+			<Fleet>2</Fleet>
+		</Owned>
+		<Other>
+			<Planet>Heart</Planet>
+		</Other>
+		<Cargo>
+			<Population>-2000</Population>
+            <Mineral Name="Germanium">-10</Mineral>
+		</Cargo>
+	</Transfer>
+    <Waypoints>
+        <Waypoint>
+            <Planet>Heart</Planet>
+            <Speed>0</Speed>
+            <Order>No Task</Order>
+        </Waypoint>
+        <Waypoint>
+            <Location>
+                <XCoord>1112</XCoord>
+                <YCoord>1128</YCoord>
+			</Location>
+            <Speed>9</Speed>
+            <Order>Colonize</Order>
+        </Waypoint>
+        <Fleet>1</Fleet>
+    </Waypoints>
+    <Waypoints>
+        <Waypoint>
+            <Planet>Heart</Planet>
+            <Speed>0</Speed>
+            <Order>No Task</Order>
+        </Waypoint>
+        <Waypoint>
+            <Planet>Erasmus</Planet>
+            <Speed>7</Speed>
+            <Order>Colonize</Order>
+        </Waypoint>
+        <Waypoint>
+            <Planet>Heart</Planet>
+            <Speed>7</Speed>
+            <Order>Colonize</Order>
+        </Waypoint>
+        <Fleet>2</Fleet>
+    </Waypoints>
+    <ProductionQueue>
+        <Ship>
+            <Design>1</Design>
+            <Number>2</Number>
+            <Partial>
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">2</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Ship>
+        <Factories>
+            <Number>2</Number>
+            <Partial>
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Factories>
+        <Mines>
+            <Number>2</Number>
+            <Partial>
+                <Resources>1</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Mines>
+        <Defenses>
+            <Number>1</Number>
+            <Partial>
+                <Resources>3</Resources>
+                <Mineral Name="Ironium">1</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Defenses>
+        <Scanner>
+            <Partial>
+                <Resources>10</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Scanner>
+        <Packet>
+            <Type>Boranium</Type>
+            <Number>1</Number>
+            <Partial>
+                <Resources>5</Resources>
+                <Mineral Name="Ironium">22</Mineral>
+                <Mineral Name="Boranium">22</Mineral>
+                <Mineral Name="Germanium">22</Mineral>
+            </Partial>
+        </Packet>
+        <Terraform>
+            <Type>-1</Type>
+<!-- -1 for best, # for specific -->
+            <Partial>
+                <Resources>40</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Terraform>
+        <AutoMine>10</AutoMine>
+        <AutoFactory>10</AutoFactory>
+        <AutoDefense>10</AutoDefense>
+        <AutoAlchemy>10</AutoAlchemy>
+        <AutoMinTerra>10</AutoMinTerra>
+        <AutoMaxTerra>10</AutoMaxTerra>
+        <AutoPacket>10</AutoPacket>
+<!-- At a later date add in auto-ship production as well. -->
+        <Planet>Heart</Planet>
+    </ProductionQueue>
+    <ProductionQueue>
+        <Ship>
+            <Design>1</Design>
+            <Number>2</Number>
+            <Partial>
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">2</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Ship>
+        <Factories>
+            <Number>2</Number>
+            <Partial>
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Factories>
+        <Mines>
+            <Number>2</Number>
+            <Partial>
+                <Resources>1</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Mines>
+        <Defenses>
+            <Number>1</Number>
+            <Partial>
+                <Resources>3</Resources>
+                <Mineral Name="Ironium">1</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Defenses>
+        <Scanner>
+            <Partial>
+                <Resources>10</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Scanner>
+        <Packet>
+            <Type>Boranium</Type>
+            <Number>1</Number>
+            <Partial>
+                <Resources>5</Resources>
+                <Mineral Name="Ironium">22</Mineral>
+                <Mineral Name="Boranium">22</Mineral>
+                <Mineral Name="Germanium">22</Mineral>
+            </Partial>
+        </Packet>
+        <Terraform>
+            <Type>-1</Type>
+<!-- -1 for best, # for specific -->
+            <Partial>
+                <Resources>40</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Terraform>
+        <AutoMine>10</AutoMine>
+        <AutoFactory>10</AutoFactory>
+        <AutoDefense>10</AutoDefense>
+        <AutoAlchemy>10</AutoAlchemy>
+        <AutoMinTerra>10</AutoMinTerra>
+        <AutoMaxTerra>10</AutoMaxTerra>
+        <AutoPacket>10</AutoPacket>
+<!-- At a later date add in auto-ship production as well. -->
+        <Planet>Knife</Planet>
+    </ProductionQueue>
+    <SetPacketDestination>
+		<Planet>Heart</Planet>
+		<PacketDestination>Scud</PacketDestination>
+	</SetPacketDestination>
+    <SetPacketSpeed>
+		<Planet>Heart</Planet>
+		<PacketSpeed>6</PacketSpeed>
+    </SetPacketSpeed>
+    <SetRouteDestination>
+		<From>Heart</From>
+	    <RouteDestination>Scud</RouteDestination>
+    </SetRouteDestination>
+</OrdersFile>
+

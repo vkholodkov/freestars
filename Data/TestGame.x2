@@ -1,0 +1,232 @@
+<?xml version="1.0" standalone="yes"?>
+<OrdersFile>
+<!-- FreeStars Turn File -->
+	<MetaInfo>
+		<FileVersion>0.1</FileVersion>
+		<FreeStarsVersion>0.1</FreeStarsVersion>
+	<!-- Client should gracefully fail if version is greater than client, and hopefully import [if practical] if version is less. -->
+	</MetaInfo>
+    <PlayerNo>2</PlayerNo>
+    <GameID>-1085627818</GameID>
+    <Turn>2400</Turn>
+	<ResearchTax>0.1</ResearchTax>
+	<ResearchField>Weapons</ResearchField>
+    <ResearchNext>Same field</ResearchNext>
+    <BattlePlan IDNumber="2">
+        <Name>Maximize Damage</Name>
+        <PrimaryTarget>Armed</PrimaryTarget>
+        <SecondaryTarget>Any</SecondaryTarget>
+        <Tactic>MaximizeDamage</Tactic>
+        <AttackWho>Enemies</AttackWho>
+    </BattlePlan>
+    <Relations>
+        <Race IDNumber="1">1</Race>
+        <Race IDNumber="2">4</Race>
+        <Race IDNumber="3">1</Race>
+    </Relations>
+    <SetPayTax>
+        <Planet>Chamber</Planet>
+        <PayTax>true</PayTax>
+	</SetPayTax>
+    <ProductionQueue>
+        <Planet>Chamber</Planet>
+<!-- Default for the default Q -->
+        <Ship>
+            <Design>1</Design>
+            <Number>10</Number>
+            <Partial>
+<!-- Amount already completed.  Check with host file before processing. -->
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">2</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Ship>
+        <Factories>
+            <Number>10</Number>
+            <Partial>
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Factories>
+        <Mines>
+            <Number>10</Number>
+            <Partial>
+                <Resources>1</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Mines>
+        <Defenses>
+            <Number>10</Number>
+            <Partial>
+                <Resources>3</Resources>
+                <Mineral Name="Ironium">1</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Defenses>
+        <Scanner>
+            <Partial>
+                <Resources>10</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Scanner>
+        <Packet>
+            <Type>Mixed</Type>
+            <Number>10</Number>
+            <Partial>
+                <Resources>5</Resources>
+                <Mineral Name="Ironium">22</Mineral>
+                <Mineral Name="Boranium">22</Mineral>
+                <Mineral Name="Germanium">22</Mineral>
+            </Partial>
+        </Packet>
+        <Terraform>
+            <Type>-1</Type>
+<!-- -1 for best, # for specific -->
+            <Partial>
+                <Resources>40</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Terraform>
+        <AutoMine>10</AutoMine>
+        <AutoFactory>10</AutoFactory>
+        <AutoDefense>10</AutoDefense>
+        <AutoAlchemy>10</AutoAlchemy>
+        <AutoMinTerra>10</AutoMinTerra>
+        <AutoMaxTerra>10</AutoMaxTerra>
+        <AutoPacket>10</AutoPacket>
+<!-- At a later date add in auto-ship production as well. -->
+    </ProductionQueue>
+    <ProductionQueue>
+        <Planet>Erasmus</Planet>
+<!-- Default for the default Q -->
+        <Ship>
+            <Design>1</Design>
+            <Number>10</Number>
+            <Partial>
+<!-- Amount already completed.  Check with host file before processing. -->
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">2</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">1</Mineral>
+            </Partial>
+        </Ship>
+        <Factories>
+            <Number>10</Number>
+            <Partial>
+                <Resources>4</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">1</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Factories>
+        <Mines>
+            <Number>10</Number>
+            <Partial>
+                <Resources>1</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Mines>
+        <Scanner>
+            <Partial>
+                <Resources>10</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Scanner>
+        <Packet>
+            <Type>Mixed</Type>
+            <Number>10</Number>
+            <Partial>
+                <Resources>5</Resources>
+                <Mineral Name="Ironium">22</Mineral>
+                <Mineral Name="Boranium">22</Mineral>
+                <Mineral Name="Germanium">22</Mineral>
+            </Partial>
+        </Packet>
+        <Terraform>
+            <Type>-1</Type>
+<!-- -1 for best, # for specific -->
+            <Partial>
+                <Resources>40</Resources>
+                <Mineral Name="Ironium">0</Mineral>
+                <Mineral Name="Boranium">0</Mineral>
+                <Mineral Name="Germanium">0</Mineral>
+            </Partial>
+        </Terraform>
+        <AutoMine>10</AutoMine>
+        <AutoFactory>10</AutoFactory>
+        <AutoDefense>10</AutoDefense>
+        <AutoAlchemy>10</AutoAlchemy>
+        <AutoMinTerra>10</AutoMinTerra>
+        <AutoMaxTerra>10</AutoMaxTerra>
+        <AutoPacket>10</AutoPacket>
+<!-- At a later date add in auto-ship production as well. -->
+        <PayTax>false</PayTax>
+    </ProductionQueue>
+    <SetPayTax>
+        <Planet>Erasmus</Planet>
+        <PayTax>false</PayTax>
+	</SetPayTax>
+    <SetPacketDestination>
+		<Planet>Chamber</Planet>
+		<PacketDestination>Winken</PacketDestination>
+	</SetPacketDestination>
+    <SetPacketSpeed>
+		<Planet>Chamber</Planet>
+		<PacketSpeed>10</PacketSpeed>
+    </SetPacketSpeed>
+    <SetRouteDestination>
+		<From>Chamber</From>
+	    <RouteDestination>Winken</RouteDestination>
+    </SetRouteDestination>
+    <Waypoints>
+        <Fleet>1</Fleet>
+        <Repeat>true</Repeat>
+        <Waypoint>
+            <Planet>Chamber</Planet>
+            <Speed>0</Speed>
+            <Order>No Task</Order>
+        </Waypoint>
+        <Waypoint>
+            <Planet>Erasmus</Planet>
+            <Speed>-1</Speed>
+            <Order>Colonize</Order>
+        </Waypoint>
+        <Waypoint>
+            <Planet>Chamber</Planet>
+            <Speed>-1</Speed>
+            <Order>Colonize</Order>
+        </Waypoint>
+    </Waypoints>
+    <Waypoints>
+        <Fleet>3</Fleet>
+        <Repeat>false</Repeat>
+        <Waypoint>
+            <Planet>Chamber</Planet>
+            <Speed>0</Speed>
+            <Order>No Task</Order>
+        </Waypoint>
+        <Waypoint>
+            <Location>
+                <XCoord>1112</XCoord>
+                <YCoord>1128</YCoord>
+			</Location>
+            <Speed>9</Speed>
+            <Order>Colonize</Order>
+        </Waypoint>
+    </Waypoints>
+</OrdersFile>
+

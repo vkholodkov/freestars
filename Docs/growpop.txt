@@ -1,0 +1,52 @@
+void Planet::GrowPop()
+{
+	if (GetOwner == NULL)
+		return;
+
+	long growthRate=GetOwner()->GrowthRate(); // In thousandths.
+	long maxPop=GetMaxPop();
+	long currentHab=GetCurrentHab(GetOwner());
+	long workingPop=GetPopulation();
+	
+
+	if ( currentHab < 0 ) { // Red world, kill people.
+		workingPop = workingPop * currentHab / PERCENT100;
+		AdjustPopulation(workingPop);
+		return;
+	}
+
+	else {	//Green world, grow people.
+
+		if ( workingPop > maxPop ) { // Die from overpop.
+			long overPop = workingPop - maxPop; // How many over.
+			overPop = 4/100 * (overPop * PERCENT100 / maxPop );
+			if (overPop > 12 * PERCENT100 ) {
+				overPop = 12 * PERCENT100;
+			}
+			workingPop = workingPop * (overPop * 4/100) / PERCENT100;
+			AdjustPopulation(-workingPop);
+
+		}
+		else if ( workingPop == maxPop ) { // nothing.
+			return;
+		}
+		else { // grow.
+			if ( workingPop * 4 < maxPop ) { // 25% or less.
+				workingPop = workingPop * currentHab / PERCENT100;
+				workingPop = workingPop * growthRate;
+				AdjustPopulation(workingPop);
+				return;
+			}
+			else { // over 25%.
+				long crowdingFactor = maxPop - workingPop;
+				crowdingFactor = crowdingFactor * crowdingFactor / PERCENT100;
+				crowdingFactor = crowdingFactor * 16 / 9;
+				workingPop = workingPop * currentHab / PERCENT100;
+				workingPop = workingPop * growthRate;
+				workingPop = workingPop * crowdingFactor;
+				AdjustPopulation(workingPop);
+				return;
+			}
+		}
+	}
+}

@@ -1,0 +1,238 @@
+gamename.m#- Player turn file. Contains all info about the current turn info that the player has. 
+This is the file a host sends to his players each turn.
+
+This is to help to get and idea of how the general tree of how the m# file looks like
+*     - means for 0 or more
+!     - means for 1 or more
+?     - means for optional
+<>    - means its a attribute
+
+MetaInfo
+	FileVersion
+	FreeStarsVersion
+TurnFile
+	Turn
+	Player
+		Number
+		Password
+		RaceDefinition
+			SingularName
+			PluralName
+			RaceEmblem
+			PrimaryRacialTrait
+			LesserRacialTrait*
+			HabSettings
+				Hab! <Name>
+					Center
+					Width
+			GrowthRate
+			PopEfficiency
+			FactoryRate
+			FactoryCost
+				Resources
+				Mineral* <Name>
+				Crew
+			FactoriesRun
+			MineRate
+			MineCost
+				Resources
+				Mineral* <Name>
+				Crew
+			MinesRun
+			TechFactor
+				Tech* <Name>
+			StartMinerals
+		Score
+		ResearchTax
+		ResearchField
+		ResearchNext
+		TechLevels
+			Tech <Name>
+		TechProgress
+			Tech <Name>
+		PlanetarySpaceScan
+		PlanetaryPenScan
+		DefenseValue
+		Relations
+			Race
+		BattlePlan
+			Number
+			Name
+			PrimaryTarget
+			SecondaryTarget
+			Tactic
+			AttackWho
+			DumpCargo
+		TerraformLimit
+			Hab* <Name>
+		ProductionQueue
+			AutoMine
+			AutoFactory
+			AutoDefense
+			AutoAlchemy
+			AutoMinTerra
+			AutoMaxTerra
+			AutoPacket
+		ShipDesign*
+			Number
+			Built
+			Hull
+			GraphicNumber
+			Name
+			Slot*
+				Component
+				Number
+		BaseDesign*
+			Number
+			Built
+			Hull
+			GraphicNumber
+			Name
+			Slot*
+				Component
+				Number
+		Minefield*
+			Location
+				XCoord
+				YCoord
+			Type
+			Number
+			Detonating
+		Fleet*
+			Number
+			Owner
+			Name
+			Location
+			Contains
+				Fuel
+				Mineral* <Name>
+				Colonists
+			SeenBy
+				Race* <Number>
+			CanLoadBy
+				Race* <Number>
+			BattlePlan
+			Stack*
+				ShipDesign
+				ShipCount
+			Waypoint*
+				Planet
+				Speed
+				Order
+		Galaxy
+			Planet!
+				Name
+				Location
+					XCoord
+					YCoord
+				Owner
+				Number
+				Contains
+				SeenBy
+					Race* <Number>
+				HomeWorld
+				CanLoadBy
+					Race* <Number>
+				Concentrations
+					Mineral* <Name>
+				MineProgress
+					Mineral* <Name>
+				AdjustPopulation
+				BaseDesign
+				BaseDamage
+				Factories
+				Mines
+				Defenses
+				Scanner
+				PacketDestination
+				PacketSpeed
+				RouteDestination
+				StartingHab
+					Hab* <Name>
+				CurrentHab
+					Hab* <Name>
+				EverColonized
+				PayTax
+				ProductionQueue
+					Ship*
+						Design
+						Number
+						Partial?
+							Resources
+							Mineral* <Name>
+					Base*
+						Design
+						Partial?
+							Resources
+							Mineral* <Name>
+					Factories*
+						Number
+						Partial?
+							Resources
+							Mineral* <Name>
+					Mines*
+						Number
+						Partial?
+							Resources
+							Mineral* <Name>
+					Defenses*
+						Number
+						Partial?
+							Resources
+							Mineral* <Name>
+					Alchemy*
+						Number
+						Partial?
+							Resources
+							Mineral* <Name>
+					Scanner
+						Partial?
+							Resources
+							Mineral* <Name>
+					Terraform
+						Type
+						Partial?
+							Resources
+							Mineral* <Name>
+					Packet
+						Type
+						Partial?
+							Resources
+							Mineral* <Name>
+					AutoMine
+					AutoFactory
+					AutoDefense
+					AutoAlchemy
+					AutoMinTerra
+					AutoMaxTerra
+					AutoPacket
+			Wormholes*
+				Number
+				Location
+					XCoord
+					YCoord
+				Destination
+					XCoord
+					YCoord
+				Volatility
+		FleetInfo
+			Fleet*
+				Player
+				FleetNum
+				FleetName
+				SafeSpeed
+				Fuel
+				CurrentPosition! <Name>
+				Orders
+					Order*
+				Waypoint*
+					Order
+		MTs
+		Packets
+		Salvage
+		Minefields
+		Messages
+			MessageFilters
+			PlayerMessage
+				Player
+				Text

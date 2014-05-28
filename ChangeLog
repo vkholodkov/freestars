@@ -1,0 +1,59 @@
+2005-03-11 Grant Speelman
+----------
+* Added *form.txt to Docs Folder (Thought it might be useful)
+* Added Task.txt (Actually a TODO/Completion list)
+
+
+2005-03-10 Grant Speelman
+----------
+* Corrected ToString methods of messages that have numbers in them
+* Corrected year in test files
+* Added HC_UNKNOWN 
+* Added missing Terraform, Scanner and Base Partial to TestGame.hst and TestGame.m1
+* Fixed Factories and Ship Partial in TestGame.hst, TestGame.m1, TestGame.x1
+* Corrected Design number in TestGame.x1
+* Fixed Some issues with cargo spliting in fleet merging
+
+2005-03-03 Grant Speelman
+----------
+* Separated Normal , Smart and Terra Bombing from one another within class
+
+2005-03-01 Grant Speelman
+----------
+* Completed Smart and Normal Bombing
+
+2005-02-15 Grant Speelman
+----------
+* Move DoBombing from Player class to Galaxy Class
+* Fix up some stuff in Bombing Class
+
+2005-02-13 Grant Speelman
+----------
+* Completed most of Bombing
+
+
+2005-02-10 Grant Speelman
+----------
+* Added Bombing Class (Bombing.cpp and Bombing.h)
+
+
+2005-02-10 Grant Speelman
+----------
+* Fix bug in Fleet ParseNode method
+
+
+2005-02-09 Grant Speelman
+----------
+* Added ToString methods to Message Classes for debuging
+* Fix a Lot of Game Messages Warnings and Errors
+
+
+2005-01-26	Grant Speelman
+----------
+* Wraped pragma statements in #ifdef WIN32
+* Cleaned up alot of gcc warnings
+
+
+2005-01-21	Grant Speelman
+-----------
+* Added GNU Build System for linux

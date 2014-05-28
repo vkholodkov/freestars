@@ -1,0 +1,73 @@
+To be researched:
+
+Do patrol orders filter on designs?
+If you have a patrol fleet targeting armed ships, and the enemy sends an armed scout and an unarmed scout, which gets targeted.
+Also, if there are two fleets that match, which does it pick?
+
+How does Stars! calculates defense coverage for some one elses world?
+A rough formula was posted on the NG or AH a while ago IIRC, we need to find and verify that, or figure it out ourselves
+ - done, posted to AH
+
+What details of a planet and/or base can you see in various circumstances:
+
+                                               Base presense, design, ship presense, design, world hab/MCs, pop, ownership
+                                    Pen scan:  Base presense,       , ship presense,       , world hab/MCs, pop, ownership
+            Non-scan ship at world with base:
+         Non-scan ship at world without base:
+                            scanner at world:
+                       robber baron at world:
+Without base:
+      Non-scan ship killed at world by owner:
+            scanner killed at world by owner:
+       robber baron killed at world by owner:
+Non-scan ship killed at world by third party:
+      scanner killed at world by third party:
+ robber baron killed at world by third party:
+With base:
+      Non-scan ship killed at world by owner:
+            scanner killed at world by owner:
+       robber baron killed at world by owner:
+Non-scan ship killed at world by third party:
+      scanner killed at world by third party:
+ robber baron killed at world by third party:
+
+                       PP packet hits driver: nothing
+        PP packet hits base without a driver:
+         PP packet hits world without a base:
+                           IT scan with gate:  Base presense,       ,             ,       , world hab/MCs, pop, ownership
+                  IT scan of another IT gate:
+                 SD det over orbit with base:
+                         SD field over orbit:
+Mining fleet without scanner over unoccupied:
+  Mining fleet without scanner over occupied:
+Others?
+
+
+Ship Rating:
+Beams:
+Firepower * (speed/2.5 + .4)
+If speed/2.5 + .4 < 1, round up, if > 1, round down.
+50% penalty for sappers
+25% penalty for range 0s
+25% bonus for range 2
+50% bonus for range 3 and gatlings
+caps affect firepower, therefore rating
+Nothing else affects it
+
+Torps and missiles
+Firepower * (range - 2) / 2
+Nothing else affects it
+
+Bombs
+%kill * 20 + installations * 2
+Nothing else affects it
+
+
+Tactic shown in battle reports
+Disengage:
+Disengage if challenged:
+ - after being shot:
+Min Damage to self:
+Max Net Damage:
+Max Damage Ratio:
+Max Damage:

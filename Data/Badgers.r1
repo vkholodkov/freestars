@@ -1,0 +1,77 @@
+<?xml version="1.0" standalone="yes"?>
+<RaceDefinition>
+	<MetaInfo>
+		<FileVersion>0.1</FileVersion>
+		<FreeStarsVersion>0.1</FreeStarsVersion>
+	</MetaInfo>
+	<Rules>
+		<File>MyModRules.xml</File>
+		<Version>0.1</Version>
+		<Verification></Verification>
+	</Rules>
+	<SingularName>Badger</SingularName>
+	<PluralName>Evil Badgers</PluralName>
+	<Password>ThisIsAPlaceholder</Password>
+	<Randomize>27318</Randomize>
+	<RaceEmblem>1</RaceEmblem>
+	<PrimaryRacialTrait>Jack of All Trades</PrimaryRacialTrait>
+	<LesserRacialTrait>Improved Fuel Efficiency</LesserRacialTrait>
+	<LesserRacialTrait>No Ram Scoop Engines</LesserRacialTrait>
+	<LesserRacialTrait>Only Basic Remote Mining</LesserRacialTrait>
+	<LesserRacialTrait>No Advanced Scanners</LesserRacialTrait>
+	<LesserRacialTrait>Regenerating Shields</LesserRacialTrait>
+	<HabSettings>
+		<Hab Name="Gravity">
+			<Center>62</Center>
+			<Width>23</Width>
+		</Hab>
+		<Hab Name="Temperature">
+			<Center>63</Center>
+			<Width>23</Width>
+		</Hab>
+		<Hab Name="Radiation">
+			<Center>62</Center>
+			<Width>23</Width>
+		</Hab>
+	</HabSettings>
+	<GrowthRate>0.19</GrowthRate>
+	<PopEfficiency>1000</PopEfficiency>
+	<FactoryRate>14</FactoryRate>
+	<FactoryCost>
+		<Resources>8</Resources>
+		<Mineral Name="Ironium">0</Mineral>
+		<Mineral Name="Boranium">0</Mineral>
+		<Mineral Name="Germanium">3</Mineral>
+		<Crew>0</Crew>
+	</FactoryCost>
+	<FactoriesRun>15</FactoriesRun>
+	<MineRate>10</MineRate>
+	<MineCost>
+		<Resources>3</Resources>
+		<Mineral Name="Ironium">0</Mineral>
+		<Mineral Name="Boranium">0</Mineral>
+		<Mineral Name="Germanium">0</Mineral>
+		<Crew>0</Crew>
+	</MineCost>
+	<MinesRun>17</MinesRun>
+	<TechFactor>
+		<Tech Name="Energy">1.75</Tech>
+		<Tech Name="Weapons">0.5</Tech>
+		<Tech Name="Propulsion">1.75</Tech>
+		<Tech Name="Construction">1.00</Tech>
+		<Tech Name="Electronics">1.75</Tech>
+		<Tech Name="Biotechnology">1.75</Tech>
+	</TechFactor>
+	<StartAt>false</StartAt>
+	<!-- Temporary Placeholder: Type of starting bonus.  Long-Term placeholder: Value of starting bonus -->
+	<StartMinerals>0</StartMinerals>
+	<InitialSettings>
+		<BattlePlan IdNumber="0">
+			<Name>ThisIsAPlaceHolder</Name>
+			<PrimaryTarget>Armed</PrimaryTarget>
+			<SecondaryTarget>Any</SecondaryTarget>
+			<Tactic>MaximizeDamage</Tactic>
+			<AttackWho>EnemisNeutrals</AttackWho>
+		</BattlePlan>
+	</InitialSettings>
+</RaceDefinition>

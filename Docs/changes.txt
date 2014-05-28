@@ -1,0 +1,43 @@
+Issues with .hst:
+
+* <Rules> section has been moved to the .xy
+* Confirm numbering for new battleplans (hash?  Array?  What are we using here?)
+* Include <Gift> flag under names for some ships/ship designs in .hst (added  as player 1 slot 1).
+* Ship slots need built/in existance.  We have <Built>, added <Exist>
+* Should we be recording instances where <Gift> is false?
+* Should move password to where it's expected (back inside the race definition)
+* Deleted extra <Energy> tech in Player 2's def.
+* Inserted <Planet>Default</Planet> to default production queues.
+* Wormhole entry/exit points are a bit weird.  Maybe just record a pair of locations, have the logic jump the fleet to the other location?  Right now we've got entry/exit points which doesn't make sense...
+* Wormhole coordinates need to match <Location><XCoord/><YCoord/>, etc.
+* <Wormholes> changed to <Wormhole>.
+* Wormholes now have two <Endpoint>'s.
+* MT destination and location corrected.
+* Update FileVersion as appropriate.
+* All instances of Colonists have been replaced by Population (update all other files!)
+
+Issues with .hstnew:
+
+* Minefields aren't recorded.
+* CanLoadBy - should always be true for the race that owns it.
+* Fleet Waypoints aren't recorded.
+* Fleet 2 has an extra <Number> tag.
+* <PacketDestination> isn't recorded.
+* <Partial> in production queues isn't processed or recorded.
+* Planet Tangent doesn't appear to be mining properly while Cosine is?
+* Salvage doesn't decay (presumed to not be implemented at this time).
+* MTs aren't recorded.
+* Wormholes aren't recorded.
+
+Issues with .x:
+
+* Standardize PacketDestination/Speed.
+* Standardize RouteDestination.
+* Change FileVersion once this stuff is complete so Tom doesn't get annoyed at us.
+* Make sure Research matches the .hst.
+* Make sure Relations matches the .hst.
+* Make sure Route matches the .hst.
+
+Issues with .m:
+* Need to define storage for Score.
+* Need to update to match .hst.

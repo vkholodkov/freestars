@@ -1,0 +1,70 @@
+From: Rogier van Vugt (rvvugt@worldaccess.nl)
+Subject: Re: Scrappin ain't helping 
+Newsgroups: rec.games.computer.stars
+Date: 1996/08/10 
+ 
+
+I wrote:
+
+->The requirements seem indeed more restrictive than the help indicates.
+->I havn't investigated this too much yet, but it seems you have to
+->scrap at a planet with a starbase and perhaps even with a ship with a
+->scanner in orbit. Also the docs say there's a chance 'up to 50%', so
+->the chance per ship might be even less than 50%....
+
+->Perhaps someone could provide us with the exact numbers. Jeff please?
+
+and CCed it to Jeff McBride who game me the following reply:
+
+->Hi Rogier,
+->
+->There are two issues here.
+
+->1) What is the %chance of learning a tech when someone scraps a
+->ship at your starbase?
+->2) Why does it seem to happen less often than it should?
+->
+->The answer to #1 is a little hard to calculate but the general algorithm
+-> goes like this:
+->
+->If you have already learned something from battle or from scrapping
+->this year that's all she wrote. You don't get no more. This helps
+->prevent serious abuse.
+->
+->Then there is a 50% chance you will learn nothing from this scrapping
+->right off the top.
+
+->Then we give you a chance to learn how to build an MT toy:
+->      You get 1% per identical part scrapped up to 25% per toy.
+->      The chance for each toy is computed separately.
+->   
+->Then up to 6 times we:
+->      Pick a random research field and check to see if the tech level
+->      in that field that is required to build the ships in that fleet is greater
+->      than your current level in that field.  If it is then you have a 50%
+->      chance of gaining a level in that field.
+->
+->As soon as you learn an MT toy or tech level we stop. One item per
+->customer per year.
+->
+->The answer to #2 is very simple. There is a bug I just fixed that the
+->planet owner wasn't getting the right message if they did not have
+->Ultimate Recycling and did not own the ships being scrapped. The
+->good news is that the Goto button works correctly. So, if you get a
+->weird/incorrect message when someone scraps a fleet at your planet
+->try the Goto button. If it takes you to the Research dialog then you
+->gained a level in something. If it takes you to the Tech Browser you
+->learned a new part. If it takes you to the planet then you learned nothing.
+->The message is fixed for version 2.6 which will be out before the end of
+->Sept. Exact date TBD.
+->
+->I think it is these broken messages that have led people to believe that
+->they never learned anything. You are learning things. Believe it.
+->
+-> Jeff
+
+So, know you know! The chance to get a tech level is quite a lot lower
+than I thought. In any case if you scrap one scout the chance is 25%,
+then 37.5%, then 43.25% etc.
+
+              Rogier 'Konradius' van Vugt

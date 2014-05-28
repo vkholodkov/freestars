@@ -1,0 +1,60 @@
+gamename.xy- Universe definition file. Contains all the data about the game's universe. 
+It is required by all players and the host, but stays the same throughout the game.
+
+This is to help to get and idea of how the general tree of how the xy file looks like
+*     - means for 0 or more
+!     - means for 1 or more
+?     - means for optional
+<>    - means its a attribute
+
+MetaInfo
+	FileVersion
+	FreeStarsVersion
+Rules
+	File
+	Verification
+	Version
+Creation
+	GameName
+	Tech_Advances
+	Random_Events
+		Start
+		Event*
+	Public_Scores
+		Start
+		Category*
+	MineralSettings
+		AllWorlds
+		HomeWorld
+		AllBonus
+		HWBonus
+		HWFloor
+	UniverseSize
+		Worlds
+		ClumpingFactor
+		PlayerPositions
+		MapFile
+	HomeWorld
+		BasePop
+		AutoGrow
+		Factories
+		Mines
+		Defenses
+		MineralBonus
+	Victory_Conditions
+		Controls
+		TechLevel
+		Score
+		OverSecond
+		Resources
+		CapShips
+		HighestScoreAt
+		WinnerConditions
+		NoWinnerTime
+Galaxy
+	Planet! <Number>
+		Name
+		Location
+			XCoord
+			YCoord
+		

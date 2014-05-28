@@ -1,0 +1,2 @@
+The files in this directory are what get generated from running the Server with TestGame.hst (output from TestGame.def in 2400) and the .x files as input.
+If any changes are done to the code or the files, then the Server should be rerun with TestGame.hst, and the results compared to this directory. If all changes are fine, then check in new versions of these files.

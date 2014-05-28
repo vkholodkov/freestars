@@ -1,0 +1,71 @@
+Battle:
+
+attractivness = BNR killed = #killed * BNR (defined in Rules) = max(dmg/dp,stack size)*BNR
+(modified for weapons and defenses, 1 hit 1 kill not considered, but stack size is considered)
+
+At start of round, find most attractive target (MAT)
+
+Movement:
+consider 9 options (8 surrounding and current position)
+calc dmg done and dmg taken, in terms of BNR
+Move to best square according to tactics, random if there are ties
+
+If out of range of MAT, move closer, equal ranges, will go as above
+
+
+I wasn't going to consider any future moves this turn, so each move is considered as if it's the last move for the turn. Which seems to match current battles
+Also, I was going to count damage taken as if every ship will fire at the moving stack
+"Disengaged if challenged" should flee if there is any enemy armed ships would be better
+
+
+Need damage functions:
+
+Stack A shoots at Stack B
+Stack A shoots at anything in range
+Stack A shoots for real at anything in range
+
+ShootAt(Stack * shooter, Stack * target, bool ForReal);
+
+
+
+
+[20:33] <OWK> Hmm. Might want to consider tactics.
+[20:33] <OWK> Isn't one of the tactics that sort of needs fixed is "disengage if challenged"
+[20:34] <OWK> If you're gonna get thwacked eventually if closing then that tactic should sorta convert into chicken
+[20:34] <OWK> Or are we still concentrating on paralleling existing behavior? If so, then probably close towards MAT
+[20:34] <LEit> A better option in that case is to set it to shoot unarmed only, and then flee
+[20:36] <LEit> I'll fix a few things, like considering base range bonus for min damage
+[20:37] <LEit> Hmm, I guess making "Disengaged if challenged" flee if there is any enemy armed ships would be better
+[20:38] <OWK> Would seem to match closer what it is usually used for.  And that'd be a simple solution w/o it starting to do firepower/movement comparisons
+[20:38] <LEit> What is known about attractivness? is it figured out or are there specific rules?
+[20:39] <OWK> I think the formula is pretty solidly known.
+[20:39] <LEit> Yeah, but that's for figuring which ship gets shot, not how it moves
+[20:39] <OWK> It also appears to adjust on the fly taking damage and current shields into consideration
+[20:40] <OWK> Ah. As in if you had equal target ships - does it move towards a damaged one rather than an undamaged one given a choice?
+[20:40] <LEit> I was thinking that using the tactics for all 9 when any ship is in range of your weapons is probably best
+[20:41] <LEit> No, as in you're in range of something, but not your MAT. Should you always move to the MAT or consider dealing with this enemy first?
+[20:42] <OWK> I think it heads for the MAT.  Multiple cases of beamer groups going past each other and exchanging fire on the way to the missile ships/transports/bombers
+[20:42] <OWK> hmm, probably headed for the chaff actually.  ;)
+[20:44] <LEit> Hmm, so I should track range to MAT, damage done, and damage taken for all possible moves, and then pick the best that closes with the MAT if out of range
+[20:46] <LEit> I wasn't going to consider any future moves this turn, so each move is considered as if it's the last move for the turn. Which seems to match current battles
+[20:46] <LEit> Also, I was going to count damage taken as if every ship will fire at the moving stack
+[20:47] <OWK> Any captain/unit commander would assume everyone is out to get him.  ;)
+[20:48] <LEit> There is something that says if I'm going to die, inflict max damage possible
+[20:48] <OWK> Well, that's an order option.
+[20:49] <OWK> I guess a possible "future" option is some sort of "take them with me" thing
+[20:49] <LEit> Actually that should work, just make sure I limit damage taken to total, and then damage taken will be the same everywhere, and the best ratio will be as close as possible
+[20:59] <LEit> For the damaged/non-damaged issue, I'll calculate based on current values, so it'll go after damaged ones first
+[21:01] <LEit> I'm not sure if it'll go after a stack of 2 or 1 first. Currently it goes after the bigger stack first
+[21:09] <OWK> Going after damaged makes sense - - reduce enemy firepower ASAP
+[21:10] <Orca> Going after the smaller stack makes more sense IMO
+[21:10] <Orca> Replicating current behavior is what we're shooting for though...
+[21:10] <Orca> Though there are times when you want to nail the bigger stack (say, if you can kill it quick)
+[21:11] * GreyHawk sets mode: -bb *!*Cowmmando@*.mpoweredpc.net *!ircap@*.*
+[21:11] <OWK> Hmm, tends to shoot the small stacks and obliterate them IIRC
+[21:12] <Orca> I'll be back in a few hours, gotta go brave rush hour traffic to play taxi...
+[22:43] <LEit> If it can't kill the smaller stack, it shoots at the bigger one. I'm not sure what happens if it can kill the stack
+[22:52] <LEit> Battles are too complex and not well understood enough for me to try to get an exact copy, I'll just go for something similar
+[14:37] <LEitW> Hmm, how should I determine the MAT for a ship with multiple weapon types (sappers and missiles for example)
+[14:39] <LEitW> I suppose I'll just sum all weapons
+[14:41] <Orca> Weapon damage?  Or taking into account range?
+[14:49] <LEitW> For this, I'll consider range to be 0

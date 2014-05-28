@@ -1,0 +1,7 @@
+Differences between Stars! and Freestars, not counting obvious ones like file formats, and modifyability:
+
+Cost % changes by racial trait stack - this is the same as Stars! execpt that AR and ISB don't stack in Stars!, they do in Freestars. So a default AR with ISB will only pay 64% of the cost of a base in Freestars as opposed to 80% in Stars!.
+
+When transferring to some one else, you know the designs.
+
+New transfer order possible: drop and load, performs both a drop and a load of a cargo. Used to invade and evacuate with one order, this is possible to do with manual orders.

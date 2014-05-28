@@ -1,0 +1,53 @@
+<LEitW> Debate time:
+<LEitW> In Stars! you can target some one elses fleet, and if it goes into hiding somewhere (in orbit, out of range, etc) you get a message that tells you where it went.
+<LEitW> You can abuse this by taking some fleet, and having it target all 'interesting' enemy fleets
+<LEitW> Then you get a message that some enemy colonization fleet went into orbit at planet A. This defeats the trick where you make it look like you're going to B but go to A the final year
+<Wumpus> this is arguably correct behaviour though ,p
+<Wumpus> since the ships are presumably scanning all the time, not just once a year :P
+<LEitW> Now: Should it continue to do this, or always report the last known location?
+<LEitW> If it continues to do this, should FreeStars do this automatically for everyone to cut down on that MM?
+<Sotek> You shouldn't get any new information if you can't scan them. But if you *can*, you should.
+<Wumpus> ideally you'd get information about the point where they left scan range, but that's probably too fiddly
+<Wumpus> (which would mean, I guess, that'd you'd see "fleet X entered orbit of planet Y")
+<LEitW> That would be very complex, if there are overlapping scanners for example
+<Sotek> hmm. do we want to inform people if we see a ship enter orbit of a planet as long as it's in scan range? That'd make planethopping ... a lot less interesting.
+<Sotek> If you lose seeing them, you should stop getting information.
+<Wumpus> although planet hopping only works *because* you only see stuff at one-year intervals
+<Wumpus> although, ofc, you can continue to allow that by using what sotek said - once you've lost tracking them, then you have to be able to see them in one of your turns before you can resume doing so
+<Sotek> I'm inclined to say you don't see planethopping. And even if you WERE tracking a ship and it enters orbit (and you don't have orbit penned), you stop following it (and instead head to the world), and if it planethops out of there, you won't know.
+
+<LEitW> There is this testbed question too: If you're following a fleet that flees your space scanning range, what happens? Specificly, does it show the last place you could see them, or their current location (outside your scanners), or the spot where they left your scanner coverage?
+<Sotek> The first is probably bad.
+<Sotek> the second is ... implausible.
+<Wumpus> again, ideally the spot where they left scanner coverage.  What does stars do in that case?  It reports a specific location, but is that where it left your scanner range or where it is now?
+<Sotek> the third is best, but likely hardest.
+<LEitW> volunteers to test it?
+<Sotek> That said ... it makes an element of sense to be able to get to where they got in a year, depending on the "physics".
+<Wumpus> I might actually hav time to do stuff this weekend :)  you going to be around tomorrow?
+<Sotek> (Again, you'd change waypoint to those coordinates instead of the ship itself.)
+<LEitW> I'm going to Maine this weekend (about a 4 hour trip). I'll have some computer acess there, but probably not on Saturday till late
+<LEitW> Is there a reason it shouldn't inform you of EVERY ship that you had seen that now enters orbit or goes out of your scanner range? Since you could have done that with some fairly easy MM
+<LEitW> And looking at your prior years turn. It's a bit of a pain
+<Sotek> A) It should. b) It should do so in a non-annoying fashion, if possible.
+<LEitW> It'll just be a message: 'Gorgon fleet Scout #12 has gone into orbit of Winken' The client program should be able to pull up the details of the fleet from the .h file
+<LEitW> You'd want to be able to filter those based on race, and probably other things, like where it went or how far it is from anything of yours
+<Sotek> Client should probably have a sort of phantom display...
+<Wumpus> leitw- you could argue that fleets you are following are being specifically monitored by the following fleet, which would possibly pass as an argument why you can't spot planet hopping.....  
+<Wumpus> (IE: as a reason not to show the info for *every* fleet)
+* Wumpus is not paticularly convinced by that argument, but still .p
+<Sotek> Wumpus: Remember, we want to cut down on MM :p
+<LEitW> Also make it so some one who is willing to do massive MM has less of an advantage
+<LEitW> Which is the same thing really
+
+<Orca> IIRC when a fleet leaves scanner range, it targets the point the fleet will be at the end of the year
+<LEitW> Yeah, where it IS, even though you cannot see that location
+<Sotek> As long as it targets the POINT and not the fleet...
+<Orca> I *think* that's what it does, but I'm not sure.
+<LEitW> That's a detail, the main question is should FreeStars send a message about every fleet that leaves your scanners?
+<Orca> And, to lessen the impact of the MMing, making the data available makes sense. On the other hand, you still need to collate it etc...but at least it cuts down on the people using scouts with targetting orders. I'm somewhat conflicted on that - making it more difficult to track can lead to some fun stuff like the planet-hopping as you said - unless someone does insane MM...
+<Orca> I'm tending towards sending the message at this point
+<Sotek> One thing I'd do is send a message and have the client display a phantom fleet.
+<Orca> I hesitate to suggest it due to code complexity and the fact that it still isn't fully functional, but maybe options for Stars! "Classic" and Stars! improved? :p
+<LEitW> I'd like to make those just different rules files if possible, until we start talking about really radical ideas (like drivers on ships :p
+<LEitW> I could easily make it an option in the rules file
+<LEitW> Of course a client program could (with difficulty) simulate the feature, so you'll have to assume that some one will

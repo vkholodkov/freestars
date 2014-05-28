@@ -1,0 +1,441 @@
+Some quick thoughts on what needs work:
+Big project: I'm working on the server first, some people were working on the client in Delphi. However, I'm pretty convinced the client is going to have to be in the same language as the server, because there will be a lot of code sharing.
+
+
+Done:
+production
+mine
+pop growth
+packets (I think)
+
+Partial:
+Battles
+bombing
+repair
+scrapping
+load/unload
+messages
+
+Not done, or I don't know:
+IS freighter growth
+movement
+random events: wormholes, MTs, comets (lots of statistical testing required)
+most waypoint orders
+Fleet transfer
+
+
+
+Notes:
+Manual lifting of cargo from a world is done in random order, even of the owner. (Tested by Raven)
+
+Manual unloads  (Tested by LEit)
+Manual loads
+Way0 unloads
+Ground combat - Colonization  (Not sure which is first, only matters if combat kills everyone on the world)
+Way0 loads
+
+
+Battle scrap in space is 25%  (Tested by LEit)
+Battle scrap in orbit is 1/6  (Tested by Volcane)
+You can get tech if a battle happens in orbit of a world you own, and you're not involved in the battle  (Tested by Volcane)
+
+Wormholes don't have entry/exit points, just points. They move after ship movement  (Tested by LEit)
+
+
+
+
+
+
+Questions:
+Verify order of events, list each one tested
+How does the wait % order work? What happens if you give that as a waypoint 0 order?
+
+Wait% order retains order in waypoint 0 each turn till it's full, then allows movement. (Tested by Volcane)
+
+
+
+
+STL info:
+http://www.infosys.tuwien.ac.at/Research/Component/tutorial/prwmain.htm#i
+http://www.cs.brown.edu/people/jak/proglang/cpp/stltut/tut.html
+
+
+
+Current:  defender fights all invaders, if invaders win, they fight in player order number to determine final victor
+
+Bill Butler's proposal:  defender fights all invaders, if invaders win, biggest fights 2nd biggest, others are ignored
+
+My plan:
+friend status is checked, if you're a friend of the defender you fight people who arn't a friend of the defender first
+then defender fights all remaining
+if defender is defeated, all survivors fight it out
+all fights are in order from weakest to strongest, doing damage in proportion of each enemy to total enemies
+Dan Neely addition: Don't fight friends, if only friends are left, biggest takes control, rest go back to freighters.
+
+
+
+Invasion(player, amount, strength, left, FoD)
+Player is the player involved in the combat
+amount is raw population amount
+strength is combat strength, depends on attacker/defender, PRT, and defenses if defender
+left is how much strength is left as the combat continues
+FoD is 'Friend of Defender' true if Player is set to be a friend of the defender (not true for the defender)
+
+FoDs fight attackers:
+while (true) {
+    combatant = find weakest FoD
+    attackers = sum !FoD strengths
+
+    if (!combatant)
+        break;
+
+    if (attackers == 0)
+        break;
+
+    // for each attacker reduce them by the proportion of the total attack that they are
+    combatantstartstr = combatant->left
+    for each attacker: {    // everyone not FoD
+        proportion = attacker->left / attackers
+        fighters = proportion * combatantstartstr
+        if (fighters > attacker->left)
+            fighters = attacker->left
+        attacker->left -= fighters
+        combatant->left -= fighters
+    }
+    at this point either the most recent combatant is dead, or all attackers are dead
+    if (combatant->left > 0)    // all attackers are dead
+        break;
+}
+
+At this point either the FoDs are all gone, or the attackers are all gone, in either case the defender fights all who is left
+Attackers are probably a team at this point
+
+defender fights everyone left:
+if (defenseleft > 0) {  // could be 0 for simultaneous colonization or for invading an AR or bombed out world
+    attackers = sum strengths
+    // for each attacker reduce them by the proportion of the total attack that they are
+    combatantstartstr = defenseleft
+    for each attacker: {    // everyone left
+        proportion = attacker->left / attackers
+        fighters = proportion * combatantstartstr
+        if (fighters > attacker->left)
+            fighters = attacker->left
+        attacker->left -= fighters
+        defenseleft -= fighters
+    }
+}
+
+At this point either defender has won, or is dead
+if (defenseleft > 0)
+    Defender has won, calculate survivors, etc, stop processing
+
+Remaining combatants fight it out (simultaneous colonization starts here -- no defender, so no one is a FoD)
+while (true) {
+    combatant = find weakest
+    everyone = sum all strengths
+
+    if (!combatant) {       // No winner! everyone is dead
+        no one left, clear world
+        break;
+    }
+
+    if (everyone == 0) {    // Winner! only one left
+        an attacker has won, calculate survivors, tech, etc, stop processing
+        break;
+    }
+
+    // for each attacker reduce them by the proportion of the total attack that they are
+    combatantstartstr = combatant->left
+    for each attacker: {    // everyone left
+        proportion = attacker->left / attackers
+        fighters = proportion * combatantstartstr
+        if (fighters > attacker->left)
+            fighters = attacker->left
+        attacker->left -= fighters
+        combatant->left -= fighters
+    }
+    at this point either the most recent combatant is dead
+}
+
+
+
+
+
+
+When you work on that order of events, could you keep track of how you decided on each thing?
+For example: w0 gain tech from pop drop or scrapping happens after all pop drop and scrapping events, because you cannot
+pass on tech from scrapping to a w0 pop drop partner the same turn, tested it with 30 trials
+
+
+
+
+
+
+
+For SD mine field scanning, each fleet has an array of mine field spotting for each player. persisted too, so it can be loaded in next turn
+
+Process order:
+For all players: get waypoint orders into an array with fleet # for all players
+    validate that they can see the target - done
+    don't validate the fleet # - done
+    tell each target fleet that some one is chasing them - done
+    keep a list of fleets you are following and who is following you
+For all players (in random order) Parse orders, including:
+    split/merge
+        keeping track of original fleet - each stack keeps track - done
+        keep track of chasing fleets - done
+    waypoint orders, apply from list above
+    production orders - done
+    other planetary orders (route, packet destination, tax payment) - partial
+    transfers of cargo - done
+    research setting - done
+    battle order setting (add/delete/edit order) - done
+    ship designs (delete/add)
+        validate on add that it is possible to build the ship -- no weapons in an elec only slot
+        check with Rules if we check for buildable designs here or in production -- have tech and PRT/LRT requirments
+For all players: Assign waypoint orders to fleets
+    first validate the fleet #
+For all players: For all fleets with chasers:
+    Adjust waypoint orders for split/merged fleets
+    Of all fleets targeting a fleet, biggest picks first:
+        add up masses of all ships from that fleet in each split fleet filtering on battle orders
+        target biggest fleet
+        loop over all targeting fleets, if all fleets have been selected already start over
+    Chasers list and Stack origins are no longer needed and can be deleted
+
+
+
+<Split Fleet Stuff>
+
+1->2
+2 splits to 3
+2 splits to 4 (and 2 is gone)
+1 splits to 8
+1 splits to 9 (and 1 is gone)
+
+
+(* is pointer to, # is ID # of (can get a * to, if it exists - it doesn't alway yet exist due to order and splits)
+
+1st case: new orders, split then waypoint orders
+fleet #8 (doesn't exist) is after *2
+    add order to list
+    chasing list of *2: #8
+    chased list of #8: *2
+fleet #9 (doesn't exist) is after *2
+    add order to list
+    chasing list of *2: #8 #9
+    chased list of #9: *2
+
+*1 splits to *8 and *9
+    current orders of *1 coppied to *8 and *9
+    no chasing (or chasing other things...)
+*1 deleted
+*8 and *9 get new orders
+    chasing list of *2: #8 and #9
+    chased list of *8: *2
+    chased list of *9: *2
+*2 splits to *3 and *4
+    current orders of *2 coppied to *3 and *4
+    list of chasers of *2 coppied to *3 and *4
+        all chasers have a new chasee
+    chasing list of *2: #8 and #9
+    chasing list of *3: #8 and #9
+    chasing list of *4: #8 and #9
+    chased list of *8: *2 *3 *4
+    chased list of *9: *2 *3 *4
+*2 deleted
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+Final:
+    chasing list of *3: #8 and #9
+    chasing list of *4: #8 and #9
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+
+
+2nd case: new orders (or existing), waypoint orders then split
+fleet *1 (does exist) is after *2
+    add order to list
+    chasing list of *2: #1
+    chased list of #1: *2
+
+*1 gets new orders
+    chasing list of *2: #1
+    chased list of *1: *2
+*1 splits to *8 and *9
+    current orders of *1 coppied to *8 and *9
+    all fleets chased by *1 now chased by *1, *8, and *9
+    chasing list of *2: #1 #8 #9
+    chased list of *1: *2
+    chased list of *8: *2
+    chased list of *9: *2
+*1 deleted
+    chasing list of *2: #8 #9
+    chased list of *8: *2
+    chased list of *9: *2
+*2 splits to *3 and *4
+    current orders of *2 coppied to *3 and *4
+    list of chasers of *2 coppied to *3 and *4
+        all chasers have a new chasee, and remove old one
+    chasing list of *2: #8 #9
+    chasing list of *3: #8 #9
+    chasing list of *4: #8 #9
+    chased list of *8: *2 *3 *4
+    chased list of *9: *2 *3 *4
+2 deleted
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+Final:
+    chasing list of *3: #8 #9
+    chasing list of *4: #8 #9
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+
+
+
+3rd case, 1st case reversed: new orders, split then waypoint orders
+fleet #8 (doesn't exist) is after *2
+    add order to list
+    chasing list of *2: #8
+    chased list of #8: *2
+fleet #9 (doesn't exist) is after *2
+    add order to list
+    chasing list of *2: #8 #9
+    chased list of #9: *2
+
+*2 splits to *3 and *4
+    current orders of *2 coppied to *3 and *4
+    list of chasers of *2 coppied to *3 and *4
+        all chasers have a new chasee
+    chasing list of *2: #8 and #9
+    chasing list of *3: #8 and #9
+    chasing list of *4: #8 and #9
+    chased list of #8: *2 *3 *4
+    chased list of #9: *2 *3 *4
+*2 deleted
+    chased list of #8: *3 *4
+    chased list of #9: *3 *4
+*1 splits to *8 and *9
+    current orders of *1 coppied to *8 and *9
+    no chasing (or chasing other things...)
+*1 deleted
+*8 and *9 get new orders
+    chasing list of *2: #8 and #9
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+Final:
+    chasing list of *3: #8 and #9
+    chasing list of *4: #8 and #9
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+
+
+rth case, 2ndt case reversed: new orders (or existing), waypoint orders then split
+fleet *1 (does exist) is after *2
+    add order to list
+    chasing list of *2: #1
+    chased list of #1: *2
+
+*2 splits to *3 and *4
+    current orders of *2 coppied to *3 and *4
+    list of chasers of *2 coppied to *3 and *4
+        all chasers have a new chasee
+    chasing list of *2: #1
+    chasing list of *3: #1
+    chasing list of *4: #1
+    chased list of #1: *2 *3 *4
+2 deleted
+    chased list of #1: *3 *4
+*1 gets new orders
+    chasing list of *3: #1
+    chasing list of *4: #1
+    chased list of *1: *3 *4
+*1 splits to *8 and *9
+    current orders of *1 coppied to *8 and *9
+    all fleets chased by *1 now chased by *1, *8, and *9
+    chasing list of *3: #1 #8 #9
+    chasing list of *4: #1 #8 #9
+    chased list of *1: *3 *4
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+*1 deleted
+    chasing list of *3: #8 #9
+    chasing list of *4: #8 #9
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+Final:
+    chasing list of *3: #8 #9
+    chasing list of *4: #8 #9
+    chased list of *8: *3 *4
+    chased list of *9: *3 *4
+
+
+
+WayOrdersList {
+deque<WayOrder> orders;
+deque<Fleet *> chasing;
+bool repeat
+}
+
+
+parse orders for waypoint settings:
+Gather into a list by player fleet#
+if chasing a fleet
+    tell the fleet it has a chasing fleet of player fleet#
+    order in order list has fleet* list of chased fleets
+
+parse orders random by player, sequential for each player
+split/merge:
+    copy orders and chased list to brand new fleet (merge to existing keeps it's own list)
+        all members in chased list of new fleet add a new chasing fleet#
+    update list of where you came from (only needed if you have a chasing fleet on your tail)
+    chasing list added to chasing list of new fleet
+    all members in chasing list updated about split/merge (new fleet*) -- search orders list, if not there, find actual fleet
+orders applied:
+    orders from list added to fleet in order
+    chased list in order becomes chased list in fleet
+    remove orders from list
+fleet deleted:
+    orders deleted
+    every fleet in chased list told it is no longer being chased by this fleet
+    every fleet in chasing list told it no longer needs to chase this fleet
+
+chasing list of a *fleet is by #fleet -- hmm, should be *fleet or *order
+chased list of a #fleet order is by *fleet
+chased list of a *fleet is by *fleet
+
+
+</Split Fleet Stuff>
+
+
+
+
+When you get a report on a planet, what things can you see?
+For example: IT gate scanning shows planet stats and base stats.
+having a ship die in orbit shows who's orbiting, and the base?
+Having a ship in orbit with no scanner shows the same thing?
+How about PP packet impact scanning?
+
+Orca:
+gatescan shows mineral concentrations, hab, player that owns the planet, approximate population, starbase class (starbase, dock, etc.).  No ships, no starbase design info.
+battle, no scanner, you get ship information, player possession information, no pop, no min cons, no hab
+Chucking a packet that doesn't get a chance to penscan (say, a normal race, or a PP attacking a REALLY close target) doesn't give any scan information whatsoever
+Bombing gives information as if you had a scanner over the world (fleets etc. due to ship in orbit, population, race, min cons, hab and defenses)
+oh yeah - and all instances previously of pop/min cons/hab should include defenses as well...
+
+3 more scanning questions:
+What does PP packet impacting a base with a driver give? - nothing
+Battle with third party only, what do you see, specificly, do you see a base?
+Does a ship with no scanner show possession info and/or presence of base? - yes
+
+
+
+Battles:
+Shoot according to attractivness, one missile at a time, however, shields vs missile 2x damage count for the whole slot.
+  Shield damage for misses should happen at end of slot or as each is calculated?
+For movement: calculate damage it can take, and damage to Res+Bora it can do, assume all missiles will hit. divide damage
+              done by 2 for secondary targets. Then use strategy to combine the numbers to get a weight for various squares.
+              If ship is armed and not in range, move towards ship with highest attractivness, could consider going after
+              another stack if the currently most attractive stack is already being chased.
+              For ratios, it probably makes sense to calculate damage taken as a percent, and add 5-10% so that 0 or
+              trivial damage doesn't mess things up.

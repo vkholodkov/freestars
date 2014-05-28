@@ -1,0 +1,42 @@
+2005-06-09 LEit
+----------
+* Remove PERCENT100, changed lots of longs to doubles
+* Added random IDs to Minefields, Packets, Salvage (needed also for wormholes and MTs, and maybe other things)
+* Added top level to all data files, to comply with .xml standards
+* Fixed a few bugs discovered in the process
+
+2005-03-15 Grant Speelmna
+----------
+* Move DoBombing from Player class to Galaxy Class
+* Fix up some stuff in Bombing Class
+
+2005-03-13 Grant Speelman
+----------
+* Completed most of Bombing
+
+
+2005-02-10 Grant Speelman
+----------
+* Added Bombing Class (Bombing.cpp and Bombing.h)
+
+
+2005-02-10 Grant Speelman
+----------
+* Fix bug in Fleet ParseNode method
+
+
+2005-02-09 Grant Speelman
+----------
+* Added ToString methods to Message Classes for debuging
+* Fix a Lot of Game Messages Warnings and Errors
+
+
+2005-01-26	Grant Speelman
+----------
+* Wraped pragma statements in #ifdef WIN32
+* Cleaned up alot of gcc warnings
+
+
+2005-01-21	Grant Speelman
+-----------
+* Added GNU Build System for linux

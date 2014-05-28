@@ -1,0 +1,60 @@
+This is also basicaly the order in which the events should occur
+Completion is only a very Rough Estimate
+
+Task																					Completion
+------------------------------------------------------------------------------------------
+Loading Host																			80%
+	Load Rules																			80%
+	Load XY																				80%
+	Load Host File																		80%
+Load Turn Files																			80%
+Process Turns	
+	Scrapping Fleets
+	Waypoint 0 tasks
+		load tasks
+		unload tasks
+		Colonization/Ground Combat
+	MT moves
+	Packets
+		move and decay
+		PP packets (de)terraform
+		Packets cause damage
+			uninhabited Planets
+	Wormhole entry points jiggle
+	Fleets 
+		move and use fuel
+		hit minefields
+		stargate travel
+		wormhole travel
+	Inner Strength colonists grow
+		excess overflows onto planet
+	Mass Packets still in space decay
+	Salvage decay																		95%
+	Wormhole exit points jiggle 
+	Wormhole endpoints degrade/jump 
+	SD Minefields detonate
+	Mining 																				95%
+	Production	and Research															95%
+		packet launch																	50%
+	SS Spy bonus obtained 
+	Population grows/dies
+	Packets that just launched
+		move
+		reach their destination cause damage
+	Random events
+	Fleet battles
+		 possible tech gain
+	Meet MT
+	Bombing																				66%
+		uninhabited Planets
+	Waypoint 1 tasks
+		load tasks
+		unload tasks
+		Colonization/Ground Combat
+	Mine Laying
+	Fleet Transfer
+	CA Instaforming
+	Minefield Decay
+	Mine sweeping
+	Starbase and fleet repair 
+	Remote Terraforming

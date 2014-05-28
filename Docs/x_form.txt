@@ -1,0 +1,102 @@
+gamename.x#- Submitted turn file. Contains the list of all commands the player gave in his turn. 
+This is the file the player sends to the host each turn. 
+
+This is to help to get and idea of how the general tree of how the x# file looks like
+*     - means for 0 or more
+!     - means for 1 or more
+?     - means for optional
+<>    - means its a attribute
+
+MetaInfo
+	FileVersion
+	FreeStarsVersion
+TurnFile
+	PlayerNo
+	Turn
+	ResearchTax
+	ResearchField
+	ResearchNext
+	BattlePlan*
+		Number
+		Name
+		PrimaryTarget
+		SecondaryTarget
+		Tactic
+		AttackWho
+	Relations
+		Race* <Number>
+	ProductionQueue*
+		Planet
+		Ship*
+			Design
+			Number
+			Partial?
+				Resources
+				Mineral* <Name>
+		Base*
+			Design
+			Partial?
+				Resources
+				Mineral* <Name>
+		Factories*
+			Number
+			Partial?
+				Resources
+				Mineral* <Name>
+		Mines*
+			Number
+			Partial?
+				Resources
+				Mineral* <Name>
+		Defenses*
+			Number
+			Partial?
+				Resources
+				Mineral* <Name>
+		Alchemy
+			Number
+			Partial?
+				Resources
+				Mineral* <Name>
+		Scanner
+			Partial?
+				Resources
+				Mineral* <Name>
+		Packet
+			Type
+			Number
+			Partial?
+				Resources
+				Mineral* <Name>
+		Terraform
+			Type
+			Partial?
+				Resources
+				Mineral* <Name>
+		AutoMine
+		AutoFactory
+		AutoDefense
+		AutoAlchemy
+		AutoMinTerra
+		AutoMaxTerra
+		AutoPacket
+	SetPayTax
+		Planet
+		PayTax
+	PacketDestination
+	PacketSpeed
+	RouteDestination
+	SplitMerge
+		FromFleet
+		ToFleet
+		Ship*
+			Design
+			Number
+			Damaged
+	Waypoints*
+		Fleet
+		Repeat
+		Waypoint*
+			Planet
+			Speed
+			Order

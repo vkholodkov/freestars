@@ -1,0 +1,14 @@
+Battles:
+Movement cycles need to be done
+All of battles should be looked at again
+
+Sort galaxy?
+
+Major things:
+Move chaser cycles (a is going after b, b after c, c after a)
+Battles
+Picking which fleet to follow if the chasee splits
+TODO parts of Game.cpp
+Wayorder clearing: when and what to clear
+
+followers to SpaceObject, deque<Fleet *> for now, maybe SpaceObject

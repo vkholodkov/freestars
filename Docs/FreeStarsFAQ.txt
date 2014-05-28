@@ -1,0 +1,106 @@
+Last updated 5/29/2004
+
+ - What is FreeStars?
+
+FreeStars is a project to write a clone of Stars! The first goal is to make it a fairly close copy (to the game play at least, look and feel is not as important).
+
+
+ - What are the design goals?
+
+We want a fairly close copy to the game play. The first version we don't want to make many changes to because the balance of Stars! is very good and we don't want to break that. However, we intend to make some (most) of the rules easily modifiable. Also we intend to fix any obvious bugs. There are some 'bugs' that we don't consider bugs, like chaff.
+
+There will be (at least) two executables. One for the player (client) to input their orders and display results. And one that is the host program (server) that will process turns and generate results. The server will not trust the client, so all orders in the .x file will be checked for validity. We are using XML for the turn files and rule sets to facilitate other clients being written; eventually an encryption module, compression, and some form of rule set verification will be added for turn security.
+
+The server will not care what generates the .x files, so if some one wants to write a new client program, or a pre/post processor it should be possible, as long as we can publish the encryption algorithm. The server will therefore not send any messages in text format ("Fleet #3 was scrapped at"...) instead it will send a number and the client will have to display the text - this allows different language clients to play the same game.
+
+We will not be writing an AI initially. However, you could conceivably write an automated turn processor. As long as it reads the .m files and generates a valid .x file, the server won't care where it comes from.
+
+
+ - Do you have support from Mare Crisium?
+
+No. We are not getting anything from them. We would welcome it if offered however.
+
+
+ - Isn't this illegal?
+
+I don't think so, as long as we don't make any money from it. However, I'm not a lawyer. If we become convinced it is illegal or will cost us to defend it, we'll probably drop the project. 
+
+
+ - I've got some nifty ideas for improvements, where do I submit them?
+
+Right now, we've got more then enough to do. We hope to make the final version easily modifiable without a new exe for each version, so save your ideas.
+
+
+ - There is something that desperately needs fixing, who do I tell.
+
+If it's a bug, submit it to 'Known Bugs' under 'The Academy'. If it's a limit (like fleet limited to 512), we intend to keep the limits because they affect game balance (imagine an SD sending a few thousand MMLs into your space). If it's a feature you desperately want, see the previous question.
+
+
+ - Who is currently working on FreeStars?
+
+* Omnivore kicked off the project and worked on the initial design.  He's been gone for awhile though.
+* LEit is the head of the project and is working on the server.
+* Sotek is assisting LEit with the server.
+* Summoner has done some work on the server, mainly with movement and mines.
+
+* Mithandir started on a client, but that appears to have fallen by the wayside.
+* nash is working on a client. http://www.nash.id.au/Software/FreeStars/
+* TomT64 is working on the client GStars. http://sourceforge.net/projects/gstars/ 
+
+* Edorfaus assists with general support.
+* Orca is working on analysis/design, file formats and administers the Sourceforge project.
+* OWK is working on analysis/design and file formats.
+
+
+ - Who is in charge?
+
+Onmi is normally in charge, however he's been absent from IRC for a while, and I (LEit) have taken it over.
+
+
+ - What progress has been made?
+
+* Omnivore had some design done, but not all. Lack of a full design hasn't stopped people from coding, however, which might be a bad idea.
+* Mithandir has the menus for the client.
+* nash's client displays stars and minerals.
+* TomT64's client displays stars and has some of the menus and dialogs done.
+* LEit has some code finished, although big parts are missing (battles...)
+* Sotek has some code finished.
+* Summoner has some code finished.
+
+
+ - What programming languages are you using?
+
+The server is being written in C++ (because LEit knows that best).
+There are clients being written in C++, Delphi, and Englightenment
+
+
+- What Operating System are you coding for?
+
+Currently Windows. However the server is being written in pretty generic C++ so it should be fairly easy to port to other systems. The client code might be a bit harder to port, however, as long as the client can read and write the correct file formats, a new client could be written in any language on any OS.  GStars currently compiles under both Windows and Linux.
+
+
+ - When will it be ready for beta testing?
+
+A long time from now, if ever. This is a volunteer effort, and as such people may drop it and move on, so there is no way to estimate when it will be done with any accuracy. Also it is possible that everyone will stop working on it.
+
+
+ - I'd like to help, but I'm not a programmer.
+
+We have several things that need to be tested as we write the code, so we do need people to testbed Stars! to figure out some of the fine points of the rules. There will be a separate thread for that.
+
+
+ - I'd like to help, and I am willing to write code.
+
+Great! We need help. join the #FreeStars channel on IRC and ask around.
+
+
+ - How do I connect to IRC?
+
+To get to our IRC channel, use your favorite IRC client and connect to a server in the StarLink.Org group(e.g. Phoenix.AZ.US.StarLink.Org), and /join #FreeStars. If you don't know what IRC is or how to use it, go to http://www.mirc.com/irc.html and start reading; or find some other intro-to-IRC page. There are quite a few of them on the web, seeing as IRC is a quite popular medium.
+
+Note that several of us are connected to IRC 24/7, however we cannot be at the computer for that time, so we might not be talking, or even present, when you join us. Try saying hi or similar, and we might respond; if no one responds, try again later.
+
+
+ - I'd like to help with financial support.
+
+Wow! While we appreciate your generosity and would like to take your money off your hands, this is a volunteer effort, and besides, if we make money from it, it might become illegal. We suggest that you support AutoHost or Starlink.org (the IRC servers we use).

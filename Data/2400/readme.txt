@@ -1,0 +1,2 @@
+The files in this directory are what get generated from running the Server with TestGame.def as input.
+If any changes are done to the code or the files, then the Server should be rerun with TestGame.def, and the results compared to this directory. If all changes are fine, then check in new versions of these files.

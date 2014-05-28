@@ -1,0 +1,1091 @@
+<?xml version="1.0" ?>
+<GraphicsFile>
+	<ComponentPictures>
+		<ComponentPicture>
+			<Component>Settler's Delight</Component>
+			<FileName>graphics/Engine/Settler's_Delight.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Quick Jump 5</Component>
+			<FileName>graphics/Engine/Quick_Jump_5.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Fuel Mizer</Component>
+			<FileName>graphics/Engine/Fuel_Mizer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Long Hump 6</Component>
+			<FileName>graphics/Engine/Long_Hump_6.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Daddy Long Legs 7</Component>
+			<FileName>graphics/Engine/Daddy_Long_Legs_7.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Alpha Drive 8</Component>
+			<FileName>graphics/Engine/Alpha_Drive_8.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Trans-Galactic Drive</Component>
+			<FileName>graphics/Engine/Trans-Galactic_Drive.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Interspace-10</Component>
+			<FileName>graphics/Engine/Interspace-10.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Enigma Pulsar</Component>
+			<FileName>graphics/Engine/Enigma_Pulsar.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Trans-Star 10</Component>
+			<FileName>graphics/Engine/Trans-Star_10.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Radiating Hydro-Ram Scoop</Component>
+			<FileName>graphics/Engine/Radiating_Hydro-Ram_Scoop.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Sub-Galactic Fuel Scoop</Component>
+			<FileName>graphics/Engine/Sub-Galactic_Fuel_Scoop.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Trans-Galactic Fuel Scoop</Component>
+			<FileName>graphics/Engine/Trans-Galactic_Fuel_Scoop.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Trans-Galactic Super Scoop</Component>
+			<FileName>graphics/Engine/Trans-Galactic_Super_Scoop.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Trans-Galactic Mizer Scoop</Component>
+			<FileName>graphics/Engine/Trans-Galactic_Mizer_Scoop.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Galaxy Scoop</Component>
+			<FileName>graphics/Engine/Galaxy_Scoop.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Bat Scanner</Component>
+			<FileName>graphics/Scanner/Bat_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Rhino Scanner</Component>
+			<FileName>graphics/Scanner/Rhino_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mole Scanner</Component>
+			<FileName>graphics/Scanner/Mole_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>DNA Scanner</Component>
+			<FileName>graphics/Scanner/DNA_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Possum Scanner</Component>
+			<FileName>graphics/Scanner/Possum_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Pick Pocket Scanner</Component>
+			<FileName>graphics/Scanner/Pick_Pocket_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Chameleon Scanner</Component>
+			<FileName>graphics/Scanner/Chameleon_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ferret Scanner</Component>
+			<FileName>graphics/Scanner/Ferret_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Dolphin Scanner</Component>
+			<FileName>graphics/Scanner/Dolphin_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gazelle Scanner</Component>
+			<FileName>graphics/Scanner/Gazelle_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>RNA Scanner</Component>
+			<FileName>graphics/Scanner/RNA_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Cheetah Scanner</Component>
+			<FileName>graphics/Scanner/Cheetah_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Elephant Scanner</Component>
+			<FileName>graphics/Scanner/Elephant_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Eagle Eye Scanner</Component>
+			<FileName>graphics/Scanner/Eagle_Eye_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robber Baron Scanner</Component>
+			<FileName>graphics/Scanner/Robber_Baron_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Peerless Scanner</Component>
+			<FileName>graphics/Scanner/Peerless_Scanner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Tritanium</Component>
+			<FileName>graphics/Armor/Tritanium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Crobmnium</Component>
+			<FileName>graphics/Armor/Crobmnium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Carbonic Armor</Component>
+			<FileName>graphics/Armor/Carbonic_Armor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Strobnium</Component>
+			<FileName>graphics/Armor/Strobnium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Organic Armor</Component>
+			<FileName>graphics/Armor/Organic_Armor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Kelarium</Component>
+			<FileName>graphics/Armor/Kelarium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Fielded Kelarium</Component>
+			<FileName>graphics/Armor/Fielded_Kelarium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Depleted Neutronium</Component>
+			<FileName>graphics/Armor/Depleted_Neutronium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Neutronium</Component>
+			<FileName>graphics/Armor/Neutronium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mega Poly Shell</Component>
+			<FileName>graphics/Armor/Mega_Poly_Shell.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Valanium</Component>
+			<FileName>graphics/Armor/Valanium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Superlatanium</Component>
+			<FileName>graphics/Armor/Superlatanium.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Laser</Component>
+			<FileName>graphics/Beam/Laser.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>X-Ray Laser</Component>
+			<FileName>graphics/Beam/X-Ray_Laser.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini Gun</Component>
+			<FileName>graphics/Beam/Mini_Gun.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Yakimora Light Phaser</Component>
+			<FileName>graphics/Beam/Yakimora_Light_Phaser.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Blackjack</Component>
+			<FileName>graphics/Beam/Blackjack.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Phaser Bazooka</Component>
+			<FileName>graphics/Beam/Phaser_Bazooka.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Pulsed Sapper</Component>
+			<FileName>graphics/Beam/Pulsed_Sapper.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Colloidal Phaser</Component>
+			<FileName>graphics/Beam/Collodial_Phaser.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gatling Gun</Component>
+			<FileName>graphics/Beam/Gatling_Gun.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini Blaster</Component>
+			<FileName>graphics/Beam/Mini_Blaster.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Bludgeon</Component>
+			<FileName>graphics/Beam/Bludgeon.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mark IV Blaster</Component>
+			<FileName>graphics/Beam/Mark_IV_Blaster.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Phased Sapper</Component>
+			<FileName>graphics/Beam/Phased_Sapper.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Heavy Blaster</Component>
+			<FileName>graphics/Beam/Heavy_Blaster.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gatling Neutrino Cannon</Component>
+			<FileName>graphics/Beam/Gatling_Neutrino_Cannon.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Myopic Disruptor</Component>
+			<FileName>graphics/Beam/Myopic_Disruptor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Blunderbuss</Component>
+			<FileName>graphics/Beam/Blunderbuss.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Disruptor</Component>
+			<FileName>graphics/Beam/Disruptor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Multi Contained Munition</Component>
+			<FileName>graphics/Beam/Multi_Contained_Munition.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Syncro Sapper</Component>
+			<FileName>graphics/Beam/Syncro_Sapper.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mega Disruptor</Component>
+			<FileName>graphics/Beam/Mega_Disruptor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Big Mutha Cannon</Component>
+			<FileName>graphics/Beam/Big_Mutha_Cannon.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Streaming Pulverizer</Component>
+			<FileName>graphics/Beam/Streaming_Pulverizer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Anti-Matter Pulverizer</Component>
+			<FileName>graphics/Beam/Anti-Matter_Pulverizer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Lady Finger Bomb</Component>
+			<FileName>graphics/Bomb/Lady_Finger_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Black Cat Bomb</Component>
+			<FileName>graphics/Bomb/Black_Cat_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>M-70 Bomb</Component>
+			<FileName>graphics/Bomb/M-70_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>M-80 Bomb</Component>
+			<FileName>graphics/Bomb/M-80_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Cherry Bomb</Component>
+			<FileName>graphics/Bomb/Cherry_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>LBU-17 Bomb</Component>
+			<FileName>graphics/Bomb/LBU-17_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>LBU-32 Bomb</Component>
+			<FileName>graphics/Bomb/LBU-32_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>LBU-74 Bomb</Component>
+			<FileName>graphics/Bomb/LBU-74_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Hush-a-Boom</Component>
+			<FileName>graphics/Bomb/Hush-a-Boom.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Retro Bomb</Component>
+			<FileName>graphics/Bomb/Retro_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Smart Bomb</Component>
+			<FileName>graphics/Bomb/Smart_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Neutron Bomb</Component>
+			<FileName>graphics/Bomb/Neutron_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Enriched Neutron Bomb</Component>
+			<FileName>graphics/Bomb/Enriched_Neutron_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Peerless Bomb</Component>
+			<FileName>graphics/Bomb/Peerless_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Annihilator Bomb</Component>
+			<FileName>graphics/Bomb/Annihilator_Bomb.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Transport Cloaking</Component>
+			<FileName>graphics/Electrical/Transport_Cloak.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stealth Cloak</Component>
+			<FileName>graphics/Electrical/Stealth_Cloak.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super-Stealth Cloak</Component>
+			<FileName>graphics/Electrical/Super-Stealth_Cloak.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra-Stealth Cloak</Component>
+			<FileName>graphics/Electrical/Ultra-Stealth_Cloak.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Multi Function Pod</Component>
+			<FileName>graphics/Electrical/Multi_Function_Pod.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Battle Computer</Component>
+			<FileName>graphics/Electrical/Battle_Computer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Battle Super Computer</Component>
+			<FileName>graphics/Electrical/Battle_Super_Computer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Battle Nexus</Component>
+			<FileName>graphics/Electrical/Battle_Nexus.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Jammer 10</Component>
+			<FileName>graphics/Electrical/Jammer_10.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Jammer 20</Component>
+			<FileName>graphics/Electrical/Jammer_20.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Jammer 30</Component>
+			<FileName>graphics/Electrical/Jammer_30.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Jammer 50</Component>
+			<FileName>graphics/Electrical/Jammer_50.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Energy Capacitor</Component>
+			<FileName>graphics/Electrical/Energy_Capacitor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Flux Capacitor</Component>
+			<FileName>graphics/Electrical/Flux_Capacitor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Energy Dampener</Component>
+			<FileName>graphics/Electrical/Energy_Dampener.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Tachyon Detector</Component>
+			<FileName>graphics/Electrical/Tachyon_Detector.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Anti-Matter Generator</Component>
+			<FileName>graphics/Electrical/Anti-Matter_Generator.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Colonization Module</Component>
+			<FileName>graphics/Mechanical/Colonization_Module.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Orbital Construction Module</Component>
+			<FileName>graphics/Mechanical/Orbital_Construction_Module.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Cargo Pod</Component>
+			<FileName>graphics/Mechanical/Cargo_Pod.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super Cargo Pod</Component>
+			<FileName>graphics/Mechanical/Super_Cargo_Pod.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Multi Cargo Pod</Component>
+			<FileName>graphics/Mechanical/Multi_Cargo_Pod.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Fuel Tank</Component>
+			<FileName>graphics/Mechanical/Fuel_Tank.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super Fuel Tank</Component>
+			<FileName>graphics/Mechanical/Super_Fuel_Tank.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Maneuvering Jet</Component>
+			<FileName>graphics/Mechanical/Maneuvering_Jet.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Overthruster</Component>
+			<FileName>graphics/Mechanical/Overthruster.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Jump Gate</Component>
+			<FileName>graphics/Mechanical/Jump_Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Beam Deflector</Component>
+			<FileName>graphics/Mechanical/Beam_Deflector.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mine Dispenser 40</Component>
+			<FileName>graphics/Mine_Layer/Standard.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mine Dispenser 50</Component>
+			<FileName>graphics/Mine_Layer/Standard.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mine Dispenser 80</Component>
+			<FileName>graphics/Mine_Layer/Standard.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mine Dispenser 130</Component>
+			<FileName>graphics/Mine_Layer/Standard.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Heavy Dispenser 50</Component>
+			<FileName>graphics/Mine_Layer/Heavy.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Heavy Dispenser 110</Component>
+			<FileName>graphics/Mine_Layer/Heavy.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Heavy Dispenser 200</Component>
+			<FileName>graphics/Mine_Layer/Heavy.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Speed Trap 20</Component>
+			<FileName>graphics/Mine_Layer/Speed_Trap.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Speed Trap 30</Component>
+			<FileName>graphics/Mine_Layer/Speed_Trap.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Speed Trap 50</Component>
+			<FileName>graphics/Mine_Layer/Speed_Trap.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robo-Midget Miner</Component>
+			<FileName>graphics/Mining_Robot/Robo-Midget_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robo-Mini Miner</Component>
+			<FileName>graphics/Mining_Robot/Robo-Mini_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robo Miner</Component>
+			<FileName>graphics/Mining_Robot/Robo-Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robo-Maxi Miner</Component>
+			<FileName>graphics/Mining_Robot/Robo-Maxi_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robo-Super Miner</Component>
+			<FileName>graphics/Mining_Robot/Robo-Super_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Robo-Ultra Miner</Component>
+			<FileName>graphics/Mining_Robot/Robo-Ultra_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Alien Miner</Component>
+			<FileName>graphics/Mining_Robot/Alien_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Orbital Adjuster</Component>
+			<FileName>graphics/Mining_Robot/Orbital_Adjuster.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate 100/250</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate any/300</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate 150/600</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate 300/500</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate 100/any</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate any/800</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stargate any/any</Component>
+			<FileName>graphics/Gate/Gate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mass Driver 5</Component>
+			<FileName>graphics/Mass_Driver/Mass.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mass Driver 6</Component>
+			<FileName>graphics/Mass_Driver/Mass.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mass Driver 7</Component>
+			<FileName>graphics/Mass_Driver/Mass.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super Driver 8</Component>
+			<FileName>graphics/Mass_Driver/Mass.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super Driver 9</Component>
+			<FileName>graphics/Mass_Driver/Mass.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra Driver 10</Component>
+			<FileName>graphics/Mass_Driver/Ultra.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra Driver 11</Component>
+			<FileName>graphics/Mass_Driver/Ultra.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra Driver 12</Component>
+			<FileName>graphics/Mass_Driver/Ultra.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra Driver 13</Component>
+			<FileName>graphics/Mass_Driver/Ultra.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Viewer 50</Component>
+			<FileName>graphics/Planetary_Scanner/Viewer_50.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Viewer 90</Component>
+			<FileName>graphics/Planetary_Scanner/Viewer_90.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Scoper 150</Component>
+			<FileName>graphics/Planetary_Scanner/Scoper_150.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Scoper 220</Component>
+			<FileName>graphics/Planetary_Scanner/Scoper_220.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Scoper 280</Component>
+			<FileName>graphics/Planetary_Scanner/Scoper_280.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Snooper 320X</Component>
+			<FileName>graphics/Planetary_Scanner/Snooper_320X.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Snooper 400X</Component>
+			<FileName>graphics/Planetary_Scanner/Snooper_400X.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Snooper 500X</Component>
+			<FileName>graphics/Planetary_Scanner/Snooper_500X.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Snooper 620X</Component>
+			<FileName>graphics/Planetary_Scanner/Snooper_620X.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>SDI</Component>
+			<FileName>graphics/Defense/SDI.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Missile Battery</Component>
+			<FileName>graphics/Defense/Missile_Battery.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Laser Battery</Component>
+			<FileName>graphics/Defense/Laser_Battery.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Planetary Shield</Component>
+			<FileName>graphics/Defense/Planetary_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Neutron Shield</Component>
+			<FileName>graphics/Defense/Neutron_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Genesis Device</Component>
+			<FileName>graphics/Planetary/Genesis_Device.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mole-skin Shield</Component>
+			<FileName>graphics/Shield/Mole-skin_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Cow-hide Shield</Component>
+			<FileName>graphics/Shield/Cow-hide_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Wolverine Diffuse Shield</Component>
+			<FileName>graphics/Shield/Wolverine_Diffuse_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Croby Sharmor</Component>
+			<FileName>graphics/Shield/Croby_Sharmor.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Shadow Shield</Component>
+			<FileName>graphics/Shield/Shadow_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Bear Neutrino Barrier</Component>
+			<FileName>graphics/Shield/Bear_Neutrino_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Langston Shell</Component>
+			<FileName>graphics/Shield/Langston_Shell.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gorilla Delagator</Component>
+			<FileName>graphics/Shield/Gorilla_Delagator.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Elephant Hide Fortress</Component>
+			<FileName>graphics/Shield/Elephant_Hide_Fortress.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Complete Phase Shield</Component>
+			<FileName>graphics/Shield/Complete_Phase_Shield.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Small Freighter</Component>
+			<FileName>graphics/Ship/Small_Freighter.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Medium Freighter</Component>
+			<FileName>graphics/Ship/Medium_Freighter.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Large Freighter</Component>
+			<FileName>graphics/Ship/Large_Freighter.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super Freighter</Component>
+			<FileName>graphics/Ship/Super_Freighter.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Scout</Component>
+			<FileName>graphics/Ship/Scout.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Frigate</Component>
+			<FileName>graphics/Ship/Frigate.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Destroyer</Component>
+			<FileName>graphics/Ship/Destroyer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Cruiser</Component>
+			<FileName>graphics/Ship/Cruiser.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Battle Cruiser</Component>
+			<FileName>graphics/Ship/Battle_Cruiser.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Battleship</Component>
+			<FileName>graphics/Ship/Battleship.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Dreadnought</Component>
+			<FileName>graphics/Ship/Dreadnought.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Privateer</Component>
+			<FileName>graphics/Ship/Privateer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Rogue</Component>
+			<FileName>graphics/Ship/Rogue.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Galleon</Component>
+			<FileName>graphics/Ship/Galleon.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini-Colony Ship</Component>
+			<FileName>graphics/Ship/Mini-Colony_Ship.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Colony Ship</Component>
+			<FileName>graphics/Ship/Colony_Ship.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini Bomber</Component>
+			<FileName>graphics/Ship/Mini_Bomber.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>B-17 Bomber</Component>
+			<FileName>graphics/Ship/B-17_Bomber.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Stealth Bomber</Component>
+			<FileName>graphics/Ship/Stealth_Bomber.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>B-52 Bomber</Component>
+			<FileName>graphics/Ship/B-52_Bomber.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Midget Miner</Component>
+			<FileName>graphics/Ship/Midget_Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini-Miner</Component>
+			<FileName>graphics/Ship/Mini-Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Miner</Component>
+			<FileName>graphics/Ship/Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Maxi-Miner</Component>
+			<FileName>graphics/Ship/Maxi-Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra-Miner</Component>
+			<FileName>graphics/Ship/Ultra-Miner.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Fuel Transport</Component>
+			<FileName>graphics/Ship/Fuel_Transport.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super-Fuel Xport</Component>
+			<FileName>graphics/Ship/Super-Fuel_Transport.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini Mine Layer</Component>
+			<FileName>graphics/Ship/Mini_Mine_Layer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Super Mine Layer</Component>
+			<FileName>graphics/Ship/Super_Mine_Layer.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Nubian</Component>
+			<FileName>graphics/Ship/Nubian.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Mini Morph</Component>
+			<FileName>graphics/Ship/Mini_Morph.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Meta Morph</Component>
+			<FileName>graphics/Ship/Meta_Morph.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Orbital Fort</Component>
+			<FileName>graphics/Base/Orbital_Fort.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Space Dock</Component>
+			<FileName>graphics/Base/Space_Dock.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Space Station</Component>
+			<FileName>graphics/Base/Space_Station.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Ultra Station</Component>
+			<FileName>graphics/Base/Ultra_Station.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Death Star</Component>
+			<FileName>graphics/Base/Death_Star.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-3</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-5</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-7</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-10</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-15</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-20</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-25</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Total Terraform +/-30</Component>
+			<FileName>graphics/Terraforming/Total.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gravity Terraform +/-3</Component>
+			<FileName>graphics/Terraforming/Gravity.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gravity Terraform +/-7</Component>
+			<FileName>graphics/Terraforming/Gravity.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gravity Terraform +/-11</Component>
+			<FileName>graphics/Terraforming/Gravity.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Gravity Terraform +/-15</Component>
+			<FileName>graphics/Terraforming/Gravity.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Temp Terraform +/-3</Component>
+			<FileName>graphics/Terraforming/Temperature.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Temp Terraform +/-7</Component>
+			<FileName>graphics/Terraforming/Temperature.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Temp Terraform +/-11</Component>
+			<FileName>graphics/Terraforming/Temperature.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Temp Terraform +/-15</Component>
+			<FileName>graphics/Terraforming/Temperature.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Radiation Terraform +/-3</Component>
+			<FileName>graphics/Terraforming/Radiation.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Radiation Terraform +/-7</Component>
+			<FileName>graphics/Terraforming/Radiation.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Radiation Terraform +/-11</Component>
+			<FileName>graphics/Terraforming/Radiation.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Radiation Terraform +/-15</Component>
+			<FileName>graphics/Terraforming/Radiation.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Alpha Torpedo</Component>
+			<FileName>graphics/Torpedo/Alpha_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Beta Torpedo</Component>
+			<FileName>graphics/Torpedo/Beta_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Delta Torpedo</Component>
+			<FileName>graphics/Torpedo/Delta_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Epsilon Torpedo</Component>
+			<FileName>graphics/Torpedo/Epsilon_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Rho Torpedo</Component>
+			<FileName>graphics/Torpedo/Rho_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Upsilon Torpedo</Component>
+			<FileName>graphics/Torpedo/Upsilon_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Omega Torpedo</Component>
+			<FileName>graphics/Torpedo/Omega_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Anti Matter Torpedo</Component>
+			<FileName>graphics/Torpedo/Anti_Matter_Torpedo.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Jihad Missile</Component>
+			<FileName>graphics/Torpedo/Jihad_Missile.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Juggernaut Missile</Component>
+			<FileName>graphics/Torpedo/Juggernaut_Missile.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Doomsday Missile</Component>
+			<FileName>graphics/Torpedo/Doomsday_Missile.png</FileName>
+		</ComponentPicture>
+		<ComponentPicture>
+			<Component>Armageddon Missile</Component>
+			<FileName>graphics/Torpedo/Armageddon_Missile.png</FileName>
+		</ComponentPicture>
+	</ComponentPictures>
+	<RaceEmblemes>
+		<RaceEmbleme>
+			<ID>0</ID>
+			<FileNameBig>graphics/Race/00.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>1</ID>
+			<FileNameBig>graphics/Race/01.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>2</ID>
+			<FileNameBig>graphics/Race/02.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>3</ID>
+			<FileNameBig>graphics/Race/03.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>4</ID>
+			<FileNameBig>graphics/Race/04.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>5</ID>
+			<FileNameBig>graphics/Race/05.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>6</ID>
+			<FileNameBig>graphics/Race/06.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>7</ID>
+			<FileNameBig>graphics/Race/07.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>8</ID>
+			<FileNameBig>graphics/Race/08.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>9</ID>
+			<FileNameBig>graphics/Race/09.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>10</ID>
+			<FileNameBig>graphics/Race/10.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>11</ID>
+			<FileNameBig>graphics/Race/11.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>12</ID>
+			<FileNameBig>graphics/Race/12.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>13</ID>
+			<FileNameBig>graphics/Race/13.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>14</ID>
+			<FileNameBig>graphics/Race/14.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>15</ID>
+			<FileNameBig>graphics/Race/15.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>16</ID>
+			<FileNameBig>graphics/Race/16.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>17</ID>
+			<FileNameBig>graphics/Race/17.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>18</ID>
+			<FileNameBig>graphics/Race/18.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>19</ID>
+			<FileNameBig>graphics/Race/19.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>20</ID>
+			<FileNameBig>graphics/Race/20.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>21</ID>
+			<FileNameBig>graphics/Race/21.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>22</ID>
+			<FileNameBig>graphics/Race/22.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>23</ID>
+			<FileNameBig>graphics/Race/23.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>24</ID>
+			<FileNameBig>graphics/Race/24.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>25</ID>
+			<FileNameBig>graphics/Race/25.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>26</ID>
+			<FileNameBig>graphics/Race/26.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>27</ID>
+			<FileNameBig>graphics/Race/27.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>28</ID>
+			<FileNameBig>graphics/Race/28.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>29</ID>
+			<FileNameBig>graphics/Race/29.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>30</ID>
+			<FileNameBig>graphics/Race/30.jpg</FileNameBig>
+		</RaceEmbleme>
+		<RaceEmbleme>
+			<ID>31</ID>
+			<FileNameBig>graphics/Race/31.jpg</FileNameBig>
+		</RaceEmbleme>
+	</RaceEmblemes>
+</GraphicsFile>

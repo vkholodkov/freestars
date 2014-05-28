@@ -1,0 +1,193 @@
+<!-- root element -->
+<!ELEMENT RulesDefination (MetaInfo,Rules,RaceWizardRules,RacialTraits,Components)>
+
+<!-- /MetaInfo -->
+<!ELEMENT MetaInfo (RulesVersion,Name,FileVersion)>
+<!-- /MetaInfo/RulesVersion -->
+<!ELEMENT RulesVersion (#PCDATA)>
+<!-- /MetaInfo/Name -->
+<!ELEMENT Name (#PCDATA)>
+<!-- /MetaInfo/FileVersion -->
+<!ELEMENT FileVersion (#PCDATA)>
+
+<!-- /Rules -->
+<!--
+<!ELEMENT Rules (Constant*,Float*,FloatArray*,MineFieldType*,TechCost+,TechName+,MinName+,Array*,Habitat+,PacketTerraformMinerals)>
+
+-->
+<!ELEMENT Rules ANY>
+<!-- /Rules/Constant -->
+<!ELEMENT Constant (#PCDATA)>
+<!ATTLIST Constant
+  Name  CDATA  #REQUIRED
+>
+<!-- /Rules/Float -->
+<!ELEMENT Float (#PCDATA)>
+<!ATTLIST Float
+  Name  CDATA  #REQUIRED
+>
+<!-- /Rules/FloatArray -->
+<!ELEMENT FloatArray (Item*)>
+<!ATTLIST FloatArray
+  Name  CDATA  #REQUIRED
+  Start  CDATA #REQUIRED
+>
+<!-- /Rules/FloatArray/Item -->
+<!ELEMENT Item (#PCDATA)>
+<!-- /Rules/MineFieldType -->
+<!-- @@@ CanDetonate should be required and t/f!! bdragon -->
+<!ELEMENT MineFieldType (SafeSpeed,HitOdds,SweepDivisor,FleetDamage,RamFleetDamage,ShipDamage,RamShipDamage,CanDetonate?)>
+<!ATTLIST MineFieldType
+  Name  CDATA  #REQUIRED
+>
+<!-- /Rules/MineFieldType/SafeSpeed -->
+<!ELEMENT SafeSpeed (#PCDATA)>
+<!-- /Rules/MineFieldType/HitOdds -->
+<!ELEMENT HitOdds (#PCDATA)>
+<!-- /Rules/MineFieldType/SweepDivisor -->
+<!ELEMENT SweepDivisor (#PCDATA)>
+<!-- /Rules/MineFieldType/FleetDamage -->
+<!ELEMENT FleetDamage (#PCDATA)>
+<!-- /Rules/MineFieldType/RamFleetDamage -->
+<!ELEMENT RamFleetDamage (#PCDATA)>
+<!-- /Rules/MineFieldType/ShipDamage -->
+<!ELEMENT ShipDamage (#PCDATA)>
+<!-- /Rules/MineFieldType/RamShipDamage -->
+<!ELEMENT RamShipDamage (#PCDATA)>
+<!-- /Rules/MineFieldType/CanDetonate -->
+<!-- Possibly change to (true|false)? bdragon-->
+<!ELEMENT CanDetonate (#PCDATA)>
+<!-- /Rules/TechCost -->
+<!ELEMENT TechCost (#PCDATA)>
+<!ATTLIST TechCost
+  Level  CDATA  #REQUIRED
+>
+<!-- /Rules/TechName -->
+<!ELEMENT TechName (#PCDATA)>
+<!-- /Rules/MinName -->
+<!ELEMENT MinName (#PCDATA)>
+<!-- /Rules/Array -->
+<!-- <!ELEMENT Array (Item*)> -->
+<!ELEMENT Array ANY>
+<!ATTLIST Array
+  Name  CDATA  #REQUIRED
+  Start  CDATA  #REQUIRED
+>
+<!-- /Rules/Array/Item -->
+<!--<!ELEMENT Item (#PCDATA)> -->
+<!-- /Rules/Habitat -->
+<!-- @@@ Probabale bug here, shouldn't Name be an ATTRIBUTE? bdragon -->
+<!ELEMENT Habitat (Name,Array)>
+<!--<!ELEMENT Name (#PCDATA)> -->
+<!-- @@@ This should be looked at! There's got to be a better way to do this. bdragon -->
+<!-- /Rules/Habitat/Array -->
+<!-- 
+<!ELEMENT Array (TickOdds*)>
+<!ATTLIST Array
+  Name  CDATA  #REQUIRED
+  Start  CDATA  #REQUIRED
+>
+-->
+<!-- /Rules/Habitat/Array/TickOdds -->
+<!ELEMENT TickOdds (#PCDATA)>
+<!ATTLIST TickOdds
+  TickNumber  CDATA  #REQUIRED
+>
+<!-- /Rules/PacketTerraformMinerals -->
+<!ELEMENT PacketTerraformMinerals (Mineral*)>
+<!-- /Rules/PacketTerraformMinerals/Mineral -->
+<!ELEMENT Mineral (#PCDATA)>
+<!ATTLIST Mineral
+  Name  CDATA  #REQUIRED
+>
+
+
+<!-- /RaceWizardRules/ -->
+<!-- @@@ This whole section needs a good look-through... bdragon -->
+<!ELEMENT RaceWizardRules (Points,PRT_HE,PRT_SS,PRT_WM,PRT_CA,PRT_IS,PRT_SD,PRT_PP,PRT_IT,PRT_AR,PRT_JOAT,LRT_IFE,LRT_NAS,Combination,HabStuff,Constant*,PopEff,FactoryCosts,MineCosts,TechCosts)>
+<!-- /RaceWizardRules/Points -->
+<!ELEMENT Points (#PCDATA)>
+<!-- /RaceWizardRules/PRT_HE -->
+<!ELEMENT PRT_HE (#PCDATA)>
+<!-- /RaceWizardRules/PRT_SS -->
+<!ELEMENT PRT_SS (#PCDATA)>
+<!-- /RaceWizardRules/PRT_WM -->
+<!ELEMENT PRT_WM (#PCDATA)>
+<!-- /RaceWizardRules/PRT_CA -->
+<!ELEMENT PRT_CA (#PCDATA)>
+<!-- /RaceWizardRules/PRT_IS -->
+<!ELEMENT PRT_IS (#PCDATA)>
+<!-- /RaceWizardRules/PRT_SD -->
+<!ELEMENT PRT_SD (#PCDATA)>
+<!-- /RaceWizardRules/PRT_PP -->
+<!ELEMENT PRT_PP (#PCDATA)>
+<!-- /RaceWizardRules/PRT_IT -->
+<!ELEMENT PRT_IT (#PCDATA)>
+<!-- /RaceWizardRules/PRT_AR -->
+<!ELEMENT PRT_AR (#PCDATA)>
+<!-- /RaceWizardRules/PRT_JOAT -->
+<!ELEMENT PRT_JOAT (#PCDATA)>
+<!-- /RaceWizardRules/LRT_IFE -->
+<!ELEMENT LRT_IFE (#PCDATA)>
+<!-- /RaceWizardRules/PRT_NAS -->
+<!ELEMENT LRT_NAS (#PCDATA)>
+<!-- /RaceWizardRules/Combination -->
+<!ELEMENT Combination (#PCDATA)>
+<!-- /RaceWizardRules/HabStuff -->
+<!ELEMENT HabStuff EMPTY> <!-- @@@ -->
+<!-- /RaceWizardRules/Constant -->
+<!--
+<!ELEMENT Constant (#PCDATA)>
+<!ATTLIST Constant
+  Name  CDATA  #REQUIRED
+>
+-->
+<!-- /RaceWizardRules/PopEff -->
+<!ELEMENT PopEff (#PCDATA)>
+<!-- /RaceWizardRules/FactoryCosts -->
+<!ELEMENT FactoryCosts EMPTY> <!-- @@@ -->
+<!-- /RaceWizardRules/MineCosts -->
+<!ELEMENT MineCosts EMPTY> <!-- @@@ -->
+<!-- /RaceWizardRules/TechCosts -->
+<!ELEMENT TechCosts EMPTY> <!-- @@@ -->
+
+<!-- /RacialTraits -->
+<!ELEMENT RacialTraits (PrimaryRacialTrait*,LesserRacialTrait*)>
+<!-- /RacialTraits/PrimaryRacialTrait -->
+<!ELEMENT PrimaryRacialTrait (Name,GrowthRateFactor,PopulationFactor,StartingTech,ShipDesign*)>
+<!-- /RacialTraits/PrimaryRacialTrait/Name -->
+<!-- <!ELEMENT Name (#PCDATA)> -->
+<!-- /RacialTraits/PrimaryRacialTrait/GrowthRateFactor -->
+<!ELEMENT GrowthRateFactor (#PCDATA)>
+<!-- /RacialTraits/PrimaryRacialTrait/PopulationFactor -->
+<!ELEMENT PopulationFactor (#PCDATA)>
+<!-- /RacialTraits/PrimaryRacialTrait/StartingTech -->
+<!ELEMENT StartingTech (Tech*)>
+<!-- /RacialTraits/PrimaryRacialTrait/Tech -->
+<!ELEMENT Tech (#PCDATA)>
+<!ATTLIST Tech
+  Name  CDATA  #REQUIRED
+>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign -->
+<!ELEMENT ShipDesign (ShipCount,Hull,GraphicNumber,Name,Slot+)>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/ShipCount -->
+<!ELEMENT ShipCount (#PCDATA)>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/Hull -->
+<!ELEMENT Hull (#PCDATA)>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/GraphicNumber -->
+<!ELEMENT GraphicNumber (#PCDATA)>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/Name -->
+<!-- <!ELEMENT Name (#PCDATA)> -->
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/Slot -->
+<!ELEMENT Slot (Component?,Number?)>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/Slot/Component -->
+<!ELEMENT Component (#PCDATA)>
+<!-- /RacialTraits/PrimaryRacialTrait/ShipDesign/Slot/Number -->
+<!ELEMENT Number (#PCDATA)>
+<!-- /RacialTraits/LesserRacialTrait -->
+<!ELEMENT LesserRacialTrait ANY>
+
+
+
+
+
