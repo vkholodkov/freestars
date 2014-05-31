@@ -6,8 +6,8 @@ include_directories(
     ${FREESTARS_SOURCE_DIR}/Server
 )
 
-SET(freestars_SOURCES main.cpp mainwindow.cpp game_view.cpp folding_widget.cpp vertical_flow_layout.cpp message_formatter.cpp habitation_bar.cpp)
-SET(freestars_HEADERS mainwindow.h game_view.h folding_widget.h habitation_bar.h)
+SET(freestars_SOURCES main.cpp mainwindow.cpp game_view.cpp folding_widget.cpp vertical_flow_layout.cpp message_formatter.cpp habitation_bar.cpp mineral_report.cpp scale_widget.cpp)
+SET(freestars_HEADERS mainwindow.h game_view.h folding_widget.h habitation_bar.h mineral_report.h scale_widget.h)
 SET(freestars_FORMS planet_report.ui planet_production_widget.ui message_widget.ui fleets_in_orbit_widget.ui status_selector.ui)
 SET(freestars_RESOURCES application.qrc)
 

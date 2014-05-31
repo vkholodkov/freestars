@@ -252,6 +252,24 @@ void GameView::selectPlanet(const Planet *_planet) {
         player->HabWidth(2)));
 
     ui_PlanetReport.habitationBar->setRadValue(_planet->GetHabValue(2));
+
+    long ironium = _planet->GetContain(0);
+    long boranium = _planet->GetContain(1);
+    long germanium = _planet->GetContain(2);
+
+    ui_PlanetReport.mineralReport->setIronium(ironium);
+    ui_PlanetReport.mineralReport->setBoranium(boranium);
+    ui_PlanetReport.mineralReport->setGermanium(germanium);
+
+    ui_PlanetReport.ironiumOverflowLabel->setText(ironium > 5000 ? "+" : " ");
+    ui_PlanetReport.boraniumOverflowLabel->setText(boranium > 5000 ? "+" : " ");
+    ui_PlanetReport.germaniumOverflowLabel->setText(germanium > 5000 ? "+" : " ");
+
+    ui_PlanetReport.mineralReport->setIroniumConc(_planet->GetMinConc(0));
+    ui_PlanetReport.mineralReport->setBoraniumConc(_planet->GetMinConc(1));
+    ui_PlanetReport.mineralReport->setGermaniumConc(_planet->GetMinConc(2));
+
+    ui_PlanetReport.scaleWidget->setMineralReport(ui_PlanetReport.mineralReport);;
 }
 
 void GameView::nextMessage()
