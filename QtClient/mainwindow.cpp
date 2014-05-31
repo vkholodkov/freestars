@@ -251,8 +251,9 @@ bool MainWindow::maybeSave()
 
 void MainWindow::loadFile(const QString &fileName)
 {
+    QRegExp mfiles("\\.m[0-9]+$", Qt::CaseInsensitive);
 
-    if(fileName.endsWith(QString(".m1"), Qt::CaseInsensitive)) {
+    if(mfiles.indexIn(fileName) > 1) {
         this->loadPlayerFile(fileName);
     }
     else {

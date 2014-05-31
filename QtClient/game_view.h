@@ -7,6 +7,7 @@
 #include "FSServer.h"
 
 #include "ui_message_widget.h"
+#include "ui_status_selector.h"
 
 namespace FreeStars {
 
@@ -20,6 +21,8 @@ public:
     void displayMessage(const Message&);
 
 public slots:
+    void selectPlanet(const Planet*);
+
     void nextMessage();
     void prevMessage();
 
@@ -28,6 +31,7 @@ private:
     const Player *player;
     std::vector<Message*> messages;
     Ui_MessageWidget ui_MessageWidget;
+    Ui_StatusSelector ui_StatusSelector;
 
     int currentMessage;
 };

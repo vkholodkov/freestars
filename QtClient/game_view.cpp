@@ -8,6 +8,8 @@
 #include "folding_widget.h"
 #include "vertical_flow_layout.h"
 
+#include "ui_status_selector.h"
+#include "ui_planet_report.h"
 #include "ui_planet_production_widget.h"
 #include "ui_fleets_in_orbit_widget.h"
 
@@ -22,6 +24,7 @@ GameView::GameView(const Player *_player)
     tableView->setModel(this->getOwnPlanetsModel());
 
     QSplitter *leftSplitter = new QSplitter(Qt::Vertical);
+    QSplitter *rightSplitter = new QSplitter(Qt::Vertical);
 
     QFrame *container = new QFrame;
     container->setFrameShadow(QFrame::Sunken);
@@ -30,11 +33,24 @@ GameView::GameView(const Player *_player)
     QWidget *messageWidget = new QWidget;
     ui_MessageWidget.setupUi(messageWidget);
 
+    QWidget *statusSelector = new QWidget;
+    ui_StatusSelector.setupUi(statusSelector);
+    ui_StatusSelector.titleLabel->setText("");
+
     leftSplitter->addWidget(container);
     leftSplitter->addWidget(messageWidget);
+    leftSplitter->setStretchFactor(0, 20);
+    leftSplitter->setStretchFactor(1, 1);
+
+    rightSplitter->addWidget(tableView);
+    rightSplitter->addWidget(statusSelector);
+    rightSplitter->setStretchFactor(0, 10);
+    rightSplitter->setStretchFactor(1, 1);
 
     this->addWidget(leftSplitter);
-    this->addWidget(tableView);
+    this->addWidget(rightSplitter);
+    this->setStretchFactor(0, 1);
+    this->setStretchFactor(1, 2);
 
     FoldingWidget *w1 = new FoldingWidget("Planet");
     w1->setObjectName("w1_column1");
@@ -67,6 +83,17 @@ GameView::GameView(const Player *_player)
     container->adjustSize();
 
     setupMessages();
+
+    unsigned num_planets = TheGalaxy->GetPlanetCount();
+
+    for(unsigned n = 1 ; n <= num_planets ; n++) {
+        Planet *p = TheGalaxy->GetPlanet(n);
+
+        if(p->GetOwner() == player) {
+            selectPlanet(p);
+            break;
+        }
+    }
 }
 
 QAbstractItemModel *GameView::getOwnPlanetsModel() const {
@@ -177,6 +204,54 @@ void GameView::displayMessage(const Message &_message) {
     ui_MessageWidget.nextButton->setEnabled(currentMessage < messages.size()-1);
     ui_MessageWidget.gotoButton->setEnabled(false);
     ui_MessageWidget.prevButton->setEnabled(currentMessage > 0);
+}
+
+void GameView::selectPlanet(const Planet *_planet) {
+    QStackedWidget *statusBed = ui_StatusSelector.statusBed;
+
+    while(statusBed->count()) {
+        QWidget *widget = statusBed->currentWidget();
+        statusBed->removeWidget(widget);
+        delete widget;
+    }
+
+    ui_StatusSelector.titleLabel->setText(tr("%0 Summary")
+        .arg(_planet->GetName().c_str()));    
+
+    QWidget *newPage = new QWidget;
+    Ui_PlanetReport ui_PlanetReport;
+    ui_PlanetReport.setupUi(newPage);
+    statusBed->addWidget(newPage);
+
+    ui_PlanetReport.valueLabel->setText(tr("Value: %0%")
+        .arg(_planet->GetOwner()->HabFactor(_planet)));
+
+    ui_PlanetReport.popLabel->setText(tr("Population: %0")
+        .arg(_planet->GetDisplayPop()));
+
+    ui_PlanetReport.gravityLabel->setText(tr("%0g")
+        .arg((double)_planet->GetHabValue(0) / 10, 0, 'f', 1));
+
+    ui_PlanetReport.habitationBar->setGravityRange(HabRange(player->HabCenter(0),
+        player->HabWidth(0)));
+
+    ui_PlanetReport.habitationBar->setGravityValue(_planet->GetHabValue(0));
+
+    ui_PlanetReport.tempLabel->setText(trUtf8("%0°C")
+        .arg(_planet->GetHabValue(1)));
+
+    ui_PlanetReport.habitationBar->setTempRange(HabRange(player->HabCenter(1),
+        player->HabWidth(1)));
+
+    ui_PlanetReport.habitationBar->setTempValue(_planet->GetHabValue(1));
+
+    ui_PlanetReport.radLabel->setText(tr("%0mR")
+        .arg(_planet->GetHabValue(2)));
+
+    ui_PlanetReport.habitationBar->setRadRange(HabRange(player->HabCenter(2),
+        player->HabWidth(2)));
+
+    ui_PlanetReport.habitationBar->setRadValue(_planet->GetHabValue(2));
 }
 
 void GameView::nextMessage()
