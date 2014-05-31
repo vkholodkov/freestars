@@ -1,5 +1,7 @@
 
 #include <QPainter>
+#include <QMouseEvent>
+#include <QToolTip>
 
 #include "habitation_bar.h"
 
@@ -37,4 +39,36 @@ void HabitationBar::drawHabitationSign(QPainter &painter, unsigned value, int to
     painter.setPen(color);
     painter.drawLine(x - width, y, x + width, y);
     painter.drawLine(x, y - width, x, y + width);
+}
+
+void HabitationBar::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton) {
+        QRect rect(contentsRect());
+        QRect gravityRect(rect.x(), rect.y(), rect.width(), rect.height() / 3);
+        QRect tempRect(rect.x(), rect.y() + rect.height() / 3, rect.width(), rect.height() / 3);
+        QRect radRect(rect.x(), rect.y() + 2 * rect.height() / 3, rect.width(), rect.height() / 3);
+
+        if(gravityRect.contains(event->pos())) {
+            QString text("Gravity");
+            QToolTip::showText(event->globalPos(), text);
+        }
+
+        if(tempRect.contains(event->pos())) {
+            QString text("Temperature");
+            QToolTip::showText(event->globalPos(), text);
+        }
+
+        if(radRect.contains(event->pos())) {
+            QString text("Radiation");
+            QToolTip::showText(event->globalPos(), text);
+        }
+    }
+}
+
+void HabitationBar::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton) {
+        QToolTip::hideText();
+    }
 }

@@ -35,6 +35,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 namespace FreeStars {
 
 Planet::Planet()
+    : CargoHolder()
+    , mProductionQ()
 {
 	Init();
 }

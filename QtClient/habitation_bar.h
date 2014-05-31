@@ -70,6 +70,8 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event);    
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
 
     HabRange m_gravityRange, m_tempRange, m_radRange;
     unsigned m_gravityValue, m_tempValue, m_radValue;

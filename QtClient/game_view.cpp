@@ -10,15 +10,17 @@
 
 #include "ui_status_selector.h"
 #include "ui_planet_report.h"
-#include "ui_planet_production_widget.h"
-#include "ui_fleets_in_orbit_widget.h"
+#include "ui_fleet_report.h"
 
 namespace FreeStars {
 
 GameView::GameView(const Player *_player)
     : player(_player)
     , QSplitter(Qt::Horizontal)
+    , verticalFlowLayout(0)
+    , productionQueueModel(0)
     , currentMessage(0)
+    , currentSelection(0)
 {
     QTableView *tableView = new QTableView;
     tableView->setModel(this->getOwnPlanetsModel());
@@ -52,35 +54,8 @@ GameView::GameView(const Player *_player)
     this->setStretchFactor(0, 1);
     this->setStretchFactor(1, 2);
 
-    FoldingWidget *w1 = new FoldingWidget("Planet");
-    w1->setObjectName("w1_column1");
-
-    FoldingWidget *w2 = new FoldingWidget("Fleets in Orbit");
-    w2->setObjectName("w2_column2");
-
-    FoldingWidget *w3 = new FoldingWidget("Production");
-    w3->setObjectName("w3_column2");
-
-    QLayout *verticalFlowLayout = new VerticalFlowLayout;
+    verticalFlowLayout = new VerticalFlowLayout;
     container->setLayout(verticalFlowLayout);
-
-    verticalFlowLayout->addWidget(w1);
-    verticalFlowLayout->addWidget(w2);
-    verticalFlowLayout->addWidget(w3);
-
-    QWidget *fleetsInOrbitWidget = new QWidget;
-    Ui_FleetsInOrbitWidget ui_FleetsInOrbitWidget;
-    ui_FleetsInOrbitWidget.setupUi(fleetsInOrbitWidget);
-
-    w2->addWidget(fleetsInOrbitWidget);
-
-    QWidget *planetProductionWidget = new QWidget;
-    Ui_PlanetProductionWidget ui_PlanetProductionWidget;
-    ui_PlanetProductionWidget.setupUi(planetProductionWidget);
-
-    w3->addWidget(planetProductionWidget);
-
-    container->adjustSize();
 
     setupMessages();
 
@@ -90,10 +65,14 @@ GameView::GameView(const Player *_player)
         Planet *p = TheGalaxy->GetPlanet(n);
 
         if(p->GetOwner() == player) {
+            clearSelection();
             selectPlanet(p);
             break;
         }
     }
+
+    connect(ui_StatusSelector.nextButton, SIGNAL(clicked()), this, SLOT(nextObject()));
+    connect(this, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
 }
 
 QAbstractItemModel *GameView::getOwnPlanetsModel() const {
@@ -180,6 +159,8 @@ QAbstractItemModel *GameView::getOwnPlanetsModel() const {
 void GameView::setupMessages() {
     const deque<Message *> &_messages = player->GetMessages();
 
+    messages.reserve(_messages.size());
+
     for(deque<Message *>::const_iterator i = _messages.begin() ; i != _messages.end() ; i++) {
         messages.push_back(*i);
     }
@@ -208,12 +189,6 @@ void GameView::displayMessage(const Message &_message) {
 
 void GameView::selectPlanet(const Planet *_planet) {
     QStackedWidget *statusBed = ui_StatusSelector.statusBed;
-
-    while(statusBed->count()) {
-        QWidget *widget = statusBed->currentWidget();
-        statusBed->removeWidget(widget);
-        delete widget;
-    }
 
     ui_StatusSelector.titleLabel->setText(tr("%0 Summary")
         .arg(_planet->GetName().c_str()));    
@@ -270,6 +245,141 @@ void GameView::selectPlanet(const Planet *_planet) {
     ui_PlanetReport.mineralReport->setGermaniumConc(_planet->GetMinConc(2));
 
     ui_PlanetReport.scaleWidget->setMineralReport(ui_PlanetReport.mineralReport);;
+
+    FoldingWidget *w1 = new FoldingWidget(tr("Planet"));
+    w1->setObjectName("w1_column1");
+
+    FoldingWidget *w11 = new FoldingWidget(tr("Minerals on hand"));
+    w11->setObjectName("w11_column1");
+
+    FoldingWidget *w12 = new FoldingWidget(tr("Status"));
+    w12->setObjectName("w12_column1");
+
+    FoldingWidget *w2 = new FoldingWidget(tr("Fleets in Orbit"));
+    w2->setObjectName("w2_column2");
+
+    FoldingWidget *w3 = new FoldingWidget(tr("Production"));
+    w3->setObjectName("w3_column2");
+
+    verticalFlowLayout->addWidget(w1);
+    verticalFlowLayout->addWidget(w11);
+    verticalFlowLayout->addWidget(w12);
+    verticalFlowLayout->addWidget(w2);
+    verticalFlowLayout->addWidget(w3);
+
+    QWidget *fleetsInOrbitWidget = new QWidget;
+    ui_FleetsInOrbitWidget.setupUi(fleetsInOrbitWidget);
+
+    w2->addWidget(fleetsInOrbitWidget);
+
+    /*
+     * Planet production
+     */
+    QWidget *planetProductionWidget = new QWidget;
+    ui_PlanetProductionWidget.setupUi(planetProductionWidget);
+
+    productionQueueModel = new ProductionQueueModel(_planet->GetProduction());
+    QItemSelectionModel *m = ui_PlanetProductionWidget.productionQueueView->selectionModel();
+    ui_PlanetProductionWidget.productionQueueView->setModel(productionQueueModel);
+    delete m;
+
+    ui_PlanetProductionWidget.productionQueueView->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    ui_PlanetProductionWidget.productionQueueView->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+
+    ui_PlanetProductionWidget.completionLabel->setText("");
+    ui_PlanetProductionWidget.routeToLabel->setText(
+        _planet->GetRoute() != NULL ? QString(_planet->GetRoute()->GetName(player).c_str()) : tr("none"));
+
+    w3->addWidget(planetProductionWidget);
+
+    /*
+     * Minerals on hand
+     */
+    QWidget *mineralsOnHandWidget = new QWidget;
+    ui_MineralsOnHandWidget.setupUi(mineralsOnHandWidget);
+
+    ui_MineralsOnHandWidget.ironiumLabel->setText(tr("%0kT").arg(ironium));
+    ui_MineralsOnHandWidget.boraniumLabel->setText(tr("%0kT").arg(boranium));
+    ui_MineralsOnHandWidget.germaniumLabel->setText(tr("%0kT").arg(germanium));
+    ui_MineralsOnHandWidget.minesLabel->setText(tr("%0 of %1").arg(_planet->GetMines()).arg(_planet->MaxMines()));
+    ui_MineralsOnHandWidget.factoriesLabel->setText(tr("%0 of %1").arg(_planet->GetFactories()).arg(_planet->MaxFactories()));
+
+    w11->addWidget(mineralsOnHandWidget);
+
+    /*
+     * Planet status
+     */
+    QWidget *planetStatusWidget = new QWidget;
+    ui_PlanetStatusWidget.setupUi(planetStatusWidget);
+
+    ui_PlanetStatusWidget.populationLabel->setText(QString::number(_planet->GetDisplayPop()));
+    ui_PlanetStatusWidget.resourcesLabel->setText(tr("%0 of %1").arg(_planet->GetResources()).arg(_planet->GetResources()));
+
+    if(_planet->GetScanner()) {
+        ui_PlanetStatusWidget.scannerTypeLabel->setText(tr("yes"));
+        ui_PlanetStatusWidget.scannerRangeLabel->setText(tr("%0 l.y.").arg(_planet->GetScanSpace()));
+    }
+    else {
+        ui_PlanetStatusWidget.scannerTypeLabel->setText(tr("none"));
+        ui_PlanetStatusWidget.scannerRangeLabel->setText(tr("none"));
+    }
+
+    ui_PlanetStatusWidget.defencesLabel->setText(tr("%0 of %1").arg(_planet->GetDefenses()).arg(_planet->MaxDefenses()));
+    ui_PlanetStatusWidget.defenceTypeLabel->setText(tr("none"));
+    ui_PlanetStatusWidget.defencesCoverageLabel->setText(tr("none"));
+
+    w12->addWidget(planetStatusWidget);
+
+    currentSelection = _planet;
+}
+
+void GameView::selectFleet(const Fleet *_fleet) {
+    QStackedWidget *statusBed = ui_StatusSelector.statusBed;
+
+    ui_StatusSelector.titleLabel->setText(tr("%0 Summary")
+        .arg(_fleet->GetName(player).c_str()));    
+
+    QWidget *newPage = new QWidget;
+    Ui_FleetReport ui_FleetReport;
+    ui_FleetReport.setupUi(newPage);
+    statusBed->addWidget(newPage);
+
+    currentSelection = _fleet;
+}
+
+void GameView::clearSelection()
+{
+    QStackedWidget *statusBed = ui_StatusSelector.statusBed;
+
+    while(statusBed->count()) {
+        QWidget *widget = statusBed->currentWidget();
+        statusBed->removeWidget(widget);
+        delete widget;
+    }
+
+    QLayoutItem *child;
+    while((child = verticalFlowLayout->takeAt(0)) != 0) {
+        delete child;
+    }
+}
+
+void GameView::selectObject(const SpaceObject *so)
+{
+    const Planet *p = dynamic_cast<const Planet*>(so);
+
+    if(p != NULL) {
+        clearSelection();
+        selectPlanet(p);
+        return;
+    }
+
+    const Fleet *f = dynamic_cast<const Fleet*>(so);
+
+    if(f != NULL) {
+        clearSelection();
+        selectFleet(f);
+        return;
+    }
 }
 
 void GameView::nextMessage()
@@ -286,6 +396,37 @@ void GameView::prevMessage()
         currentMessage--;
         displayMessage(*messages[currentMessage]);
     }
+}
+
+void GameView::nextObject()
+{
+    if(currentSelection != NULL) {
+        const deque<SpaceObject *> * deq = currentSelection->GetAlsoHere();
+
+        if(deq != NULL) {
+            deque<SpaceObject *>::const_iterator i = deq->begin();
+
+            while(i != deq->end()) {
+                if(*i != currentSelection) {
+                    emit selectionChanged(*i);
+                    break;
+                }
+                i++;
+            }
+        }
+    }
+}
+
+void GameView::changeProductionQueue()
+{
+}
+
+void GameView::clearProductionQueue()
+{
+}
+
+void GameView::setRouteDest()
+{
 }
 
 };

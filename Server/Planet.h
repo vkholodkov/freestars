@@ -171,6 +171,7 @@ public:
 	void CreateSecondWorld(const Planet * HW);
 	void AdjustSecondWorld(Player * player);
 	void ParseProduction(const TiXmlNode * node);
+    const deque<ProdOrder *> GetProduction() const { return mProductionQ; }
 	void SetProduction(const deque<ProdOrder *> & ords);
 	void SetPayTax(bool paytax);
 	void SetInBattle()	{ mHadBattle = true; }

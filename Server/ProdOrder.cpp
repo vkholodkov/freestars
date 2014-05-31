@@ -24,6 +24,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 */
 
 #include <typeinfo>
+#include <sstream>
 
 #include "FSServer.h"
 
@@ -456,6 +457,13 @@ void ProdOrder::BuildPartial(const Cost & cost, Planet * planet, long * resource
 	}
 }
 
+string ProdOrder::AmountToString() const
+{
+    ostringstream o;
+    o << Amount;
+	return o.str();
+}
+
 POAuto::~POAuto()
 {
 }
@@ -491,9 +499,16 @@ string POAuto::TypeToString() const
 	else if (Type == POP_MAXTERRA)
 		str = "AutoMaxTerra";
 	else
-		TheGame->AddMessage("Error: Invalid auto procution order");
+		TheGame->AddMessage("Error: Invalid auto production order");
 
 	return str;
+}
+
+string POAuto::AmountToString() const
+{
+    ostringstream o;
+    o << "Up to " << Amount;
+	return o.str();
 }
 
 bool POAuto::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
@@ -913,6 +928,13 @@ string POTerraform::TypeToString() const
 		str = "Terraform";
 
 	return str;
+}
+
+string POTerraform::AmountToString() const
+{
+    ostringstream o;
+    o << Amount << '%';
+	return o.str();
 }
 
 bool POTerraform::Produce(Planet * planet, long * resources, bool * AutoAlchemy)

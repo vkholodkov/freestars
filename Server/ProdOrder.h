@@ -67,6 +67,7 @@ public:
 	ProdOrder * Copy() const;
 	Cost& GetPartial() {return Partial;}
 	virtual string TypeToString() const = 0;
+    virtual string AmountToString() const;
 	long GetType() const	{ return Type; }
 
 protected:
@@ -128,6 +129,7 @@ public:
 
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual string TypeToString() const;
+    virtual string AmountToString() const;
 };
 
 /**
@@ -176,6 +178,7 @@ public:
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual void Built(Planet * planet, long number);
 	virtual string TypeToString() const;
+    virtual string AmountToString() const;
 
 private:
 	long mResCost;
