@@ -129,6 +129,8 @@ public:
 	double GetDisplayDef() const;
 	long GetDisplayPop() const;
 	long GetMaxPop() const;
+    long GetMiningVelocity(long) const;
+    long GetMiningVelocity(long, const Player*, long) const;
 	void Mine();
 	void Mine(long mines, const Player * miner);
 	void DoProduction();

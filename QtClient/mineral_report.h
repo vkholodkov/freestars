@@ -11,6 +11,10 @@ class MineralReport : public QWidget {
     Q_PROPERTY(unsigned boranium READ boranium WRITE setBoranium)
     Q_PROPERTY(unsigned germanium READ germanium WRITE setGermanium)
 
+    Q_PROPERTY(unsigned ironiumVelocity READ ironiumVelocity WRITE setIroniumVelocity)
+    Q_PROPERTY(unsigned boraniumVelocity READ boraniumVelocity WRITE setBoraniumVelocity)
+    Q_PROPERTY(unsigned germaniumVelocity READ germaniumVelocity WRITE setGermaniumVelocity)
+
     Q_PROPERTY(unsigned ironiumConc READ ironiumConc WRITE setIroniumConc)
     Q_PROPERTY(unsigned boraniumConc READ boraniumConc WRITE setBoraniumConc)
     Q_PROPERTY(unsigned germaniumConc READ germaniumConc WRITE setGermaniumConc)
@@ -18,6 +22,9 @@ class MineralReport : public QWidget {
 public:
     MineralReport(QWidget *parent = 0)
         : QWidget(parent)
+        , m_ironium(0), m_boranium(0), m_germanium(0)
+        , m_ironiumVelocity(0), m_boraniumVelocity(0), m_germaniumVelocity(0)
+        , m_ironiumConc(0), m_boraniumConc(0), m_germaniumConc(0)
     {
     }
 
@@ -29,6 +36,15 @@ public:
 
     unsigned germanium() const { return m_germanium; }
     void setGermanium(unsigned _germanium) { m_germanium = _germanium; }
+
+    unsigned ironiumVelocity() const { return m_ironiumVelocity; }
+    void setIroniumVelocity(unsigned _ironiumVelocity) { m_ironiumVelocity = _ironiumVelocity; }
+
+    unsigned boraniumVelocity() const { return m_boraniumVelocity; }
+    void setBoraniumVelocity(unsigned _boraniumVelocity) { m_boraniumVelocity = _boraniumVelocity; }
+
+    unsigned germaniumVelocity() const { return m_germaniumVelocity; }
+    void setGermaniumVelocity(unsigned _germaniumVelocity) { m_germaniumVelocity = _germaniumVelocity; }
 
     unsigned ironiumConc() const { return m_ironiumConc; }
     void setIroniumConc(unsigned _ironiumConc) { m_ironiumConc = _ironiumConc; }
@@ -43,10 +59,11 @@ protected:
     void paintEvent(QPaintEvent *event);    
 
     unsigned m_ironium, m_boranium, m_germanium;
+    unsigned m_ironiumVelocity, m_boraniumVelocity, m_germaniumVelocity;
     unsigned m_ironiumConc, m_boraniumConc, m_germaniumConc;
 
 protected:
-    void drawMineralBar(QPainter&, unsigned, int, int, const QColor&) const;
+    void drawMineralBar(QPainter&, unsigned, unsigned, int, int, const QColor&, const QColor&) const;
     void drawConcentrationSign(QPainter&, unsigned, int, int, const QColor&) const;
 };
 

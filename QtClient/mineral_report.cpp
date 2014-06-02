@@ -23,18 +23,27 @@ void MineralReport::paintEvent(QPaintEvent *event)
         painter.drawLine(x, 0, x, rect.height());
     }
 
-    drawMineralBar(painter, m_ironium, 0, rect.height() / 3 - 2, Qt::blue);
-    drawMineralBar(painter, m_germanium, rect.y() + rect.height() / 3 + 3, 2 * rect.height() / 3 - 2, Qt::red);
-    drawMineralBar(painter, m_boranium, 2 * rect.height() / 3 + 3, rect.height() - 3, Qt::green);
+    drawMineralBar(painter, m_ironium, m_ironiumVelocity, 0, rect.height() / 3 - 2, Qt::blue, Qt::darkBlue);
+    drawMineralBar(painter, m_boranium, m_boraniumVelocity, rect.y() + rect.height() / 3 + 3, 2 * rect.height() / 3 - 2, Qt::green, Qt::darkGreen);
+    drawMineralBar(painter, m_germanium, m_germaniumVelocity, 2 * rect.height() / 3 + 3, rect.height() - 3, Qt::yellow, Qt::darkYellow);
 
     drawConcentrationSign(painter, m_ironiumConc, 0, rect.height() / 3 - 2, Qt::darkBlue);
-    drawConcentrationSign(painter, m_germaniumConc, rect.y() + rect.height() / 3 + 3, 2 * rect.height() / 3 - 2, Qt::darkRed);
-    drawConcentrationSign(painter, m_boraniumConc, 2 * rect.height() / 3 + 3, rect.height() - 3, Qt::darkGreen);
+    drawConcentrationSign(painter, m_boraniumConc, rect.y() + rect.height() / 3 + 3, 2 * rect.height() / 3 - 2, Qt::darkGreen);
+    drawConcentrationSign(painter, m_germaniumConc, 2 * rect.height() / 3 + 3, rect.height() - 3, Qt::darkYellow);
 }
 
-void MineralReport::drawMineralBar(QPainter &painter, unsigned value, int top, int bottom, const QColor &color) const {
-    int width = value * contentsRect().width() / 5000;
-    painter.fillRect(0, top, width, bottom - top, color);
+void MineralReport::drawMineralBar(QPainter &painter, unsigned value, unsigned velocity, int top, int bottom, const QColor &color, const QColor &velColor) const {
+    int barWidth = value * contentsRect().width() / 5000;
+
+    if(barWidth != 0) {
+        painter.fillRect(0, top, barWidth, bottom - top, color);
+    }
+
+    int velocityBarWidth = velocity * contentsRect().width() / 5000;
+
+    if(velocityBarWidth != 0) {
+        painter.fillRect(barWidth, top, barWidth + velocityBarWidth, bottom - top, velColor);
+    }
 }
 
 void MineralReport::drawConcentrationSign(QPainter &painter, unsigned value, int top, int bottom, const QColor &color) const {

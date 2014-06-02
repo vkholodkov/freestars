@@ -783,6 +783,40 @@ long Planet::GetMaxPop() const
 	}
 }
 
+long Planet::GetMiningVelocity(long mineral) const {
+	if (GetOwner() == NULL)
+		return 0;
+
+	long mines;
+	if (GetOwner()->ARTechType() >= 0) {
+		mines = long(sqrt((double)min(GetMaxPop(), GetContain(POPULATION)) * GetOwner()->MinesRun()));
+	} else {
+		mines = min(GetMaxPop(), GetContain(POPULATION)) * GetOwner()->MinesRun() / 100;
+		mines = min(mines, mMines);
+	}
+
+	return this->GetMiningVelocity(mines, GetOwner(), mineral);
+}
+
+long Planet::GetMiningVelocity(long mines, const Player *miner, long mineral) const {
+	if (mines == 0)
+		return 0;
+
+	long rate;
+	if (GetOwner() == NULL)
+		rate = 10;
+	else
+		rate = GetOwner()->MineRate();
+
+    long conc;
+    if (mHomeWorld && miner == GetOwner())
+        conc = max(mMinConc[mineral], Rules::GetConstant("MineralHWMinimum"));
+    else
+        conc = mMinConc[mineral];
+
+    return (conc * mines * rate + 500) / 10 / 100;
+}
+
 void Planet::Mine()
 {
 	if (GetOwner() == NULL)
