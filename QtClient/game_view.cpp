@@ -11,6 +11,8 @@
 #include "vertical_flow_layout.h"
 #include "space_object_sorter.h"
 
+#include "fleets_in_orbit_widget.h"
+
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
 #include "ui_status_selector.h"
@@ -284,21 +286,27 @@ void GameView::selectPlanet(const Planet *_planet) {
     FoldingWidget *w12 = new FoldingWidget(tr("Status"));
     w12->setObjectName("w12_column1");
 
-    FoldingWidget *w2 = new FoldingWidget(tr("Fleets in Orbit"));
-    w2->setObjectName("w2_column2");
+    verticalFlowLayout->addWidget(w1);
+    verticalFlowLayout->addWidget(w11);
+    verticalFlowLayout->addWidget(w12);
+
+    FleetsInOrbitWidget *fleetsInOrbitWidget = new FleetsInOrbitWidget(_planet, player);
+    fleetsInOrbitWidget->setObjectName("w2_column2");
+    verticalFlowLayout->addWidget(fleetsInOrbitWidget);
+    
+    connect(fleetsInOrbitWidget, SIGNAL(selectObject(const SpaceObject*)),
+        this, SLOT(selectObject(const SpaceObject*)));
+    connect(fleetsInOrbitWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
+        this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
 
     planetProductionWidget = new PlanetProductionWidget(_planet, player);
     planetProductionWidget->setObjectName("w3_column2");
+    verticalFlowLayout->addWidget(planetProductionWidget);
+
     connect(planetProductionWidget, SIGNAL(changeProductionQueue(const Planet*)),
         this, SLOT(changeProductionQueue(const Planet*)));
     connect(planetProductionWidget, SIGNAL(clearProductionQueue(const Planet*)),
         this, SLOT(clearProductionQueue(const Planet*)));
-
-    verticalFlowLayout->addWidget(w1);
-    verticalFlowLayout->addWidget(w11);
-    verticalFlowLayout->addWidget(w12);
-    verticalFlowLayout->addWidget(w2);
-    verticalFlowLayout->addWidget(planetProductionWidget);
 
     /*
      * Planet widget
@@ -308,33 +316,6 @@ void GameView::selectPlanet(const Planet *_planet) {
     ui_PlanetWidget.setupUi(planetWidget);
 
     w1->addWidget(planetWidget);
-
-    /*
-     * Fleets in orbit widget
-     */
-    {
-        QWidget *fleetsInOrbitWidget = new QWidget;
-        ui_FleetsInOrbitWidget.setupUi(fleetsInOrbitWidget);
-
-        ui_FleetsInOrbitWidget.fuelWidget->setChangeable(false);
-        ui_FleetsInOrbitWidget.fuelWidget->setCargoColor(Qt::red);
-
-        ui_FleetsInOrbitWidget.cargoWidget->setChangeable(false);
-        ui_FleetsInOrbitWidget.cargoWidget->setCargoColor(Qt::white);
-
-        SpaceObjectSorter sos(_planet, player, SOT_OWN|SOT_FLEET);
-
-        if(!sos.m_object_list.empty()) {
-            for(std::vector<const SpaceObject*>::const_iterator i = sos.m_object_list.begin() ; i != sos.m_object_list.end() ; i++) {
-                ui_FleetsInOrbitWidget.fleetsComboBox->addItem(QString((*i)->GetName(player).c_str()), (qlonglong)(*i)->GetID());
-            }
-        }
-        else {
-            ui_FleetsInOrbitWidget.textWidget->setVisible(false);
-        }
-
-        w2->addWidget(fleetsInOrbitWidget);
-    }
 
     /*
      * Minerals on hand
@@ -498,6 +479,11 @@ void GameView::nextObject()
     }
 }
 
+void GameView::exchangeCargo(const Planet *planet, const Fleet *fleet)
+{
+    std::cout << "GameView::exchangeCargo planet=" << planet << " fleet=" << fleet << std::endl;
+}
+
 void GameView::changeProductionQueue(const Planet *planet)
 {
     std::cout << "GameView::changeProductionQueue " << planet << std::endl;
@@ -510,16 +496,12 @@ void GameView::clearProductionQueue(const Planet *planet)
 
 void GameView::setRouteDest()
 {
+    std::cout << "GameView::setRouteDest " << std::endl;
 }
 
 void GameView::showProductionDialog(bool)
 {
     std::cout << "GameView::showProductionDialog" << std::endl;
-}
-
-void GameView::submitTurn()
-{
-    std::cout << "GameView::submitTurn" << std::endl;
 }
 
 void GameView::shipDesignDialog()
@@ -540,6 +522,11 @@ void GameView::battlePlansDialog()
 void GameView::playerRelationsDialog()
 {
     std::cout << "GameView::playerRelationsDialog" << std::endl;
+}
+
+void GameView::submitTurn()
+{
+    std::cout << "GameView::submitTurn" << std::endl;
 }
 
 };

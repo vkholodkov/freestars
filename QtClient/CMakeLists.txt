@@ -18,6 +18,7 @@ SET(freestars_SOURCES
     scale_widget.cpp
     cargo_widget.cpp
     planet_production_widget.cpp
+    fleets_in_orbit_widget.cpp
     production_queue_model.cpp
     space_object_sorter.cpp
     map_view.cpp
@@ -32,6 +33,7 @@ SET(freestars_HEADERS
     scale_widget.h
     cargo_widget.h
     planet_production_widget.h
+    fleets_in_orbit_widget.h
     production_queue_model.h
 )
 

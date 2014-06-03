@@ -12,7 +12,6 @@
 
 #include "ui_message_widget.h"
 #include "ui_status_selector.h"
-#include "ui_fleets_in_orbit_widget.h"
 #include "ui_minerals_on_hand_widget.h"
 #include "ui_planet_status_widget.h"
 
@@ -38,16 +37,18 @@ public slots:
 
     void nextObject();
 
+    void exchangeCargo(const Planet*, const Fleet*);
     void changeProductionQueue(const Planet*);
     void clearProductionQueue(const Planet*);
     void setRouteDest();
     void showProductionDialog(bool);
 
-    void submitTurn();
     void shipDesignDialog();
     void researchDialog();
     void battlePlansDialog();
     void playerRelationsDialog();
+
+    void submitTurn();
 
 private:
     void setupToolbar(QToolBar*);
@@ -63,7 +64,6 @@ private:
     PlanetProductionWidget *planetProductionWidget;
     Ui_MessageWidget ui_MessageWidget;
     Ui_StatusSelector ui_StatusSelector;
-    Ui_FleetsInOrbitWidget ui_FleetsInOrbitWidget;
     Ui_MineralsOnHandWidget ui_MineralsOnHandWidget;
     Ui_PlanetStatusWidget ui_PlanetStatusWidget;
     MapView *mapView;
