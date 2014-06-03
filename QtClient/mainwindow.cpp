@@ -14,6 +14,7 @@ namespace FreeStars {
 MainWindow::MainWindow()
 {
     tabWidget = new QTabWidget;
+    tabWidget->setTabsClosable(tabWidget);
     setCentralWidget(tabWidget);
 
     createActions();
@@ -23,10 +24,8 @@ MainWindow::MainWindow()
 
     readSettings();
 
-#if 0
-    connect(textEdit->document(), SIGNAL(contentsChanged()),
-            this, SLOT(documentWasModified()));
-#endif
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(activateTab(int)));
+    connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
     setCurrentFile("");
 
@@ -142,9 +141,36 @@ void MainWindow::createActions()
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-    populationTransportationAct = new QAction(tr("&Population"), this);
-    exitAct->setStatusTip(tr("Compute population transportation strategy"));
-    connect(populationTransportationAct, SIGNAL(triggered()), this, SLOT(openPopulationTransportationView()));
+    /*
+     * Turn menu
+     */
+    submitTurnAction = new QAction(tr("&Submit"), this);
+    submitTurnAction->setShortcut(QKeySequence(Qt::Key_F9));
+    submitTurnAction->setStatusTip(tr("Submit current turn"));
+    submitTurnAction->setEnabled(false);
+
+    /*
+     * Commands menu
+     */
+    shipDesignAction = new QAction(tr("&Ship Design"), this);
+    shipDesignAction->setShortcut(QKeySequence(Qt::Key_F4));
+    shipDesignAction->setStatusTip(tr("Design ships and starbases"));
+    shipDesignAction->setEnabled(false);
+
+    researchAction = new QAction(tr("&Research"), this);
+    researchAction->setShortcut(QKeySequence(Qt::Key_F5));
+    researchAction->setStatusTip(tr("Edit research strategy"));
+    researchAction->setEnabled(false);
+
+    battlePlansAction = new QAction(tr("&Battle Plans"), this);
+    battlePlansAction->setShortcut(QKeySequence(Qt::Key_F6));
+    battlePlansAction->setStatusTip(tr("Edit battle plans"));
+    battlePlansAction->setEnabled(false);
+
+    playerRelationsAction = new QAction(tr("&Player Rrelations"), this);
+    playerRelationsAction->setShortcut(QKeySequence(Qt::Key_F7));
+    playerRelationsAction->setStatusTip(tr("Edit player relations"));
+    playerRelationsAction->setEnabled(false);
 
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
@@ -153,15 +179,6 @@ void MainWindow::createActions()
     aboutQtAct = new QAction(tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-
-#if 0
-    cutAct->setEnabled(false);
-    copyAct->setEnabled(false);
-    connect(textEdit, SIGNAL(copyAvailable(bool)),
-            cutAct, SLOT(setEnabled(bool)));
-    connect(textEdit, SIGNAL(copyAvailable(bool)),
-            copyAct, SLOT(setEnabled(bool)));
-#endif
 }
 
 void MainWindow::createMenus()
@@ -178,15 +195,14 @@ void MainWindow::createMenus()
     fileMenu->addAction(exitAct);
     updateRecentFileActions();
 
-    transportationMenu = menuBar()->addMenu(tr("&Transportation"));
-    transportationMenu->addAction(populationTransportationAct);
+    turnMenu = menuBar()->addMenu(tr("&Turn"));
+    turnMenu->addAction(submitTurnAction);
 
-#if 0
-    editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(cutAct);
-    editMenu->addAction(copyAct);
-    editMenu->addAction(pasteAct);
-#endif
+    commandsMenu = menuBar()->addMenu(tr("&Commands"));
+    commandsMenu->addAction(shipDesignAction);
+    commandsMenu->addAction(researchAction);
+    commandsMenu->addAction(battlePlansAction);
+    commandsMenu->addAction(playerRelationsAction);
 
     menuBar()->addSeparator();
 
@@ -298,10 +314,11 @@ void MainWindow::loadPlayerFile(const QString &fileName)
         return;
     }
 
-    closeAllViews();
-    openPlanetsView();
-
     setCurrentFile(fileName);
+
+    closeAllViews();
+    openGameView();
+
     statusBar()->showMessage(tr("File loaded"), 2000);
 }
 
@@ -379,9 +396,12 @@ void MainWindow::updateRecentFileActions()
 void MainWindow::updateModel() {
 }
 
-void MainWindow::openPlanetsView() {
-    GameView *gameView = new GameView(TheGame->GetCurrentPlayer());
-    tabWidget->addTab(gameView, "Planets");
+void MainWindow::openGameView() {
+    const Player *player = TheGame->GetCurrentPlayer();
+    GameView *gameView = new GameView(player);
+    tabWidget->addTab(gameView, QString("%0 -- %1")
+        .arg(strippedName(curFile))
+        .arg(player->GetPluralName().c_str()));
 }
 
 void MainWindow::openPopulationTransportationView() {
@@ -419,6 +439,48 @@ void MainWindow::closeAllViews() {
     for(std::list<QWidget*>::iterator i = widgets.begin() ; i != widgets.end() ; i++) {
         delete *i;
     }
+}
+
+void MainWindow::activateTab(int index)
+{
+    if(index >= 0) {
+        GameView *gameView = dynamic_cast<GameView*>(tabWidget->widget(index));
+
+        if(gameView != NULL) {
+            submitTurnAction->disconnect();
+            shipDesignAction->disconnect();
+            researchAction->disconnect();
+            battlePlansAction->disconnect();
+            playerRelationsAction->disconnect();
+
+            connect(submitTurnAction, SIGNAL(triggered()), gameView, SLOT(submitTurn()));
+            connect(shipDesignAction, SIGNAL(triggered()), gameView, SLOT(shipDesignDialog()));
+            connect(researchAction, SIGNAL(triggered()), gameView, SLOT(researchDialog()));
+            connect(battlePlansAction, SIGNAL(triggered()), gameView, SLOT(battlePlansDialog()));
+            connect(playerRelationsAction, SIGNAL(triggered()), gameView, SLOT(playerRelationsDialog()));
+
+            submitTurnAction->setEnabled(true);
+            shipDesignAction->setEnabled(true);
+            researchAction->setEnabled(true);
+            battlePlansAction->setEnabled(true);
+            playerRelationsAction->setEnabled(true);
+
+            return;
+        }
+    }
+
+    submitTurnAction->setEnabled(false);
+    shipDesignAction->setEnabled(false);
+    researchAction->setEnabled(false);
+    battlePlansAction->setEnabled(false);
+    playerRelationsAction->setEnabled(false);
+}
+
+void MainWindow::closeTab(int index)
+{
+    QWidget *tab = tabWidget->widget(index);
+    tabWidget->removeTab(index);
+    delete tab;
 }
 
 QString MainWindow::strippedName(const QString &fullFileName)

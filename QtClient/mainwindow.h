@@ -32,6 +32,8 @@ private slots:
     void about();
     void documentWasModified();
     void openPopulationTransportationView();
+    void activateTab(int);
+    void closeTab(int);
 
 private:
     void createActions();
@@ -48,7 +50,7 @@ private:
     void updateRecentFileActions();
 
     void updateModel();    
-    void openPlanetsView();
+    void openGameView();
     void closeAllViews();
 
     QString strippedName(const QString &fullFileName);
@@ -57,8 +59,8 @@ private:
     QString curFile;
 
     QMenu *fileMenu;
-    QMenu *transportationMenu;
-    QMenu *editMenu;
+    QMenu *turnMenu;
+    QMenu *commandsMenu;
     QMenu *helpMenu;
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
@@ -67,14 +69,17 @@ private:
     QAction *saveAct;
     QAction *saveAsAct;
     QAction *exitAct;
-    QAction *cutAct;
-    QAction *copyAct;
-    QAction *pasteAct;
+
+    QAction *submitTurnAction;
+
+    QAction *shipDesignAction;
+    QAction *researchAction;
+    QAction *battlePlansAction;
+    QAction *playerRelationsAction;
+
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *separatorAct;
-
-    QAction *populationTransportationAct;
 
     enum { MaxRecentFiles = 5 };
     QAction *recentFileActs[MaxRecentFiles];

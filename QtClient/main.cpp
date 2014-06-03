@@ -3,8 +3,6 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 
-#include "globals.h"
-
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {

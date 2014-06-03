@@ -16,13 +16,17 @@ void CargoWidget::paintEvent(QPaintEvent *event)
         .arg(m_maxCargo)
         .arg(m_unit));
 
+    int width = fm.width(text);
     int height = fm.height();
 
+    rect.adjust(0, 0, -1, -1);
+ 
     painter.fillRect(rect, m_cargoColor);
     painter.setPen(Qt::black);
-    painter.drawRect(contentsRect());
+    painter.drawRect(rect);
 
     QPoint baseline(rect.center());
-    baseline.setY(rect.bottom() - 3);
+    baseline.rx() -= width / 2;
+    baseline.setY(rect.bottom() - 2);
     painter.drawText(baseline, text);
 }

@@ -6,6 +6,7 @@
 void MineralReport::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing);
 
     QRect rect(contentsRect());
 

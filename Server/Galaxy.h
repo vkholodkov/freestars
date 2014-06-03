@@ -81,7 +81,7 @@ public:
 	 * @param id The ID number of the planet to retrieve.
 	 * @returns The planet, or NULL if the ID was out of range.
 	 */
-	Planet * GetPlanet(int id)					{ return (id < 1 || id > mPlanets.size()) ? NULL : mPlanets[id-1]; }
+	Planet * GetPlanet(int id) const { return (id < 1 || id > mPlanets.size()) ? NULL : mPlanets[id-1]; }
 	
 	/**
 	 * Count planets near a location.

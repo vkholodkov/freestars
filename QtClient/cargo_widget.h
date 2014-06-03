@@ -16,6 +16,11 @@ class CargoWidget : public QWidget {
 public:
     CargoWidget(QWidget *parent = 0)
         : QWidget(parent)
+        , m_changeable(false)
+        , m_cargoColor(Qt::black)
+        , m_cargo(0)
+        , m_maxCargo(0)
+        , m_unit("")
     {
     }
 

@@ -17,7 +17,10 @@ SET(freestars_SOURCES
     mineral_report.cpp
     scale_widget.cpp
     cargo_widget.cpp
+    planet_production_widget.cpp
     production_queue_model.cpp
+    space_object_sorter.cpp
+    map_view.cpp
 )
 
 SET(freestars_HEADERS
@@ -28,10 +31,12 @@ SET(freestars_HEADERS
     mineral_report.h
     scale_widget.h
     cargo_widget.h
+    planet_production_widget.h
     production_queue_model.h
 )
 
 SET(freestars_FORMS
+    planet_widget.ui
     planet_report.ui
     fleet_report.ui
     planet_production_widget.ui
@@ -40,6 +45,7 @@ SET(freestars_FORMS
     status_selector.ui
     minerals_on_hand_widget.ui
     planet_status_widget.ui
+    starbase_widget.ui
 )
 
 SET(freestars_RESOURCES application.qrc)
