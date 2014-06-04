@@ -3,6 +3,7 @@
 
 #include <QtGui>
 
+#include "advanced_new_game_wizard.h"
 #include "game_view.h"
 
 #include "mainwindow.h"
@@ -58,6 +59,10 @@ void MainWindow::newFile()
         //textEdit->clear();
         setCurrentFile("");
     }
+
+    AdvancedNewGameWizard advancedNewGameWizard;
+
+    advancedNewGameWizard.exec();
 }
 
 void MainWindow::open()
@@ -109,7 +114,7 @@ void MainWindow::documentWasModified()
 
 void MainWindow::createActions()
 {
-    newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);
+    newAct = new QAction(QIcon(":/images/new.png"), tr("&New..."), this);
     newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Create a new file"));
     connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));

@@ -9,6 +9,7 @@ include_directories(
 SET(freestars_SOURCES
     main.cpp
     mainwindow.cpp
+    advanced_new_game_wizard.cpp
     game_view.cpp
     folding_widget.cpp
     vertical_flow_layout.cpp
@@ -17,6 +18,7 @@ SET(freestars_SOURCES
     mineral_report.cpp
     scale_widget.cpp
     cargo_widget.cpp
+    diamond_button.cpp
     planet_production_widget.cpp
     fleets_in_orbit_widget.cpp
     production_queue_model.cpp
@@ -26,6 +28,7 @@ SET(freestars_SOURCES
 
 SET(freestars_HEADERS
     mainwindow.h
+    advanced_new_game_wizard.h
     game_view.h
     folding_widget.h
     habitation_bar.h
@@ -38,6 +41,8 @@ SET(freestars_HEADERS
 )
 
 SET(freestars_FORMS
+    angw_page1.ui
+    angw_page3.ui
     planet_widget.ui
     planet_report.ui
     fleet_report.ui
