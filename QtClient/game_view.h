@@ -3,7 +3,7 @@
 #define _GAME_VIEW_H_
 
 #include <QScrollArea>
-#include <QToolBar>
+#include <QSplitter>
 
 #include "FSServer.h"
 
@@ -17,7 +17,7 @@
 
 namespace FreeStars {
 
-class GameView  : public QWidget {
+class GameView  : public QSplitter {
     Q_OBJECT
 
 public:
@@ -51,14 +51,11 @@ public slots:
     void submitTurn();
 
 private:
-    void setupToolbar(QToolBar*);
-
     void selectPlanet(const Planet*);
     void selectFleet(const Fleet*);
     void clearSelection();
 
 private:
-    QAbstractItemModel *getOwnPlanetsModel() const;
     const Player *player;
     std::vector<Message*> messages;
     PlanetProductionWidget *planetProductionWidget;

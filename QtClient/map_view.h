@@ -31,6 +31,20 @@ public:
 
     void setSelection(const SpaceObject*);
 
+public slots:
+    void setNormalMapMode();
+    void setSurfaceMineralsMapMode();
+    void setMineralConcMapMode();
+    void setPlanetValueMapMode();
+    void setPopulationMapMode();
+    void setNoInfoMapMode();
+
+    void showScannerRange(bool);
+    void showFleetPaths(bool);
+    void showNames(bool);
+    void showShipCount(bool);
+    void dontShowIdleFleets(bool);
+
 protected:
     void paintEvent(QPaintEvent*);    
 
@@ -50,6 +64,7 @@ private:
     const Player *player;
     const SpaceObject *selection;
     map_mode_t mapMode;
+    unsigned mapOptions;
 };
 
 };
