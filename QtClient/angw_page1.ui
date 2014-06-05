@@ -31,7 +31,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="gameNameEdit"/>
       </item>
      </layout>
     </widget>
@@ -216,49 +216,49 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="bmmBox">
               <property name="text">
                <string>Beginner: &amp;Maximum minerals</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_5">
+             <widget class="QCheckBox" name="staBox">
               <property name="text">
                <string>&amp;Slower Tech Advances</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_6">
+             <widget class="QCheckBox" name="abbsBox">
               <property name="text">
                <string>&amp;Accelerated BBS Play</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_2">
+             <widget class="QCheckBox" name="nreBox">
               <property name="text">
                <string>No &amp;Random Events</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_4">
+             <widget class="QCheckBox" name="cpfaBox">
               <property name="text">
                <string>&amp;Computer Players From Alliances</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_3">
+             <widget class="QCheckBox" name="ppsBox">
               <property name="text">
                <string>&amp;Public Player Scores</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_7">
+             <widget class="QCheckBox" name="gcBox">
               <property name="text">
                <string>&amp;Galaxy Clumping</string>
               </property>

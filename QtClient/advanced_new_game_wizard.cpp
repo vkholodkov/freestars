@@ -2,6 +2,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QStandardItemModel>
 
 #include "diamond_button.h"
 
@@ -14,8 +15,11 @@ namespace FreeStars {
 
 AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     : QDialog(parent)
+    , victoryConditions(new VictoryConditions)
+    , victoryConditionsModel(new QStandardItemModel(1, 17, this))
 {
     pagesWidget = new QStackedWidget;
+    pagesWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
     QWidget *page1 = new QWidget;
     Ui_AdvancedNewGameWizardPage1 advancedNewGameWizardPage1;
@@ -53,7 +57,27 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     advancedNewGameWizardPage3.setupUi(page3);
     pagesWidget->addWidget(page3);
 
-    pagesWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+    victoryConditionsMapper = new QDataWidgetMapper(this);
+    victoryConditionsMapper->setModel(victoryConditionsModel);
+
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.worldsCheck, 0);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.techCheck, 1);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.scoreCheck, 2);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.times2ndCheck, 3);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.resourcesCheck, 4);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.capShipsCheck, 5);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.highScoreAtCheck, 6);
+
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.worldsBox, 0);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.techLevelBox, 1);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.techCountBox, 2);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.scoreBox, 3);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.times2ndBox, 4);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.resourcesBox, 5);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.capShipsBox, 6);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.highScoreAtBox, 7);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.countBox, 8);
+    victoryConditionsMapper->addMapping(advancedNewGameWizardPage3.starsBox, 9);
 
     QWidget *buttonsPane = new QWidget;
 
@@ -112,6 +136,8 @@ void AdvancedNewGameWizard::nextClicked(bool)
 
 void AdvancedNewGameWizard::finishClicked(bool)
 {
+    victoryConditionsMapper->submit();
+
     accept();
 }
 

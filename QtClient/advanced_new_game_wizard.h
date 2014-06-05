@@ -2,8 +2,11 @@
 #ifndef _ADVANCED_NEW_GAME_WIZARD_H_
 #define _ADVANCED_NEW_GAME_WIZARD_H_
 
+#include <memory>
+
 #include <QDialog>
 #include <QStackedWidget>
+#include <QDataWidgetMapper>
 
 #include "FSServer.h"
 
@@ -14,6 +17,8 @@ class AdvancedNewGameWizard : public QDialog {
 
 public:
     AdvancedNewGameWizard(QWidget *parent = 0);
+
+    std::auto_ptr<VictoryConditions> victoryConditions;
 
 private slots:
     void helpClicked(bool);
@@ -29,6 +34,9 @@ private:
     QPushButton *nextButton;
     QPushButton *backButton;
     QStackedWidget *pagesWidget;
+
+    QAbstractItemModel *victoryConditionsModel;
+    QDataWidgetMapper *victoryConditionsMapper;
 };
 
 };

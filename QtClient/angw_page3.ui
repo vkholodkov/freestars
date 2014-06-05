@@ -58,7 +58,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox">
+          <widget class="QCheckBox" name="worldsCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -74,7 +74,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox">
+          <widget class="QSpinBox" name="worldsBox">
            <property name="minimum">
             <number>20</number>
            </property>
@@ -125,7 +125,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox_3">
+          <widget class="QCheckBox" name="techCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -141,7 +141,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_2">
+          <widget class="QSpinBox" name="techLevelBox">
            <property name="minimum">
             <number>8</number>
            </property>
@@ -167,7 +167,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_3">
+          <widget class="QSpinBox" name="techCountBox">
            <property name="minimum">
             <number>2</number>
            </property>
@@ -218,7 +218,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox_6">
+          <widget class="QCheckBox" name="scoreCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -231,7 +231,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_4">
+          <widget class="QSpinBox" name="scoreBox">
            <property name="minimum">
             <number>1000</number>
            </property>
@@ -282,7 +282,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox_7">
+          <widget class="QCheckBox" name="times2ndCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -298,7 +298,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_5">
+          <widget class="QSpinBox" name="times2ndBox">
            <property name="minimum">
             <number>20</number>
            </property>
@@ -349,7 +349,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox_4">
+          <widget class="QCheckBox" name="resourcesCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -362,7 +362,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_6">
+          <widget class="QSpinBox" name="resourcesBox">
            <property name="minimum">
             <number>10</number>
            </property>
@@ -413,7 +413,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox_5">
+          <widget class="QCheckBox" name="capShipsCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -426,7 +426,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_7">
+          <widget class="QSpinBox" name="capShipsBox">
            <property name="minimum">
             <number>10</number>
            </property>
@@ -477,7 +477,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="checkBox_2">
+          <widget class="QCheckBox" name="highScoreAtCheck">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -490,7 +490,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_8">
+          <widget class="QSpinBox" name="highScoreAtBox">
            <property name="minimum">
             <number>30</number>
            </property>
@@ -557,7 +557,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_9">
+       <widget class="QSpinBox" name="countBox">
         <property name="maximum">
          <number>3</number>
         </property>
@@ -618,7 +618,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_10">
+       <widget class="QSpinBox" name="starsBox">
         <property name="minimum">
          <number>30</number>
         </property>
