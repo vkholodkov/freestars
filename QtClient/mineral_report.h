@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _MINERAL_REPORT_H_
 #define _MINERAL_REPORT_H_

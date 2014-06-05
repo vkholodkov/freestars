@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _PLANET_PRODUCTION_WIDGET_H_
 #define _PLANET_PRODUCTION_WIDGET_H_

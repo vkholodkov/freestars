@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _FLEETS_IN_ORBIT_WIDGET_H_
 #define _FLEETS_IN_ORBIT_WIDGET_H_

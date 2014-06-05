@@ -1,4 +1,6 @@
-
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>

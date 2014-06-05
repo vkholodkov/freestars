@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _DIAMOND_BUTTON_H_
 #define _DIAMOND_BUTTON_H_

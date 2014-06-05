@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _SCALE_WIDGET_H_
 #define _SCALE_WIDGET_H_

@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _FOLDING_WIDGET_H
 #define _FOLDING_WIDGET_H

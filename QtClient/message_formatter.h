@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _MESSAGE_COMPILER_H_
 #define _MESSAGE_COMPILER_H_

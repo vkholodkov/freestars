@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _HABITATION_BAR_H_
 #define _HABITATION_BAR_H_

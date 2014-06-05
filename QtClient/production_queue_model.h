@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _PRODUCTION_QUEUE_MODEL_H
 #define _PRODUCTION_QUEUE_MODEL_H

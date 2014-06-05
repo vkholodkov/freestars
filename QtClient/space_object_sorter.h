@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _SPACE_OBJECT_SORTER_H_
 #define _SPACE_OBJECT_SORTER_H_

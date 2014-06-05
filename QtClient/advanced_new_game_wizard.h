@@ -1,4 +1,6 @@
-
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 #ifndef _ADVANCED_NEW_GAME_WIZARD_H_
 #define _ADVANCED_NEW_GAME_WIZARD_H_
 

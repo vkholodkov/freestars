@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _GAME_VIEW_H_
 #define _GAME_VIEW_H_

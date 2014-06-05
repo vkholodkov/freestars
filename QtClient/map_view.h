@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef _MAP_VIEW_H_
 #define _MAP_VIEW_H_

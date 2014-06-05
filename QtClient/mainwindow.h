@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

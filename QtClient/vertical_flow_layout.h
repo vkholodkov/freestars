@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2014 Valery Kholodkov
+ */
 
 #ifndef VERTICALFLOWLAYOUT_H
 #define VERTICALFLOWLAYOUT_H
