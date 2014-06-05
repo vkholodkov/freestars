@@ -67,4 +67,15 @@ QT4_ADD_RESOURCES(freestars_RESOURCES_RCC ${freestars_RESOURCES})
 
 add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS_MOC} ${freestars_FORMS_HEADERS} ${freestars_RESOURCES_RCC})
 
+add_custom_command( 
+    TARGET    fs-client-qt
+    POST_BUILD
+    COMMAND   lrelease
+    ARGS      messages.ts
+    COMMENT   "lrelease"
+)
+
+#set_target_properties(fs-client-qt PROPERTIES OBJECT_DEPENDS ${FREESTARS_SOURCE_DIR}/messages.qm)
+
 target_link_libraries(fs-client-qt fsserver MersenneTwister tinyxml QtGui QtCore)
+
