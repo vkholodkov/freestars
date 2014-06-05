@@ -307,7 +307,9 @@ void MainWindow::loadPlayerFile(const QString &fileName)
     TheGalaxy = new Galaxy;
 
     try {
-        if(!TheGame->LoadPlayerFile(fileName.toAscii().data())) {
+        std::string filename_ascii(fileName.toAscii());
+
+        if(!TheGame->LoadPlayerFile(filename_ascii.c_str())) {
             QMessageBox::warning(this, tr("Application"),
                                  tr("Cannot open player file %1")
                                  .arg(fileName));
