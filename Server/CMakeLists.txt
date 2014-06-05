@@ -39,6 +39,7 @@ SET(fsserver_SOURCES
 	Stack.cpp
 	TempFleet.cpp
 	TinyXmlPlus.cpp
+    VictoryConditions.cpp
 	WayOrder.cpp
 	WayOrderList.cpp
     Wormhole.cpp

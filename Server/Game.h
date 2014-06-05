@@ -35,6 +35,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #include "WayOrderList.h"
 #include "Component.h"
 #include "Player.h"
+#include "VictoryConditions.h"
+
 class TiXmlNode;
 
 namespace FreeStars {
@@ -162,19 +164,7 @@ protected:
 	unsigned long * mSeed;
 
 	Creation * mCreation;
-
-	// VictoryConditions
-	long VCWorlds;
-	long VCTechLevel;
-	long VCTechCount;
-	long VCScore;
-	double VCTimes2nd;
-	long VCResources;
-	long VCCapShips;
-	long VCHighScoreAt;
-	long VCCount;
-	long VCStart;
-
+    VictoryConditions *VC;
 };
 
 // turn phases

@@ -45,21 +45,11 @@ Game::Game()
 {
 	mTurnPhase = 0;
 	mCreation = NULL;
+    VC = NULL;
 	mNumberOfPlayers = 0;
 	mWHMin = 0;
 	mWHMax = 0;
 	mWHMinDistance = 0;
-
-	VCWorlds = 0;
-	VCTechLevel = 0;
-	VCTechCount = 0;
-	VCScore = 0;
-	VCTimes2nd = 0.0;
-	VCResources = 0;
-	VCCapShips = 0;
-	VCHighScoreAt = 0;
-	VCCount = 0;
-	VCStart = 0;
 	mGameID = 0;
 
 	mSeed = NULL;
@@ -69,6 +59,7 @@ Game::Game()
 Game::~Game()
 {
 	delete mCreation;
+    delete VC;
 
 	deque<Component *>::iterator i1;
 	for (i1 = mComponents.begin(); i1 != mComponents.end(); ++i1)
@@ -225,19 +216,8 @@ bool Game::LoadCreation(const TiXmlNode * options)
 
 	child1 = options->FirstChild("VictoryConditions");
 	if (child1) {
-		VCCount = GetLong(child1->FirstChild("WinnerConditions"));
-		VCStart = GetLong(child1->FirstChild("MinimumYears"));
-		VCWorlds = GetLong(child1->FirstChild("ControledWorlds"));
-		child2 = child1->FirstChild("TechLevels");
-		if (child2) {
-			VCTechLevel = GetLong(child2->FirstChild("Level"));
-			VCTechCount = GetLong(child2->FirstChild("Number"));
-		}
-		VCScore = GetLong(child1->FirstChild("Score"));
-		VCTimes2nd = GetDouble(child1->FirstChild("OverSecond"));
-		VCResources = GetLong(child1->FirstChild("Resources"));
-		VCCapShips = GetLong(child1->FirstChild("CapShips"));
-		VCHighScoreAt = GetLong(child1->FirstChild("HighestScoreAt"));
+        VC = new VictoryConditions;
+        VC->Parse(child1);
 	}
 
 	child1 = options->FirstChild("MineralSettings");
@@ -988,28 +968,7 @@ void Game::WriteXYFile()
 	}
 	cre->LinkEndChild(ps);
 
-	TiXmlElement * vc = new TiXmlElement("VictoryConditions");
-	AddLong(vc, "WinnerConditions", VCCount);
-	AddLong(vc, "MinimumYears", VCStart);
-	if (VCWorlds > 0)
-		AddLong(vc, "ControledWorlds", VCWorlds);
-	if (VCTechLevel > 0) {
-		TiXmlElement * tl = new TiXmlElement("TechLevels");
-		AddLong(tl, "Level", VCTechLevel);
-		AddLong(tl, "Number", VCTechCount);
-		vc->LinkEndChild(tl);
-	}
-	if (VCScore > 0)
-		AddLong(vc, "Score", VCScore);
-	if (VCTimes2nd > 0.0)
-		AddDouble(vc, "OverSecond", VCTimes2nd);
-	if (VCResources > 0)
-		AddLong(vc, "Resources", VCResources);
-	if (VCCapShips > 0)
-		AddLong(vc, "CapShips", VCCapShips);
-	if (VCHighScoreAt > 0)
-		AddLong(vc, "HighestScoreAt", VCHighScoreAt);
-	cre->LinkEndChild(vc);
+    VC->WriteNode(cre);
 
 	Rules::WriteMinSettings(cre);
 	XYFile->LinkEndChild(cre);
