@@ -25,6 +25,8 @@ typedef enum {
 } map_options_t;
 
 class MapView : public QWidget {
+    Q_OBJECT
+
 public:
     MapView(const Galaxy*, const Game*, const Player*, QWidget *parent = 0);
 
@@ -32,8 +34,14 @@ public:
 
     QPoint galaxyToScreen(const QPoint&) const;
 
+    void clearSelection();
     void setSelection(const SpaceObject*);
+    const SpaceObject *findSelection(const QPoint&) const;
 
+signals:
+    void selectionChanged(const SpaceObject*);
+
+/*
 public slots:
     void setNormalMapMode();
     void setSurfaceMineralsMapMode();
@@ -47,9 +55,13 @@ public slots:
     void showNames(bool);
     void showShipCount(bool);
     void dontShowIdleFleets(bool);
+*/
 
 protected:
     void paintEvent(QPaintEvent*);    
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
+    void mouseMoveEvent(QMouseEvent*);
 
 private:
     void drawArrow(QPainter&, const QPoint&);

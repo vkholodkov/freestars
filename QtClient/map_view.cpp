@@ -2,9 +2,11 @@
  * Copyright (C) 2014 Valery Kholodkov
  */
 
-#include <iostream>
+#include <limits>
 
 #include <QPainter>
+#include <QMouseEvent>
+#include <QScrollArea>
 
 #include "map_view.h"
 
@@ -31,6 +33,7 @@ MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player
     , selection(0)
     , mapMode(MM_PLANET_VALUE)
 {
+    setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 QSize MapView::sizeHint() const {
@@ -46,16 +49,74 @@ QPoint MapView::galaxyToScreen(const QPoint &gp) const {
         (gp.y() - galaxy->MinY()) * contentsRect().height() / (galaxy->MaxY() - galaxy->MinY()));
 }
 
+void MapView::clearSelection()
+{
+    if(selection != NULL) {
+        QPoint pos(galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
+
+        QRect updateRect(pos, QSize(60, 60));
+
+        updateRect.translate(-30, -30);
+
+        QPoint parentPos(mapToParent(updateRect.topLeft()));
+
+        QRect viewportUpdateRect(parentPos, updateRect.size());
+
+        selection = NULL;
+
+        if(viewportUpdateRect.intersects(parentWidget()->contentsRect())) {
+            update(updateRect);
+            parentWidget()->update(viewportUpdateRect);
+        }
+    }
+}
+
 void MapView::setSelection(const SpaceObject *o) {
     selection = o;
 
     QPoint pos(galaxyToScreen(QPoint(o->GetPosX(), o->GetPosY())));
 
-    QRect updateRect(pos, QSize(40, 40));
+    QRect updateRect(pos, QSize(60, 60));
 
-    updateRect.translate(-20, 20);
+    updateRect.translate(-30, -30);
 
-    update(updateRect);
+    QPoint parentPos(mapToParent(updateRect.topLeft()));
+
+    QRect viewportUpdateRect(parentPos, updateRect.size());
+
+    if(viewportUpdateRect.intersects(parentWidget()->contentsRect())) {
+        update(updateRect);
+        parentWidget()->update(viewportUpdateRect);
+    }
+}
+
+const SpaceObject *MapView::findSelection(const QPoint &selectionPos) const {
+    double min_distance = std::numeric_limits<double>::max();
+    const SpaceObject *selection = NULL;
+
+    unsigned num_planets = galaxy->GetPlanetCount();
+
+    for(unsigned n = 1 ; n <= num_planets ; n++) {
+        const Planet *planet = galaxy->GetPlanet(n);
+
+        QPoint pos(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())));
+
+        double dx = abs(selectionPos.x() - pos.x());
+        double dy = abs(selectionPos.y() - pos.y());
+
+        double distance = ::sqrt(dx * dx + dy * dy);
+
+        if(distance < min_distance) {
+            min_distance = distance;
+            selection = planet;
+        }
+    }
+
+    if(min_distance > 20) {
+        selection = NULL;
+    }
+
+    return selection;
 }
 
 void (MapView::*MapView::planetDrawers[])(QPainter&, const Planet*, const QPoint&) = {
@@ -160,6 +221,28 @@ void MapView::drawArrow(QPainter &painter, const QPoint &p)
     path.translate(0, 2);
 
     painter.fillPath(path, QBrush(Qt::yellow));
+}
+
+void MapView::mousePressEvent(QMouseEvent *e)
+{
+    if(e->button() == Qt::LeftButton) {
+        const SpaceObject *newSelection = findSelection(e->pos());
+
+        if(newSelection != NULL) {
+            emit selectionChanged(newSelection);
+            return;
+        }
+    }
+
+    QWidget::mousePressEvent(e);
+}
+
+void MapView::mouseReleaseEvent(QMouseEvent *e)
+{
+}
+
+void MapView::mouseMoveEvent(QMouseEvent *e)
+{
 }
 
 };

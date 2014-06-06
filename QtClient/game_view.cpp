@@ -84,6 +84,7 @@ GameView::GameView(const Player *_player)
 
     connect(ui_StatusSelector.nextButton, SIGNAL(clicked()), this, SLOT(nextObject()));
     connect(this, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
+    connect(mapView, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
 }
 
 void GameView::setupMessages() {
@@ -305,6 +306,8 @@ void GameView::selectFleet(const Fleet *_fleet) {
 
 void GameView::clearSelection()
 {
+    mapView->clearSelection();
+
     QStackedWidget *statusBed = ui_StatusSelector.statusBed;
 
     while(statusBed->count()) {
@@ -325,13 +328,13 @@ void GameView::selectObject(const SpaceObject *so)
 {
     QPoint pos(mapView->galaxyToScreen(QPoint(so->GetPosX(), so->GetPosY())));
 
+    clearSelection();
     mapScroller->ensureVisible(pos.x(), pos.y());
     mapView->setSelection(so);
 
     const Planet *p = dynamic_cast<const Planet*>(so);
 
     if(p != NULL) {
-        clearSelection();
         selectPlanet(p);
         return;
     }
@@ -339,7 +342,6 @@ void GameView::selectObject(const SpaceObject *so)
     const Fleet *f = dynamic_cast<const Fleet*>(so);
 
     if(f != NULL) {
-        clearSelection();
         selectFleet(f);
         return;
     }

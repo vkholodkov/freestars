@@ -35,6 +35,7 @@ SET(freestars_HEADERS
     planet_production_widget.h
     fleets_in_orbit_widget.h
     production_queue_model.h
+    map_view.h
 )
 
 SET(freestars_FORMS
