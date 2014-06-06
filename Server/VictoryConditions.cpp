@@ -62,6 +62,8 @@ bool VictoryConditions::Parse(const TiXmlNode *child1)
     Resources = GetLong(child1->FirstChild("Resources"));
     CapShips = GetLong(child1->FirstChild("CapShips"));
     HighScoreAt = GetLong(child1->FirstChild("HighestScoreAt"));
+
+    return true;
 }
 
 void VictoryConditions::WriteNode(TiXmlNode *cre) const
