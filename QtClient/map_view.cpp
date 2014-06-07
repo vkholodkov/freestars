@@ -43,7 +43,7 @@ MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player
     , mapMode(MM_NORMAL)
 {
     setContextMenuPolicy(Qt::DefaultContextMenu);
-    setCursor(QCursor(QPixmap(arrow_up_xpm)));
+    setCursor(QCursor(QPixmap(arrow_up_xpm), 8, 0));
 }
 
 QSize MapView::sizeHint() const {
