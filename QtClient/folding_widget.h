@@ -5,12 +5,36 @@
 #ifndef _FOLDING_WIDGET_H
 #define _FOLDING_WIDGET_H
 
+#include <QLabel>
 #include <QWidget>
 #include <QFrame>
 
 class QPushButton;
 class QStackedWidget;
 class QVBoxLayout;
+
+namespace FreeStars {
+
+class FoldButton : public QFrame {
+    Q_OBJECT
+
+public:
+    FoldButton(QWidget *parent = 0);
+
+    QSize sizeHint() const;
+
+signals:
+    void clicked();
+
+protected:
+    void paintEvent(QPaintEvent*);
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
+
+private:
+    bool pressed, checked;
+    QImage fold, unfold;
+};
 
 class FoldingWidget : public QFrame
 {
@@ -46,9 +70,12 @@ signals:
     void foldedChanged(bool);
 
 private:
-    QPushButton *button;
+    FoldButton *button;
+    QLabel *title;
     QStackedWidget *stackWidget;
     QVBoxLayout *layout;
+};
+
 };
 
 #endif
