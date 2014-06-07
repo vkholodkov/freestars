@@ -17,6 +17,7 @@
 #include "fleets_in_orbit_widget.h"
 #include "fleet_widget.h"
 #include "orbiting_widget.h"
+#include "fleet_cargo_widget.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -355,6 +356,16 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
         connect(orbitingWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
             this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
     }
+
+    /*
+     * Fleet cargo widget
+     */
+    FleetCargoWidget *fleetCargoWidget = new FleetCargoWidget(_fleet, player);
+    fleetCargoWidget->setObjectName("w1_column2");
+    verticalFlowLayout->addWidget(fleetCargoWidget);
+    
+    connect(fleetCargoWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
+        this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
 }
 
 void GameView::clearBriefSelection()
