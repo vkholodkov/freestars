@@ -141,6 +141,11 @@ Planet * SpaceObject::InOrbit()
 	return dynamic_cast<Planet *>(mAlsoHere->at(0));
 }
 
+const Planet * SpaceObject::InOrbit() const
+{
+	return dynamic_cast<const Planet *>(mAlsoHere->at(0));
+}
+
 void SpaceObject::GetChasers(deque<Chaser *> * chasers, int owner)
 {
 	chasers->clear();

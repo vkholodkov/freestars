@@ -100,7 +100,7 @@ public:
 	void GetChasers(deque<Chaser *> * chasers, int owner);
 
 	virtual Planet * InOrbit(); ///< Get planet this object is in orbit of, or NULL if none.
-	virtual const Planet * InOrbit() const	{ return InOrbit(); } ///< Get planet this object is in orbit of, or NULL if none.
+	virtual const Planet * InOrbit() const; ///< Get planet this object is in orbit of, or NULL if none.
 
 protected:
 	deque<long> mSeenBy;

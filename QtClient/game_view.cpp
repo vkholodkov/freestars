@@ -16,6 +16,7 @@
 
 #include "fleets_in_orbit_widget.h"
 #include "fleet_widget.h"
+#include "orbiting_widget.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -87,7 +88,8 @@ GameView::GameView(const Player *_player)
     connect(ui_StatusSelector.nextButton, SIGNAL(clicked()), this, SLOT(nextObject()));
     connect(this, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
     connect(mapView, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
-    connect(mapView, SIGNAL(listObjectsInLocation(const SpaceObject*, const QPoint&)), this, SLOT(listObjectsInLocation(const SpaceObject*, const QPoint&)));
+    connect(mapView, SIGNAL(listObjectsInLocation(const SpaceObject*, const QPoint&)),
+        this, SLOT(listObjectsInLocation(const SpaceObject*, const QPoint&)));
 }
 
 void GameView::setupMessages() {
@@ -337,6 +339,22 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     connect(fleetWidget, SIGNAL(prevObject()), this, SLOT(prevObject()));
     connect(fleetWidget, SIGNAL(renameObject(const SpaceObject*)),
         this, SLOT(renameObject(const SpaceObject*)));
+
+    const Planet *inOrbit = _fleet->InOrbit();
+
+    if(inOrbit != NULL) {
+        /*
+         * Orbiting widget
+         */
+        OrbitingWidget *orbitingWidget = new OrbitingWidget(inOrbit, _fleet, player);
+        orbitingWidget->setObjectName("w2_column1");
+        verticalFlowLayout->addWidget(orbitingWidget);
+        
+        connect(orbitingWidget, SIGNAL(selectObject(const SpaceObject*)),
+            this, SLOT(selectObject(const SpaceObject*)));
+        connect(orbitingWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
+            this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
+    }
 }
 
 void GameView::clearBriefSelection()
