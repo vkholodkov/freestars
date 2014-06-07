@@ -46,7 +46,7 @@ GameView::GameView(const Player *_player)
     container->setFrameShadow(QFrame::Sunken);
     container->setFrameShape(QFrame::Panel);
 
-    verticalFlowLayout = new VerticalFlowLayout;
+    verticalFlowLayout = new VerticalFlowLayout(3, 3, 2);
     container->setLayout(verticalFlowLayout);
 
     QWidget *messageWidget = new QWidget;
