@@ -4,3 +4,4 @@ qrc_*.cxx
 *.qm
 debug.sh
 run.sh
+application.qrc.depends

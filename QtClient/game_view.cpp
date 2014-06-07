@@ -20,6 +20,8 @@
 #include "fleet_cargo_widget.h"
 #include "fleet_composition_widget.h"
 
+#include "research_dialog.h"
+
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
 #include "ui_status_selector.h"
@@ -590,7 +592,8 @@ void GameView::shipDesignDialog()
 
 void GameView::researchDialog()
 {
-    std::cout << "GameView::researchDialog" << std::endl;
+    ResearchDialog researchDialog(player);
+    researchDialog.exec();
 }
 
 void GameView::battlePlansDialog()

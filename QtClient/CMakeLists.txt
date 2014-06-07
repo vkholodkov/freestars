@@ -27,6 +27,7 @@ SET(freestars_SOURCES
     production_queue_model.cpp
     space_object_sorter.cpp
     map_view.cpp
+    research_dialog.cpp
 )
 
 SET(freestars_HEADERS
@@ -46,6 +47,7 @@ SET(freestars_HEADERS
     orbiting_widget.h
     production_queue_model.h
     map_view.h
+    research_dialog.h
 )
 
 SET(freestars_FORMS
@@ -65,6 +67,7 @@ SET(freestars_FORMS
     minerals_on_hand_widget.ui
     planet_status_widget.ui
     starbase_widget.ui
+    research_dialog.ui
 )
 
 SET(freestars_RESOURCES application.qrc)
