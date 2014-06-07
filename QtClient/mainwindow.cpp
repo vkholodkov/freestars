@@ -517,6 +517,12 @@ void MainWindow::activateTab(int index)
 
             viewModeGroup->setEnabled(true);
 
+            submitTurnAction->setEnabled(true);
+            shipDesignAction->setEnabled(true);
+            researchAction->setEnabled(true);
+            battlePlansAction->setEnabled(true);
+            playerRelationsAction->setEnabled(true);
+
             return;
         }
     }
