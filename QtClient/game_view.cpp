@@ -15,6 +15,7 @@
 #include "space_object_sorter.h"
 
 #include "fleets_in_orbit_widget.h"
+#include "fleet_widget.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -106,69 +107,102 @@ void GameView::setupMessages() {
     displayMessage(*messages[currentMessage]);
 }
 
-void GameView::selectPlanet(const Planet *_planet) {
+void GameView::setBriefSelection(const Planet *_planet) {
+    long seen = _planet->SeenBy(player);
+
     QStackedWidget *statusBed = ui_StatusSelector.statusBed;
 
     ui_StatusSelector.titleLabel->setText(tr("%0 Summary")
         .arg(_planet->GetName().c_str()));    
 
+    if(seen & (SEEN_PLANETHAB|SEEN_PLANETPOP|SEEN_PLANETMC)) {
+        QWidget *newPage = new QWidget;
+        Ui_PlanetReport ui_PlanetReport;
+        ui_PlanetReport.setupUi(newPage);
+        statusBed->addWidget(newPage);
+
+        if(seen & SEEN_PLANETHAB) {
+            ui_PlanetReport.valueLabel->setText(tr("Value: %0%")
+                .arg(_planet->GetOwner()->HabFactor(_planet)));
+        }
+
+        if(seen & SEEN_PLANETPOP) {
+            ui_PlanetReport.popLabel->setText(tr("Population: %0")
+                .arg(_planet->GetDisplayPop()));
+        }
+
+        if(seen & SEEN_PLANETHAB) {
+            ui_PlanetReport.gravityLabel->setText(tr("%0g")
+                .arg((double)_planet->GetHabValue(0) / 10, 0, 'f', 1));
+
+            ui_PlanetReport.habitationBar->setGravityRange(HabRange(player->HabCenter(0),
+                player->HabWidth(0)));
+
+            ui_PlanetReport.habitationBar->setGravityValue(_planet->GetHabValue(0));
+
+            ui_PlanetReport.tempLabel->setText(trUtf8("%0°C")
+                .arg(_planet->GetHabValue(1)));
+
+            ui_PlanetReport.habitationBar->setTempRange(HabRange(player->HabCenter(1),
+                player->HabWidth(1)));
+
+            ui_PlanetReport.habitationBar->setTempValue(_planet->GetHabValue(1));
+
+            ui_PlanetReport.radLabel->setText(tr("%0mR")
+                .arg(_planet->GetHabValue(2)));
+
+            ui_PlanetReport.habitationBar->setRadRange(HabRange(player->HabCenter(2),
+                player->HabWidth(2)));
+
+            ui_PlanetReport.habitationBar->setRadValue(_planet->GetHabValue(2));
+        }
+
+        if(seen & SEEN_PLANETMC) {
+            long ironium = _planet->GetContain(0);
+            long boranium = _planet->GetContain(1);
+            long germanium = _planet->GetContain(2);
+
+            ui_PlanetReport.mineralReport->setIronium(ironium);
+            ui_PlanetReport.mineralReport->setBoranium(boranium);
+            ui_PlanetReport.mineralReport->setGermanium(germanium);
+
+            ui_PlanetReport.mineralReport->setIroniumVelocity(_planet->GetMiningVelocity(0));
+            ui_PlanetReport.mineralReport->setBoraniumVelocity(_planet->GetMiningVelocity(1));
+            ui_PlanetReport.mineralReport->setGermaniumVelocity(_planet->GetMiningVelocity(2));
+
+            ui_PlanetReport.ironiumOverflowLabel->setText(ironium > 5000 ? "+" : " ");
+            ui_PlanetReport.boraniumOverflowLabel->setText(boranium > 5000 ? "+" : " ");
+            ui_PlanetReport.germaniumOverflowLabel->setText(germanium > 5000 ? "+" : " ");
+
+            ui_PlanetReport.mineralReport->setIroniumConc(_planet->GetMinConc(0));
+            ui_PlanetReport.mineralReport->setBoraniumConc(_planet->GetMinConc(1));
+            ui_PlanetReport.mineralReport->setGermaniumConc(_planet->GetMinConc(2));
+
+            ui_PlanetReport.scaleWidget->setMineralReport(ui_PlanetReport.mineralReport);;
+        }
+    }
+
+    SpaceObjectSorter sos(_planet);
+    currentStack.assign(sos.m_object_list.begin(), sos.m_object_list.end());
+    currentSelection = _planet;
+    currentObject = std::find(currentStack.begin(), currentStack.end(), currentSelection) - currentStack.begin();
+}
+
+void GameView::setBriefSelection(const Fleet *_fleet) {
+    QStackedWidget *statusBed = ui_StatusSelector.statusBed;
+
+    ui_StatusSelector.titleLabel->setText(tr("%0 Summary")
+        .arg(_fleet->GetName(player).c_str()));    
+
     QWidget *newPage = new QWidget;
-    Ui_PlanetReport ui_PlanetReport;
-    ui_PlanetReport.setupUi(newPage);
+    Ui_FleetReport ui_FleetReport;
+    ui_FleetReport.setupUi(newPage);
     statusBed->addWidget(newPage);
 
-    ui_PlanetReport.valueLabel->setText(tr("Value: %0%")
-        .arg(_planet->GetOwner()->HabFactor(_planet)));
+    currentSelection = _fleet;
+}
 
-    ui_PlanetReport.popLabel->setText(tr("Population: %0")
-        .arg(_planet->GetDisplayPop()));
-
-    ui_PlanetReport.gravityLabel->setText(tr("%0g")
-        .arg((double)_planet->GetHabValue(0) / 10, 0, 'f', 1));
-
-    ui_PlanetReport.habitationBar->setGravityRange(HabRange(player->HabCenter(0),
-        player->HabWidth(0)));
-
-    ui_PlanetReport.habitationBar->setGravityValue(_planet->GetHabValue(0));
-
-    ui_PlanetReport.tempLabel->setText(trUtf8("%0°C")
-        .arg(_planet->GetHabValue(1)));
-
-    ui_PlanetReport.habitationBar->setTempRange(HabRange(player->HabCenter(1),
-        player->HabWidth(1)));
-
-    ui_PlanetReport.habitationBar->setTempValue(_planet->GetHabValue(1));
-
-    ui_PlanetReport.radLabel->setText(tr("%0mR")
-        .arg(_planet->GetHabValue(2)));
-
-    ui_PlanetReport.habitationBar->setRadRange(HabRange(player->HabCenter(2),
-        player->HabWidth(2)));
-
-    ui_PlanetReport.habitationBar->setRadValue(_planet->GetHabValue(2));
-
-    long ironium = _planet->GetContain(0);
-    long boranium = _planet->GetContain(1);
-    long germanium = _planet->GetContain(2);
-
-    ui_PlanetReport.mineralReport->setIronium(ironium);
-    ui_PlanetReport.mineralReport->setBoranium(boranium);
-    ui_PlanetReport.mineralReport->setGermanium(germanium);
-
-    ui_PlanetReport.mineralReport->setIroniumVelocity(_planet->GetMiningVelocity(0));
-    ui_PlanetReport.mineralReport->setBoraniumVelocity(_planet->GetMiningVelocity(1));
-    ui_PlanetReport.mineralReport->setGermaniumVelocity(_planet->GetMiningVelocity(2));
-
-    ui_PlanetReport.ironiumOverflowLabel->setText(ironium > 5000 ? "+" : " ");
-    ui_PlanetReport.boraniumOverflowLabel->setText(boranium > 5000 ? "+" : " ");
-    ui_PlanetReport.germaniumOverflowLabel->setText(germanium > 5000 ? "+" : " ");
-
-    ui_PlanetReport.mineralReport->setIroniumConc(_planet->GetMinConc(0));
-    ui_PlanetReport.mineralReport->setBoraniumConc(_planet->GetMinConc(1));
-    ui_PlanetReport.mineralReport->setGermaniumConc(_planet->GetMinConc(2));
-
-    ui_PlanetReport.scaleWidget->setMineralReport(ui_PlanetReport.mineralReport);;
-
+void GameView::setDetailedSelection(const Planet *_planet) {
     FoldingWidget *w1 = new FoldingWidget(_planet->GetName().c_str());
     w1->setObjectName("w1_column1");
 
@@ -218,6 +252,10 @@ void GameView::selectPlanet(const Planet *_planet) {
     /*
      * Minerals on hand
      */
+    long ironium = _planet->GetContain(0);
+    long boranium = _planet->GetContain(1);
+    long germanium = _planet->GetContain(2);
+
     QWidget *mineralsOnHandWidget = new QWidget;
     ui_MineralsOnHandWidget.setupUi(mineralsOnHandWidget);
 
@@ -285,28 +323,23 @@ void GameView::selectPlanet(const Planet *_planet) {
         
         verticalFlowLayout->addWidget(w4);
     }
-
-    SpaceObjectSorter sos(_planet);
-    currentStack.assign(sos.m_object_list.begin(), sos.m_object_list.end());
-    currentSelection = _planet;
-    currentObject = std::find(currentStack.begin(), currentStack.end(), currentSelection) - currentStack.begin();
 }
 
-void GameView::selectFleet(const Fleet *_fleet) {
-    QStackedWidget *statusBed = ui_StatusSelector.statusBed;
-
-    ui_StatusSelector.titleLabel->setText(tr("%0 Summary")
-        .arg(_fleet->GetName(player).c_str()));    
-
-    QWidget *newPage = new QWidget;
-    Ui_FleetReport ui_FleetReport;
-    ui_FleetReport.setupUi(newPage);
-    statusBed->addWidget(newPage);
-
-    currentSelection = _fleet;
+void GameView::setDetailedSelection(const Fleet *_fleet) {
+    /*
+     * Fleet widget
+     */
+    FleetWidget *fleetWidget = new FleetWidget(_fleet, player);
+    fleetWidget->setObjectName("w1_column1");
+    verticalFlowLayout->addWidget(fleetWidget);
+    
+    connect(fleetWidget, SIGNAL(nextObject()), this, SLOT(nextObject()));
+    connect(fleetWidget, SIGNAL(prevObject()), this, SLOT(prevObject()));
+    connect(fleetWidget, SIGNAL(renameObject(const SpaceObject*)),
+        this, SLOT(renameObject(const SpaceObject*)));
 }
 
-void GameView::clearSelection()
+void GameView::clearBriefSelection()
 {
     mapView->clearSelection();
 
@@ -317,7 +350,10 @@ void GameView::clearSelection()
         statusBed->removeWidget(widget);
         delete widget;
     }
+}
 
+void GameView::clearDetailedSelection()
+{
     QLayoutItem *item;
     while ((item = verticalFlowLayout->itemAt(0))) {
         verticalFlowLayout->removeItem(item);
@@ -330,21 +366,34 @@ void GameView::selectObject(const SpaceObject *so)
 {
     QPoint pos(mapView->galaxyToScreen(QPoint(so->GetPosX(), so->GetPosY())));
 
-    clearSelection();
+    clearBriefSelection();
+
+    if(so->GetOwner() == player) {
+        clearDetailedSelection();
+    }
+
     mapScroller->ensureVisible(pos.x(), pos.y());
     mapView->setSelection(so);
 
     const Planet *p = dynamic_cast<const Planet*>(so);
 
     if(p != NULL) {
-        selectPlanet(p);
+        setBriefSelection(p);
+
+        if(so->GetOwner() == player) {
+            setDetailedSelection(p);
+        }
         return;
     }
 
     const Fleet *f = dynamic_cast<const Fleet*>(so);
 
     if(f != NULL) {
-        selectFleet(f);
+        setBriefSelection(f);
+
+        if(so->GetOwner() == player) {
+            setDetailedSelection(f);
+        }
         return;
     }
 }
@@ -389,6 +438,11 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
     }
 }
 
+void GameView::renameObject(const SpaceObject *o)
+{
+    std::cout << "GameView::renameObject o=" << o << std::endl;
+}
+
 void GameView::displayMessage(const Message &_message) {
     MessageFormatter messageFormatter(player);
     _message.ApplyVisitor(messageFormatter);
@@ -427,6 +481,19 @@ void GameView::nextObject()
         }
         else {
             currentObject = 0;
+        }
+        emit selectionChanged(currentStack[currentObject]);
+    }
+}
+
+void GameView::prevObject()
+{
+    if(currentSelection != NULL) {
+        if(currentObject > 0) {
+            currentObject--;
+        }
+        else {
+            currentObject = currentStack.size()-1;
         }
         emit selectionChanged(currentStack[currentObject]);
     }

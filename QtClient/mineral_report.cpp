@@ -36,7 +36,9 @@ void MineralReport::paintEvent(QPaintEvent *event)
     drawConcentrationSign(painter, m_germaniumConc, 2 * rect.height() / 3 + 3, rect.height() - 3, Qt::darkYellow);
 }
 
-void MineralReport::drawMineralBar(QPainter &painter, unsigned value, unsigned velocity, int top, int bottom, const QColor &color, const QColor &velColor) const {
+void MineralReport::drawMineralBar(QPainter &painter, int value, int velocity, int top, int bottom, const QColor &color, const QColor &velColor) const {
+    
+
     int barWidth = value * contentsRect().width() / 5000;
 
     if(barWidth != 0) {
@@ -50,7 +52,7 @@ void MineralReport::drawMineralBar(QPainter &painter, unsigned value, unsigned v
     }
 }
 
-void MineralReport::drawConcentrationSign(QPainter &painter, unsigned value, int top, int bottom, const QColor &color) const {
+void MineralReport::drawConcentrationSign(QPainter &painter, int value, int top, int bottom, const QColor &color) const {
     int width = (bottom - top) / 2 - 3;
     QRect rect(contentsRect());
 

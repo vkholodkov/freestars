@@ -34,7 +34,11 @@ void HabitationBar::drawHabitationBar(QPainter &painter, const HabRange &range, 
     painter.fillRect(rect, color);
 }
 
-void HabitationBar::drawHabitationSign(QPainter &painter, unsigned value, int top, int bottom, const QColor &color) const {
+void HabitationBar::drawHabitationSign(QPainter &painter, int value, int top, int bottom, const QColor &color) const {
+    if(value < 0) {
+        return;
+    }
+
     int x = value * contentsRect().width() / 100;
     int y = (top + bottom) / 2;
     int width = (bottom - top) / 2 - 3;

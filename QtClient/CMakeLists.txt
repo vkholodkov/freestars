@@ -20,6 +20,7 @@ SET(freestars_SOURCES
     diamond_button.cpp
     planet_production_widget.cpp
     fleets_in_orbit_widget.cpp
+    fleet_widget.cpp
     production_queue_model.cpp
     space_object_sorter.cpp
     map_view.cpp
@@ -36,6 +37,7 @@ SET(freestars_HEADERS
     cargo_widget.h
     planet_production_widget.h
     fleets_in_orbit_widget.h
+    fleet_widget.h
     production_queue_model.h
     map_view.h
 )
@@ -45,11 +47,13 @@ SET(freestars_FORMS
     angw_page3.ui
     planet_widget.ui
     planet_report.ui
+    fleet_widget.ui
     fleet_report.ui
     planet_production_widget.ui
     message_widget.ui
     fleets_in_orbit_widget.ui
     status_selector.ui
+    orbiting_widget.ui
     minerals_on_hand_widget.ui
     planet_status_widget.ui
     starbase_widget.ui

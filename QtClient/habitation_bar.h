@@ -43,9 +43,9 @@ class HabitationBar : public QFrame {
     Q_PROPERTY(HabRange tempRange READ tempRange WRITE setTempRange)
     Q_PROPERTY(HabRange radRange READ radRange WRITE setRadRange)
 
-    Q_PROPERTY(unsigned gravityValue READ gravityValue WRITE setGravityValue)
-    Q_PROPERTY(unsigned tempValue READ tempValue WRITE setTempValue)
-    Q_PROPERTY(unsigned radValue READ radValue WRITE setRadValue)
+    Q_PROPERTY(int gravityValue READ gravityValue WRITE setGravityValue)
+    Q_PROPERTY(int tempValue READ tempValue WRITE setTempValue)
+    Q_PROPERTY(int radValue READ radValue WRITE setRadValue)
 
 public:
     HabitationBar(QWidget *parent = 0)
@@ -62,14 +62,14 @@ public:
     HabRange radRange() const { return m_radRange; }
     void setRadRange(const HabRange &_radRange) { m_radRange = _radRange; }
 
-    unsigned gravityValue() const { return m_gravityValue; }
-    void setGravityValue(unsigned _gravityValue) { m_gravityValue = _gravityValue; }
+    int gravityValue() const { return m_gravityValue; }
+    void setGravityValue(int _gravityValue) { m_gravityValue = _gravityValue; }
 
-    unsigned tempValue() const { return m_tempValue; }
-    void setTempValue(unsigned _tempValue) { m_tempValue = _tempValue; }
+    int tempValue() const { return m_tempValue; }
+    void setTempValue(int _tempValue) { m_tempValue = _tempValue; }
 
-    unsigned radValue() const { return m_radValue; }
-    void setRadValue(unsigned _radValue) { m_radValue = _radValue; }
+    int radValue() const { return m_radValue; }
+    void setRadValue(int _radValue) { m_radValue = _radValue; }
 
 protected:
     void paintEvent(QPaintEvent *event);    
@@ -77,11 +77,11 @@ protected:
     void mouseReleaseEvent(QMouseEvent*);
 
     HabRange m_gravityRange, m_tempRange, m_radRange;
-    unsigned m_gravityValue, m_tempValue, m_radValue;
+    int m_gravityValue, m_tempValue, m_radValue;
 
 protected:
     void drawHabitationBar(QPainter&, const HabRange&, int, int, const QColor&) const;
-    void drawHabitationSign(QPainter&, unsigned, int, int, const QColor&) const;
+    void drawHabitationSign(QPainter&, int, int, int, const QColor&) const;
 };
 
 #endif

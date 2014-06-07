@@ -2,3 +2,5 @@ ui_*.h
 moc_*.cxx
 qrc_*.cxx
 *.qm
+debug.sh
+run.sh

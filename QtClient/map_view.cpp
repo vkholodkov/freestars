@@ -148,6 +148,10 @@ void MapView::paintEvent(QPaintEvent *event)
 
     painter.fillRect(rect, Qt::black);
 
+    if(selection != NULL) { 
+        drawArrow(painter, galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
+    }
+
     unsigned num_planets = galaxy->GetPlanetCount();
 
     for(unsigned n = 1 ; n <= num_planets ; n++) {
@@ -156,10 +160,6 @@ void MapView::paintEvent(QPaintEvent *event)
         QPoint pos(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())));
 
         (this->*planetDrawers[mapMode])(painter, planet, pos);
-    }
-
-    if(selection != NULL) { 
-        drawArrow(painter, galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
     }
 }
 

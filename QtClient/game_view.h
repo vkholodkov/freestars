@@ -38,11 +38,13 @@ signals:
 public slots:
     void selectObject(const SpaceObject*);
     void listObjectsInLocation(const SpaceObject*, const QPoint&);
+    void renameObject(const SpaceObject*);
 
     void nextMessage();
     void prevMessage();
 
     void nextObject();
+    void prevObject();
 
     void exchangeCargo(const Planet*, const Fleet*);
     void changeProductionQueue(const Planet*);
@@ -58,9 +60,12 @@ public slots:
     void submitTurn();
 
 private:
-    void selectPlanet(const Planet*);
-    void selectFleet(const Fleet*);
-    void clearSelection();
+    void setBriefSelection(const Planet*);
+    void setBriefSelection(const Fleet*);
+    void setDetailedSelection(const Planet*);
+    void setDetailedSelection(const Fleet*);
+    void clearBriefSelection();
+    void clearDetailedSelection();
 
 private:
     const Player *player;

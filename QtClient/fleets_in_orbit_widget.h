@@ -21,15 +21,13 @@ class FleetsInOrbitWidget : public FoldingWidget {
 public:
     FleetsInOrbitWidget(const Planet*, const Player*, QWidget *parent = 0);
 
-public slots:
-    void gotoButtonClicked(bool);
-    void cargoButtonClicked(bool);
-
 signals:
     void selectObject(const SpaceObject*);
     void exchangeCargo(const Planet*, const Fleet*);
 
 private slots:
+    void gotoButtonClicked(bool);
+    void cargoButtonClicked(bool);
     void objectActivated(int);
 
 private:
