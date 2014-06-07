@@ -187,6 +187,51 @@ void MainWindow::createActions()
     aboutQtAct = new QAction(tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
+    /*
+     * Toolbar actions
+     */
+    viewModeGroup = new QActionGroup(this);
+
+    normalViewAction = new QAction(QIcon(":/images/normal_map_mode.png"), tr("N&ormal view"), this);
+    normalViewAction->setStatusTip(tr("Normal view"));
+    normalViewAction->setCheckable(true);
+    viewModeGroup->addAction(normalViewAction);
+
+    surfaceMineralsViewAction = new QAction(QIcon(":/images/surface_minerals.png"), tr("S&urface minerals"), this);
+    surfaceMineralsViewAction->setStatusTip(tr("Surface Mineral View"));
+    surfaceMineralsViewAction->setCheckable(true);
+    viewModeGroup->addAction(surfaceMineralsViewAction);
+
+    mineralConcViewAction = new QAction(QIcon(":/images/minconc.png"), tr("Mineral &Concentration view"), this);
+    mineralConcViewAction->setStatusTip(tr("Mineral Concentration view"));
+    mineralConcViewAction->setCheckable(true);
+    viewModeGroup->addAction(mineralConcViewAction);
+
+    planetValueViewAction = new QAction(QIcon(":/images/planet_value.png"), tr("Planet &value view"), this);
+    planetValueViewAction->setStatusTip(tr("Planet Value View"));
+    planetValueViewAction->setCheckable(true);
+    viewModeGroup->addAction(planetValueViewAction);
+
+    populationViewAction = new QAction(QIcon(":/images/population_view.png"), tr("Population view"), this);
+    populationViewAction->setStatusTip(tr("Population View"));
+    populationViewAction->setCheckable(true);
+    viewModeGroup->addAction(populationViewAction);
+
+    viewModeGroup->setEnabled(false);
+
+    viewModeMapper = new QSignalMapper(this);
+    viewModeMapper->setMapping(normalViewAction, MM_NORMAL);
+    viewModeMapper->setMapping(surfaceMineralsViewAction, MM_SURFACE_MIN);
+    viewModeMapper->setMapping(mineralConcViewAction, MM_CONC_MIN);
+    viewModeMapper->setMapping(planetValueViewAction, MM_PLANET_VALUE);
+    viewModeMapper->setMapping(populationViewAction, MM_POPULATION);
+
+    connect(normalViewAction, SIGNAL(triggered()), viewModeMapper, SLOT(map()));
+    connect(surfaceMineralsViewAction, SIGNAL(triggered()), viewModeMapper, SLOT(map()));
+    connect(mineralConcViewAction, SIGNAL(triggered()), viewModeMapper, SLOT(map()));
+    connect(planetValueViewAction, SIGNAL(triggered()), viewModeMapper, SLOT(map()));
+    connect(populationViewAction, SIGNAL(triggered()), viewModeMapper, SLOT(map()));
 }
 
 void MainWindow::createMenus()
@@ -221,17 +266,12 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
-    fileToolBar = addToolBar(tr("File"));
-    fileToolBar->addAction(newAct);
-    fileToolBar->addAction(openAct);
-    fileToolBar->addAction(saveAct);
-
-#if 0
-    editToolBar = addToolBar(tr("Edit"));
-    editToolBar->addAction(cutAct);
-    editToolBar->addAction(copyAct);
-    editToolBar->addAction(pasteAct);
-#endif
+    toolBar = addToolBar(tr("View Settings"));
+    toolBar->addAction(normalViewAction);
+    toolBar->addAction(surfaceMineralsViewAction);
+    toolBar->addAction(mineralConcViewAction);
+    toolBar->addAction(planetValueViewAction);
+    toolBar->addAction(populationViewAction);
 }
 
 void MainWindow::createStatusBar()
@@ -457,11 +497,17 @@ void MainWindow::activateTab(int index)
         GameView *gameView = dynamic_cast<GameView*>(tabWidget->widget(index));
 
         if(gameView != NULL) {
+            MapView *mapView = gameView->getMapView();
+
+            viewModeMapper->disconnect();
+
             submitTurnAction->disconnect();
             shipDesignAction->disconnect();
             researchAction->disconnect();
             battlePlansAction->disconnect();
             playerRelationsAction->disconnect();
+
+            connect(viewModeMapper, SIGNAL(mapped(int)), mapView, SLOT(setViewMode(int)));
 
             connect(submitTurnAction, SIGNAL(triggered()), gameView, SLOT(submitTurn()));
             connect(shipDesignAction, SIGNAL(triggered()), gameView, SLOT(shipDesignDialog()));
@@ -469,15 +515,13 @@ void MainWindow::activateTab(int index)
             connect(battlePlansAction, SIGNAL(triggered()), gameView, SLOT(battlePlansDialog()));
             connect(playerRelationsAction, SIGNAL(triggered()), gameView, SLOT(playerRelationsDialog()));
 
-            submitTurnAction->setEnabled(true);
-            shipDesignAction->setEnabled(true);
-            researchAction->setEnabled(true);
-            battlePlansAction->setEnabled(true);
-            playerRelationsAction->setEnabled(true);
+            viewModeGroup->setEnabled(true);
 
             return;
         }
     }
+
+    viewModeGroup->setEnabled(false);
 
     submitTurnAction->setEnabled(false);
     shipDesignAction->setEnabled(false);

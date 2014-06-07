@@ -12,18 +12,27 @@
 
 namespace FreeStars {
 
-static const char * blarg_xpm[] = {
-    "16 7 2 1",
-    "* c #000000",
-    ". c #ffffff",
-    "**..*...........",
-    "*.*.*...........",
-    "**..*..**.**..**",
-    "*.*.*.*.*.*..*.*",
-    "**..*..**.*...**",
-    "...............*",
-    ".............**."
-};
+static const char * arrow_up_xpm[] = {
+"16 16 2 1",
+"   c None",
+".  c #FFFFFF",
+"       .        ",
+"       .        ",
+"      ...       ",
+"      ...       ",
+"      ...       ",
+"      ....      ",
+"     .....      ",
+"     .....      ",
+"     ......     ",
+"    .......     ",
+"    ........    ",
+"    ........    ",
+"   ....  ...    ",
+"   ..     ...   ",
+"  ..       ..   ",
+"  .         ..  "};
+
 
 MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player, QWidget *parent)
     : QWidget(parent)
@@ -31,9 +40,10 @@ MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player
     , game(_game)
     , player(_player)
     , selection(0)
-    , mapMode(MM_PLANET_VALUE)
+    , mapMode(MM_NORMAL)
 {
-    setContextMenuPolicy(Qt::CustomContextMenu);
+    setContextMenuPolicy(Qt::DefaultContextMenu);
+    setCursor(QCursor(QPixmap(arrow_up_xpm)));
 }
 
 QSize MapView::sizeHint() const {
@@ -145,16 +155,7 @@ void MapView::paintEvent(QPaintEvent *event)
 
         QPoint pos(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())));
 
-        painter.setPen(Qt::gray);
-
-        painter.drawPoint(pos);
-        painter.drawPoint(pos + QPoint(1, 0));
-        painter.drawPoint(pos + QPoint(0, 1));
-        painter.drawPoint(pos + QPoint(1, 1));
-
-        if(planet->GetOwner() == player) {
-            (this->*planetDrawers[mapMode])(painter, planet, pos);
-        }
+        (this->*planetDrawers[mapMode])(painter, planet, pos);
     }
 
     if(selection != NULL) { 
@@ -162,20 +163,84 @@ void MapView::paintEvent(QPaintEvent *event)
     }
 }
 
-void MapView::normalPlanetDrawer(QPainter&, const Planet*, const QPoint&)
+void MapView::normalPlanetDrawer(QPainter &painter, const Planet *planet, const QPoint &pos)
 {
+    long seen = planet->SeenBy(player);
+
+    if(seen == 0) {
+        noInfoPlanetDrawer(painter, planet, pos);
+        return;
+    }
+    
+    const Player *owner = planet->GetOwner();
+
+    int diameter = 3;
+
+    if(seen & SEEN_OWNER) {
+        if(owner != NULL) {
+            long relation = player->GetRelations(owner);
+
+            if(relation == PR_SELF) {
+                if(planet->IsHW()) {
+                    diameter += 1;
+                }
+
+                fillCircle(painter, pos, diameter, Qt::green);
+            }
+            else if(relation == PR_FRIEND) {
+                fillCircle(painter, pos, diameter, Qt::yellow);
+            }
+            else {
+                fillCircle(painter, pos, diameter, Qt::red);
+            }
+        }
+        else {
+            drawDot(painter, pos, Qt::white);
+        }
+    }
+    else {
+        drawDot(painter, pos, Qt::white);
+    }
+
+    if(seen & SEEN_HULL) {
+        const deque<SpaceObject *> *alsoHere = planet->GetAlsoHere();
+
+        if(alsoHere && !alsoHere->empty()) {
+            diameter += 3;
+            painter.setPen(Qt::white);
+            drawCircle(painter, pos, diameter);
+        }
+
+        if(planet->GetBaseDesign() != NULL) {
+            fillCircle(painter, pos + QPoint(3, -3), 2, Qt::yellow);
+        }
+    }
 }
 
-void MapView::surfaceMineralPlanetDrawer(QPainter&, const Planet*, const QPoint&)
+void MapView::surfaceMineralPlanetDrawer(QPainter &painter, const Planet *planet, const QPoint &pos)
 {
+    normalPlanetDrawer(painter, planet, pos);
 }
 
-void MapView::mineralConcPlanetDrawer(QPainter&, const Planet*, const QPoint&)
+void MapView::mineralConcPlanetDrawer(QPainter &painter, const Planet *planet, const QPoint &pos)
 {
+    normalPlanetDrawer(painter, planet, pos);
 }
 
 void MapView::valuePlanetDrawer(QPainter &painter, const Planet *planet, const QPoint &pos)
 {
+    long seen = planet->SeenBy(player);
+
+    if(seen == 0) {
+        noInfoPlanetDrawer(painter, planet, pos);
+        return;
+    }
+
+    if((seen & SEEN_PLANETHAB) == 0) {
+        drawDot(painter, pos, Qt::white);
+        return;
+    }
+    
     const int diameter = 10;
     const int diameter2 = 8;
     int hab = player->HabFactor(planet);
@@ -198,12 +263,39 @@ void MapView::valuePlanetDrawer(QPainter &painter, const Planet *planet, const Q
     }
 }
 
-void MapView::populationPlanetDrawer(QPainter&, const Planet*, const QPoint&)
+void MapView::populationPlanetDrawer(QPainter &painter, const Planet *planet, const QPoint &pos)
 {
+    long seen = planet->SeenBy(player);
+
+    if(seen == 0) {
+        noInfoPlanetDrawer(painter, planet, pos);
+        return;
+    }
+
+    if((seen & SEEN_PLANETPOP) == 0) {
+        drawDot(painter, pos, Qt::white);
+        return;
+    }
+
+    int hab = player->HabFactor(planet);
+
+    fillCircle(painter, pos, 2 + (8 * planet->GetDisplayPop()) / planet->GetMaxPop(),
+        hab > 0 ? Qt::green : Qt::red);
 }
 
-void MapView::noInfoPlanetDrawer(QPainter&, const Planet*, const QPoint&)
+void MapView::noInfoPlanetDrawer(QPainter &painter, const Planet*, const QPoint &pos)
 {
+    drawDot(painter, pos, Qt::gray);
+}
+
+void MapView::drawDot(QPainter &painter, const QPoint &pos, const QColor &color)
+{
+    painter.setPen(color);
+
+    painter.drawPoint(pos);
+    painter.drawPoint(pos + QPoint(1, 0));
+    painter.drawPoint(pos + QPoint(0, 1));
+    painter.drawPoint(pos + QPoint(1, 1));
 }
 
 void MapView::drawArrow(QPainter &painter, const QPoint &p)
@@ -221,6 +313,25 @@ void MapView::drawArrow(QPainter &painter, const QPoint &p)
     path.translate(0, 2);
 
     painter.fillPath(path, QBrush(Qt::yellow));
+}
+
+void MapView::drawCircle(QPainter &painter, const QPoint &center, int diameter)
+{
+    QPainterPath path, patho;
+
+    path.addEllipse(center, diameter, diameter);
+    painter.drawPath(path);
+}
+
+void MapView::fillCircle(QPainter &painter, const QPoint &center, int diameter, const QColor &color)
+{
+    QPainterPath path, patho;
+
+    path.addEllipse(center, diameter, diameter);
+    painter.fillPath(path, QBrush(color.darker()));
+
+    patho.addEllipse(center, diameter / 1.1, diameter / 1.1);
+    painter.fillPath(patho, QBrush(color));
 }
 
 void MapView::mousePressEvent(QMouseEvent *e)
@@ -243,6 +354,23 @@ void MapView::mouseReleaseEvent(QMouseEvent *e)
 
 void MapView::mouseMoveEvent(QMouseEvent *e)
 {
+}
+
+void MapView::contextMenuEvent(QContextMenuEvent *e)
+{
+    const SpaceObject *selection = findSelection(e->pos());
+
+    if(selection != NULL) {
+        emit listObjectsInLocation(selection, mapToGlobal(e->pos()));
+    }
+}
+
+void MapView::setViewMode(int _mapMode)
+{
+    mapMode = _mapMode;
+
+    update(contentsRect());
+    parentWidget()->update(parentWidget()->contentsRect());
 }
 
 };

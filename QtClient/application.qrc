@@ -1,5 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <file>images/minconc.png</file>
+    <file>images/normal_map_mode.png</file>
+    <file>images/planet_value.png</file>
+    <file>images/surface_minerals.png</file>
+    <file>images/population_view.png</file>
     <file>images/copy.png</file>
     <file>images/cut.png</file>
     <file>images/new.png</file>

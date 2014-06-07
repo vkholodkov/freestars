@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Valery Kholodkov
  */
 
+#include <QMenu>
 #include <QSplitter>
 #include <QScrollArea>
 #include <QStandardItemModel>
@@ -85,6 +86,7 @@ GameView::GameView(const Player *_player)
     connect(ui_StatusSelector.nextButton, SIGNAL(clicked()), this, SLOT(nextObject()));
     connect(this, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
     connect(mapView, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
+    connect(mapView, SIGNAL(listObjectsInLocation(const SpaceObject*, const QPoint&)), this, SLOT(listObjectsInLocation(const SpaceObject*, const QPoint&)));
 }
 
 void GameView::setupMessages() {
@@ -344,6 +346,46 @@ void GameView::selectObject(const SpaceObject *so)
     if(f != NULL) {
         selectFleet(f);
         return;
+    }
+}
+
+void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
+{
+    typedef std::map<QAction*, const SpaceObject*> action_map_t;
+    SpaceObjectSorter sos(o);
+    action_map_t actions;
+
+    QMenu menu(this);
+
+    for(std::vector<const SpaceObject*>::const_iterator i = sos.m_object_list.begin() ;
+        i != sos.m_object_list.end() ; i++)
+    {
+        const Planet *p = dynamic_cast<const Planet*>(*i);
+
+        if(p != NULL) {
+            QAction *action = menu.addAction(QString(p->GetName().c_str()));
+            menu.addSeparator();
+            actions.insert(std::make_pair(action, *i));
+            continue;
+        }
+
+        const Fleet *f = dynamic_cast<const Fleet*>(*i);
+
+        if(f != NULL) {
+            QAction *action = menu.addAction(QString(f->GetName(player).c_str()));
+            actions.insert(std::make_pair(action, *i));
+            continue;
+        }
+
+        menu.addAction(tr("Unknown object #%0").arg((*i)->GetID()));
+    }
+
+    QAction *clicked = menu.exec(pos);
+
+    action_map_t::const_iterator ai = actions.find(clicked);
+
+    if(ai != actions.end()) {
+        emit selectionChanged(ai->second);
     }
 }
 

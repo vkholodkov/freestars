@@ -170,6 +170,7 @@ public:
 	void CreateRandom(Creation * c);
 	void CreateHW(const Player * player);
 	void AdjustHW(Player * player);
+    bool IsHW() const { return mHomeWorld; }
 	void CreateSecondWorld(const Planet * HW);
 	void AdjustSecondWorld(Player * player);
 	void ParseProduction(const TiXmlNode * node);

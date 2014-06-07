@@ -6,6 +6,8 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QActionGroup>
+#include <QSignalMapper>
 
 #include "FSServer.h"
 
@@ -65,8 +67,7 @@ private:
     QMenu *turnMenu;
     QMenu *commandsMenu;
     QMenu *helpMenu;
-    QToolBar *fileToolBar;
-    QToolBar *editToolBar;
+    QToolBar *toolBar;
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;
@@ -83,6 +84,14 @@ private:
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *separatorAct;
+
+    QActionGroup *viewModeGroup;
+    QAction *normalViewAction;
+    QAction *surfaceMineralsViewAction;
+    QAction *mineralConcViewAction;
+    QAction *planetValueViewAction;
+    QAction *populationViewAction;
+    QSignalMapper *viewModeMapper;
 
     enum { MaxRecentFiles = 5 };
     QAction *recentFileActs[MaxRecentFiles];

@@ -1,3 +1,5 @@
+INCLUDE(${QT_USE_FILE})
+
 include_directories(
     ${FREESTARS_SOURCE_DIR}/tinyxml
     ${FREESTARS_SOURCE_DIR}/Server

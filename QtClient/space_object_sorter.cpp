@@ -32,6 +32,10 @@ struct space_object_sorter : binary_function <const SpaceObject*,const SpaceObje
             return true;
         }
 
+        if(soty.planet) {
+            return false;
+        }
+
         /*
          * Fleets compare with each other by ID
          */

@@ -40,16 +40,12 @@ public:
 
 signals:
     void selectionChanged(const SpaceObject*);
+    void listObjectsInLocation(const SpaceObject*, const QPoint&);
+
+public slots:
+    void setViewMode(int);
 
 /*
-public slots:
-    void setNormalMapMode();
-    void setSurfaceMineralsMapMode();
-    void setMineralConcMapMode();
-    void setPlanetValueMapMode();
-    void setPopulationMapMode();
-    void setNoInfoMapMode();
-
     void showScannerRange(bool);
     void showFleetPaths(bool);
     void showNames(bool);
@@ -62,9 +58,13 @@ protected:
     void mousePressEvent(QMouseEvent*);
     void mouseReleaseEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
+    void contextMenuEvent(QContextMenuEvent*);
 
 private:
     void drawArrow(QPainter&, const QPoint&);
+    void drawDot(QPainter&, const QPoint&, const QColor&);
+    void drawCircle(QPainter&, const QPoint&, int);
+    void fillCircle(QPainter&, const QPoint&, int, const QColor&);
     void normalPlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void surfaceMineralPlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void mineralConcPlanetDrawer(QPainter&, const Planet*, const QPoint&);
@@ -78,7 +78,7 @@ private:
     const Game *game;
     const Player *player;
     const SpaceObject *selection;
-    map_mode_t mapMode;
+    int mapMode;
     unsigned mapOptions;
 };
 

@@ -29,11 +29,15 @@ public:
     void setupMessages();
     void displayMessage(const Message&);
 
+    const MapView *getMapView() const { return mapView; }
+    MapView *getMapView() { return mapView; }
+
 signals:
     void selectionChanged(const SpaceObject*);
 
 public slots:
     void selectObject(const SpaceObject*);
+    void listObjectsInLocation(const SpaceObject*, const QPoint&);
 
     void nextMessage();
     void prevMessage();
