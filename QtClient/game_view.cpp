@@ -374,6 +374,13 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     FleetCompositionWidget *fleetCompositionWidget = new FleetCompositionWidget(_fleet, player);
     fleetCompositionWidget->setObjectName("w2_column2");
     verticalFlowLayout->addWidget(fleetCompositionWidget);
+    
+    connect(fleetCompositionWidget, SIGNAL(splitFleet(const Fleet*)),
+        this, SLOT(splitFleet(const Fleet*)));
+    connect(fleetCompositionWidget, SIGNAL(splitAllFleet(const Fleet*)),
+        this, SLOT(splitAllFleet(const Fleet*)));
+    connect(fleetCompositionWidget, SIGNAL(mergeFleet(const Fleet*)),
+        this, SLOT(mergeFleet(const Fleet*)));
 }
 
 void GameView::clearBriefSelection()
@@ -536,11 +543,6 @@ void GameView::prevObject()
     }
 }
 
-void GameView::exchangeCargo(const Planet *planet, const Fleet *fleet)
-{
-    std::cout << "GameView::exchangeCargo planet=" << planet << " fleet=" << fleet << std::endl;
-}
-
 void GameView::changeProductionQueue(const Planet *planet)
 {
     std::cout << "GameView::changeProductionQueue " << planet << std::endl;
@@ -554,6 +556,26 @@ void GameView::clearProductionQueue(const Planet *planet)
 void GameView::setRouteDest()
 {
     std::cout << "GameView::setRouteDest " << std::endl;
+}
+
+void GameView::exchangeCargo(const Planet *planet, const Fleet *fleet)
+{
+    std::cout << "GameView::exchangeCargo planet=" << planet << " fleet=" << fleet << std::endl;
+}
+
+void GameView::splitFleet(const Fleet *_fleet)
+{
+    std::cout << "GameView::splitFleet fleet=" << _fleet << std::endl;
+}
+
+void GameView::splitAllFleet(const Fleet *_fleet)
+{
+    std::cout << "GameView::splitAllFleet fleet=" << _fleet << std::endl;
+}
+
+void GameView::mergeFleet(const Fleet *_fleet)
+{
+    std::cout << "GameView::mergeFleet fleet=" << _fleet << std::endl;
 }
 
 void GameView::showProductionDialog(bool)

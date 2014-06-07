@@ -21,6 +21,16 @@ class FleetCompositionWidget : public FoldingWidget {
 public:
     FleetCompositionWidget(const Fleet*, const Player*, QWidget *parent = 0);
 
+signals:
+    void splitFleet(const Fleet*);
+    void splitAllFleet(const Fleet*);
+    void mergeFleet(const Fleet*);
+
+private slots:
+    void splitButtonClicked(bool);
+    void splitAllButtonClicked(bool);
+    void mergeButtonClicked(bool);
+
 private:
     const Fleet *fleet;
     const Player *player;

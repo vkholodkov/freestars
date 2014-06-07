@@ -25,7 +25,29 @@ FleetCompositionWidget::FleetCompositionWidget(const Fleet *_fleet, const Player
             .arg(cloaked));
     }
 
+    connect(ui_FleetCompositionWidget.splitButton, SIGNAL(clicked(bool)),
+        this, SLOT(splitButtonClicked(bool)));
+    connect(ui_FleetCompositionWidget.splitAllButton, SIGNAL(clicked(bool)),
+        this, SLOT(splitAllButtonClicked(bool)));
+    connect(ui_FleetCompositionWidget.mergeButton, SIGNAL(clicked(bool)),
+        this, SLOT(mergeButtonClicked(bool)));
+
     this->addWidget(widget);
+}
+
+void FleetCompositionWidget::splitButtonClicked(bool)
+{
+    emit splitFleet(fleet);
+}
+
+void FleetCompositionWidget::splitAllButtonClicked(bool)
+{
+    emit splitAllFleet(fleet);
+}
+
+void FleetCompositionWidget::mergeButtonClicked(bool)
+{
+    emit mergeFleet(fleet);
 }
 
 };

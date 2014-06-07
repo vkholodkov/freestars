@@ -46,11 +46,14 @@ public slots:
     void nextObject();
     void prevObject();
 
-    void exchangeCargo(const Planet*, const Fleet*);
     void changeProductionQueue(const Planet*);
     void clearProductionQueue(const Planet*);
     void setRouteDest();
     void showProductionDialog(bool);
+    void exchangeCargo(const Planet*, const Fleet*);
+    void splitFleet(const Fleet*);
+    void splitAllFleet(const Fleet*);
+    void mergeFleet(const Fleet*);
 
     void shipDesignDialog();
     void researchDialog();
