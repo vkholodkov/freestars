@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<Hints>
+    <Context name="PlanetReport">
+        <Subcontext name="value">
+           <Hint ownerRelation="=none" value="&gt;0" terraformBy="=0">
+               <p ref="name"/> is uninhabited.
+               <p ref="name"/> will kill <p ref="popGrowBy"/> of all colonists you settle there every turn.
+           </Hint>
+           <Hint ownerRelation="=none" value="&lt;0" terraformBy="=0">
+               <p ref="name"/> is uninhabited.
+               If you were to colonize <p ref="name"/>, it would support up to <p ref="maxPop"/> of your colonists.
+           </Hint>
+           <Hint ownerRelation="=self" value="&gt;0" terraformBy="=0">
+               Your population on <p ref="name"/> is <p ref="displayPop"/>.
+               <p ref="name"/> will support a population of up to <p ref="maxPop"/> of your colonists.
+               Your population on <p ref="name"/> will grow by <p ref="popGrowBy"/> to <p ref="popNextYear"/>.
+           </Hint>
+           <Hint ownerRelation="=friend" value="&gt;0" terraformBy="=0">
+               The allied population on <p ref="name"/> is approimately <p ref="displayPop"/>.
+               Your population on <p ref="name"/> will grow by <p ref="popGrowBy"/> to <p ref="popNextYear"/>.
+               <p ref="name"/> will kill <p ref="popGrowBy"/> to <p ref="popNextYear"/>.
+           </Hint>
+           <Hint ownerRelation="=friend" value="&lt;0" terraformBy="=0">
+               The allied population on <p ref="name"/> is approimately <p ref="displayPop"/>.
+               <p ref="name"/> will kill <p ref="popGrowBy"/> of all colonists you settle there every turn.
+           </Hint>
+           <Hint ownerRelation="=enemy" value="&gt;0" terraformBy="=0">
+               The enemy population on <p ref="name"/> is approimately <p ref="displayPop"/>.
+               Your population on <p ref="name"/> will grow by <p ref="popGrowBy"/> to <p ref="popNextYear"/>.
+               <p ref="name"/> will kill <p ref="popGrowBy"/> to <p ref="popNextYear"/>.
+           </Hint>
+           <Hint ownerRelation="=enemy" value="&lt;0" terraformBy="=0">
+               The enemy population on <p ref="name"/> is approimately <p ref="displayPop"/>.
+               <p ref="name"/> will kill <p ref="popGrowBy"/> of all colonists you settle there every turn.
+           </Hint>
+        </Subcontext>
+        <Subcontext name="MineralReport">
+        </Subcontext>
+    </Context>
+</Hints>
