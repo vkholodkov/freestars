@@ -168,11 +168,19 @@ public:
 	long GetValueType() const		{ return SubTypeIndex.size() == 0 ? -1 : SubTypeIndex[0]; }
 
 	bool IsBuildable(const Player * player) const;	// can this player build this component (right LRT and tech levels)
+	
+	/*
+	 * Would the player be able to build this component
+	 * if advances specified research field by specified
+	 * number of levels.
+	 */
+	bool WouldBeBuildable(const Player*, long, long) const;
 
 	static const Component * Upgrade(const Player * player);
 
 private:
 	void init();
+	bool CheckPRTLRT(const Player*) const;
 
 	// standard stuff for every component
 	long ID;

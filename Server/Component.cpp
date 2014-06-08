@@ -624,6 +624,21 @@ bool Component::IsBuildable(const Player * player) const	// can this player buil
 			return false;
 	}
 
+	return CheckPRTLRT(player);
+}
+
+bool Component::WouldBeBuildable(const Player *player, long techType, long levels) const
+{
+	for (TechType tt = 0; tt < Rules::MaxTechType; ++tt) {
+		if (Tech[tt] > (player->GetTechLevel(tt) + (tt == techType) ? levels : 0))
+			return false;
+	}
+
+	return CheckPRTLRT(player);
+}
+
+bool Component::CheckPRTLRT(const Player *player) const
+{
 	if (find(PRTDenied.begin(), PRTDenied.end(), player->GetPRT()) != PRTDenied.end())
 		return false;
 
