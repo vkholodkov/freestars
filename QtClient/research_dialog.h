@@ -18,14 +18,18 @@ class ResearchDialog : public QDialog, private Ui_ResearchDialog {
     Q_OBJECT
 
 public:
-    ResearchDialog(const Player*, QWidget *parent = 0);
+    ResearchDialog(Player*, QWidget *parent = 0);
 
 private slots:
     void setResearchField(int);
+    void setResearchTax(int);
+    void accept();
 
 private:
-    const Player *player;
+    Player *player;
     QButtonGroup *researchFieldGroup;
+    long totalResources;
+    long techTypeOffset;
 };
 
 };

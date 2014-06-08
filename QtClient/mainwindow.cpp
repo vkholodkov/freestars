@@ -447,7 +447,7 @@ void MainWindow::updateModel() {
 }
 
 void MainWindow::openGameView() {
-    const Player *player = TheGame->GetCurrentPlayer();
+    Player *player = TheGame->GetCurrentPlayer();
     GameView *gameView = new GameView(player);
     tabWidget->addTab(gameView, QString("%0 -- %1")
         .arg(strippedName(curFile))

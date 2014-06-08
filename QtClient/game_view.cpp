@@ -30,7 +30,7 @@
 
 namespace FreeStars {
 
-GameView::GameView(const Player *_player)
+GameView::GameView(Player *_player)
     : QSplitter(Qt::Horizontal)
     , player(_player)
     , mapView(0)

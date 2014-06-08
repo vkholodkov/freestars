@@ -177,6 +177,7 @@ public:
     const deque<ProdOrder *> GetProduction() const { return mProductionQ; }
 	void SetProduction(const deque<ProdOrder *> & ords);
 	void SetPayTax(bool paytax);
+	bool GetPayTax() const { return mPayTax; };
 	void SetInBattle()	{ mHadBattle = true; }
 	void RepairBase();
 

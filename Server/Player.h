@@ -92,6 +92,7 @@ public:
 	void GainSpyTech(long TechGain, TechType tech);
 	void CheckTechGain();
 	long TechCost(TechType tech) const;
+	long TechProgress(TechType tech) const { return mTechProgress[tech]; };
 	long GetTechLevel(TechType tech) const	{ return mTechLevel[tech]; }
 	void AddProductionTech();
 	long GetLastTechGainPhase() const		{ return mLastTechGainPhase; }
