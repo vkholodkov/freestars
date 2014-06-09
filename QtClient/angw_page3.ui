@@ -75,6 +75,9 @@
          </item>
          <item>
           <widget class="QSpinBox" name="worldsBox">
+           <property name="suffix">
+            <string>%</string>
+           </property>
            <property name="minimum">
             <number>20</number>
            </property>
@@ -95,7 +98,7 @@
             </font>
            </property>
            <property name="text">
-            <string>% of all planets.</string>
+            <string> of all planets.</string>
            </property>
           </widget>
          </item>
@@ -299,6 +302,9 @@
          </item>
          <item>
           <widget class="QSpinBox" name="times2ndBox">
+           <property name="suffix">
+            <string>%</string>
+           </property>
            <property name="minimum">
             <number>20</number>
            </property>
@@ -319,7 +325,7 @@
             </font>
            </property>
            <property name="text">
-            <string>%.</string>
+            <string>.</string>
            </property>
           </widget>
          </item>
