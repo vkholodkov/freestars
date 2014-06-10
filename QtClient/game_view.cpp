@@ -21,6 +21,7 @@
 #include "fleet_composition_widget.h"
 
 #include "research_dialog.h"
+#include "ship_design_dialog.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -587,7 +588,8 @@ void GameView::showProductionDialog(bool)
 
 void GameView::shipDesignDialog()
 {
-    std::cout << "GameView::shipDesignDialog" << std::endl;
+    ShipDesignDialog shipDesignDialog(player);
+    shipDesignDialog.exec();
 }
 
 void GameView::researchDialog()
