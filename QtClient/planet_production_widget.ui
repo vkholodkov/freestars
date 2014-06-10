@@ -25,6 +25,9 @@
       </property>
       <item>
        <widget class="QTableView" name="productionQueueView">
+        <property name="styleSheet">
+         <string notr="true">background-color: white</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>

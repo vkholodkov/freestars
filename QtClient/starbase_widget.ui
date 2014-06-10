@@ -39,6 +39,7 @@
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -53,6 +54,11 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="dockCapacityLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -65,6 +71,7 @@
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -79,6 +86,11 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="armorLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -91,6 +103,7 @@
        <widget class="QLabel" name="label_4">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -102,6 +115,11 @@
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="shieldsLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -114,6 +132,7 @@
        <widget class="QLabel" name="label_10">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -125,6 +144,11 @@
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="damageLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -168,6 +192,7 @@
        <widget class="QLabel" name="label_8">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -181,6 +206,7 @@
        <widget class="QLabel" name="label_9">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -192,6 +218,11 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="packetSpeedLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -202,6 +233,11 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="packetDestLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -224,6 +260,13 @@
       </property>
       <item>
        <widget class="QPushButton" name="setDestButton">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
          <string>Set Dest</string>
         </property>

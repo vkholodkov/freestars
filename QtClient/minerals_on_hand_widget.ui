@@ -36,6 +36,7 @@
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -50,6 +51,11 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="ironiumLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -62,6 +68,7 @@
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -76,6 +83,11 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="boraniumLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -88,6 +100,7 @@
        <widget class="QLabel" name="label_5">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -102,6 +115,11 @@
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="germaniumLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -145,6 +163,7 @@
        <widget class="QLabel" name="label_8">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -158,6 +177,7 @@
        <widget class="QLabel" name="label_9">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -169,6 +189,11 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="minesLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -179,6 +204,11 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="factoriesLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>

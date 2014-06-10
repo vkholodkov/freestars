@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>153</height>
+    <height>126</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,12 @@
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QFormLayout" name="formLayout">
+      <property name="verticalSpacing">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
       <property name="bottomMargin">
        <number>6</number>
       </property>
@@ -30,6 +36,7 @@
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -40,12 +47,19 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="CargoWidget" name="fuelWidget" native="true"/>
+       <widget class="CargoWidget" name="fuelWidget" native="true">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -56,7 +70,13 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QWidget" name="cargoWidget" native="true"/>
+       <widget class="QWidget" name="cargoWidget" native="true">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -70,13 +90,20 @@
       </sizepolicy>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
+      <property name="verticalSpacing">
+       <number>0</number>
+      </property>
       <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -91,6 +118,11 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="ironiumLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -103,6 +135,7 @@
        <widget class="QLabel" name="label_5">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -117,6 +150,11 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="boraniumLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -129,6 +167,7 @@
        <widget class="QLabel" name="label_7">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -143,6 +182,11 @@
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="germaniumLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -155,6 +199,7 @@
        <widget class="QLabel" name="label_9">
         <property name="font">
          <font>
+          <family>Arial</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -169,6 +214,11 @@
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="colonistsLabel">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
