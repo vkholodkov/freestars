@@ -5,6 +5,8 @@
 #ifndef _MAP_VIEW_H_
 #define _MAP_VIEW_H_
 
+#include <list>
+
 #include <QWidget>
 
 #include "FSServer.h"
@@ -26,6 +28,11 @@ typedef enum {
 
 class MapView : public QWidget {
     Q_OBJECT
+
+public:
+    typedef std::pair<int, int> loc_t;
+    typedef std::pair<loc_t, loc_t> order_t;
+    typedef std::pair<QPoint, QPoint> track_t;
 
 public:
     MapView(const Galaxy*, const Game*, const Player*, QWidget *parent = 0);
@@ -71,6 +78,7 @@ private:
     void valuePlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void populationPlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void noInfoPlanetDrawer(QPainter&, const Planet*, const QPoint&);
+    void collectTracks(std::list<track_t>&);
 
 private:
     static void (MapView::*planetDrawers[])(QPainter&, const Planet*, const QPoint&);

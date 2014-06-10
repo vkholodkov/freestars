@@ -3,6 +3,7 @@
  */
 
 #include <limits>
+#include <set>
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -150,6 +151,16 @@ void MapView::paintEvent(QPaintEvent *event)
 
     if(selection != NULL) { 
         drawArrow(painter, galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
+    }
+
+    std::list<track_t> tracks;
+
+    collectTracks(tracks);
+
+    painter.setPen(Qt::blue);
+
+    for (std::list<track_t>::const_iterator i = tracks.begin() ; i != tracks.end() ; i++) {
+        painter.drawLine(i->first, i->second);
     }
 
     unsigned num_planets = galaxy->GetPlanetCount();
@@ -371,6 +382,47 @@ void MapView::setViewMode(int _mapMode)
 
     update(contentsRect());
     parentWidget()->update(parentWidget()->contentsRect());
+}
+
+void MapView::collectTracks(std::list<track_t> &orders)
+{
+    std::set<order_t> order_set;
+
+    unsigned num_planets = galaxy->GetPlanetCount();
+
+    for (unsigned n = 1; n <= num_planets; n++) {
+        const Planet *planet = galaxy->GetPlanet(n);
+
+        const std::deque<SpaceObject *> *alsoHere = planet->GetAlsoHere();
+
+        if (alsoHere != NULL) {
+            for (std::deque<SpaceObject *>::const_iterator i = alsoHere->begin(); i != alsoHere->end() ; i++) {
+                const Fleet *fleet = dynamic_cast<const Fleet*>(*i);
+
+                if (fleet != NULL && (fleet->SeenBy(player) & SEEN_ORDERS)) {
+                    const std::deque<WayOrder *> &orders = fleet->GetOrders();
+
+                    std::deque<QPoint> points;
+
+                    for (std::deque<WayOrder*>::const_iterator oi = orders.begin(); oi != orders.end(); oi++) {
+                        points.push_back(galaxyToScreen(QPoint((*oi)->GetLocation()->GetPosX(), (*oi)->GetLocation()->GetPosY())));
+
+                        if (points.size() == 2) {
+                            order_set.insert(std::make_pair(
+                                std::make_pair(points[0].x(), points[0].y()),
+                                std::make_pair(points[1].x(), points[1].y())));
+                            points.pop_front();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (std::set<order_t>::const_iterator i = order_set.begin(); i != order_set.end(); i++) {
+        orders.push_back(std::make_pair(QPoint(i->first.first, i->first.second),
+            QPoint(i->second.first, i->second.second)));
+    }
 }
 
 };
