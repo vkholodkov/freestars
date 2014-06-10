@@ -33,6 +33,7 @@ public:
     typedef std::pair<int, int> loc_t;
     typedef std::pair<loc_t, loc_t> order_t;
     typedef std::pair<QPoint, QPoint> track_t;
+    typedef std::pair<QPoint, int> scan_area_t;
 
 public:
     MapView(const Galaxy*, const Game*, const Player*, QWidget *parent = 0);
@@ -40,6 +41,7 @@ public:
     QSize sizeHint() const;
 
     QPoint galaxyToScreen(const QPoint&) const;
+    int galaxyToScreen(int) const;
 
     void clearSelection();
     void setSelection(const SpaceObject*);
@@ -79,6 +81,7 @@ private:
     void populationPlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void noInfoPlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void collectTracks(std::list<track_t>&);
+    void collectScanAreas(std::list<scan_area_t>&);
 
 private:
     static void (MapView::*planetDrawers[])(QPainter&, const Planet*, const QPoint&);

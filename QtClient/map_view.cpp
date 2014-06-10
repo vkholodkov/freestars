@@ -60,6 +60,10 @@ QPoint MapView::galaxyToScreen(const QPoint &gp) const {
         (gp.y() - galaxy->MinY()) * contentsRect().height() / (galaxy->MaxY() - galaxy->MinY()));
 }
 
+int MapView::galaxyToScreen(int distance) const {
+    return (distance * contentsRect().width()) / (galaxy->MaxX() - galaxy->MinX());
+}
+
 void MapView::clearSelection()
 {
     if(selection != NULL) {
@@ -149,18 +153,26 @@ void MapView::paintEvent(QPaintEvent *event)
 
     painter.fillRect(rect, Qt::black);
 
-    if(selection != NULL) { 
-        drawArrow(painter, galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
-    }
-
     std::list<track_t> tracks;
+    std::list<scan_area_t> scan_areas;
 
     collectTracks(tracks);
+    collectScanAreas(scan_areas);
+
+    for (std::list<scan_area_t>::const_iterator i = scan_areas.begin(); i != scan_areas.end(); i++) {
+        QPainterPath path;
+        path.addEllipse(i->first, i->second / 10, i->second / 10);
+        painter.fillPath(path, QBrush(QColor(143, 29,12)));
+    }
 
     painter.setPen(Qt::blue);
 
     for (std::list<track_t>::const_iterator i = tracks.begin() ; i != tracks.end() ; i++) {
         painter.drawLine(i->first, i->second);
+    }
+
+    if (selection != NULL) {
+        drawArrow(painter, galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
     }
 
     unsigned num_planets = galaxy->GetPlanetCount();
@@ -422,6 +434,24 @@ void MapView::collectTracks(std::list<track_t> &orders)
     for (std::set<order_t>::const_iterator i = order_set.begin(); i != order_set.end(); i++) {
         orders.push_back(std::make_pair(QPoint(i->first.first, i->first.second),
             QPoint(i->second.first, i->second.second)));
+    }
+}
+
+void MapView::collectScanAreas(std::list<scan_area_t> &scan_areas)
+{
+    unsigned num_planets = galaxy->GetPlanetCount();
+
+    for (unsigned n = 1; n <= num_planets; n++) {
+        const Planet *planet = galaxy->GetPlanet(n);
+
+        if (planet->SeenBy(player) & SEEN_INSTALLATIONS) {
+            long scanRange = planet->GetScanSpace();
+
+            if (scanRange > 0) {
+                scan_areas.push_back(std::make_pair(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())),
+                    galaxyToScreen(scanRange)));
+            }
+        }
     }
 }
 
