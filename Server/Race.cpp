@@ -454,7 +454,7 @@ double Race::HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, d
 	return sumOverHab;
 }
 
-bool Race::ParseNode(const TiXmlNode * node, bool other)
+bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSink)
 {
 	const TiXmlNode * child1;
 	const TiXmlNode * child2;
@@ -481,7 +481,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			const RacialTrait * rt;
 			rt = RacialTrait::ParseLRT(GetString(child1));
 			if (rt == NULL) {
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddItem("LesserRacialTrait", GetString(child1));
 				return false;
@@ -493,7 +493,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 				el = child2->ToElement();
 				int i = Rules::HabID(el->Attribute("Name"));
 				if (i < 0 || i >= Rules::MaxHabType) {
-					Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+					Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 					mess->AddItem("Race", mSingularName);
 					mess->AddItem("Hab type", el->Attribute("Name"));
 					return false;
@@ -511,7 +511,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 					(mHabCenter[i] != -1 && mHabWidth[i] == -1) ||
 					(mHabWidth[i] > mHabCenter[i] || mHabWidth[i] > 100 - mHabCenter[i]))
 				{
-					Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+					Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 					mess->AddItem("Race", mSingularName);
 					mess->AddLong("Hab width", mHabCenter[i]);
 					return false;
@@ -520,7 +520,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "GrowthRate") == 0) {
 			mGrowthRate = GetDouble(child1);
 			if (mGrowthRate < 0.009 || mGrowthRate > 0.201) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddFloat("GrowthRate", mGrowthRate);
 				return false;
@@ -528,7 +528,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "PopEfficiency") == 0) {
 			mPopEfficiency = GetLong(child1);
 			if (mPopEfficiency < 700 || mPopEfficiency > 2500) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("PopEfficiency", mPopEfficiency);
 				return false;
@@ -536,7 +536,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "FactoryRate") == 0) {
 			mFactoryRate = GetLong(child1);
 			if (mFactoryRate < 5 || mFactoryRate > 15) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("FactoryRate", mFactoryRate);
 				return false;
@@ -549,7 +549,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 				|| mFactoryCost[1] != 0
 				|| !(mFactoryCost[2] == 3 || mFactoryCost[2] == 4))
 			{
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("FactoryCost - Resources", mFactoryCost.GetResources());
 				mess->AddLong("FactoryCost - Mineral", mFactoryCost[2]);
@@ -558,7 +558,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "FactoriesRun") == 0) {
 			mFactoriesRun = GetLong(child1);
 			if (mFactoriesRun < 5 || mFactoriesRun > 25) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("FactoriesRun", mFactoriesRun);
 				return false;
@@ -566,7 +566,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "MineRate") == 0) {
 			mMineRate = GetLong(child1);
 			if (mMineRate < 5 || mMineRate > 25) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("MineRate", mMineRate);
 				return false;
@@ -579,7 +579,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 				|| mMineCost[1] != 0
 				|| mMineCost[2] != 0)
 			{
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("Mine - Resources", mMineCost.GetResources());
 				return false;
@@ -587,7 +587,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "MinesRun") == 0) {
 			mMinesRun = GetLong(child1);
 			if (mMinesRun < 5 || mMinesRun > 25) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("MinesRun", mMinesRun);
 				return false;
@@ -602,7 +602,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			mLeftoverBuys = LOPB_MINERALS;
 			mLeftoverPoints = GetLong(child1);
 			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartMinerals", mLeftoverPoints);
 				return false;
@@ -611,7 +611,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			mLeftoverBuys = LOPB_CONCENTRATIONS;
 			mLeftoverPoints = GetLong(child1);
 			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartConcentrations", mLeftoverPoints);
 				return false;
@@ -620,7 +620,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			mLeftoverBuys = LOPB_MINES;
 			mLeftoverPoints = GetLong(child1);
 			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartMines", mLeftoverPoints);
 				return false;
@@ -629,7 +629,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			mLeftoverBuys = LOPB_FACTORIES;
 			mLeftoverPoints = GetLong(child1);
 			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartFactories", mLeftoverPoints);
 				return false;
@@ -638,7 +638,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			mLeftoverBuys = LOPB_DEFENSES;
 			mLeftoverPoints = GetLong(child1);
 			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartDefenses", mLeftoverPoints);
 				return false;
@@ -646,7 +646,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "RaceEmblem") == 0) {
 			mRaceEmblem = GetLong(child1);
 			if (mRaceEmblem < 0 || mRaceEmblem > 32) { //magic number
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("RaceEmblem", mRaceEmblem);
 				return false;
@@ -660,14 +660,14 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 			// skip it
 		} else if (stricmp(child1->Value(), "PacketTerraformMinerals") == 0) {
 			if (mPacketMap.size() > 0) {
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddItem("Duplicate section", "PacketTerraformMinerals");
 				continue;
 			}
 
 			if (Rules::GetArrayValue("PacketTerraformMinerals", 0) >= 0) {
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddItem("Rules file doesn't allow section", "PacketTerraformMinerals");
 				continue;
@@ -682,7 +682,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child1->Value(), "InitialSettings") == 0) {
 			// skip it here
 		} else {
-			Message * mess = TheGame->AddMessage("Warning: Unknown section");
+			Message * mess = messageSink.AddMessage("Warning: Unknown section");
 			mess->AddItem("Race", mSingularName);
 			mess->AddItem("Section", child1->Value());
 			continue;
@@ -691,13 +691,13 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 
 	if (!other) {
 		if (mPRT == NULL) {
-			Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+			Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 			mess->AddItem("Race", mSingularName);
 			mess->AddItem("Missing PRT", "");
 			return false;
 		}
 		if (mGrowthRate <= 0.009) {
-			Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+			Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 			mess->AddItem("Race", mSingularName);
 			mess->AddFloat("GrowthRate", mGrowthRate);
 			return false;
@@ -705,7 +705,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other)
 
 		for (i = 0; i < Rules::MaxHabType; ++i) {
 			if (mHabCenter[i] == 0 || mHabWidth[i] == 0) {
-				Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddItem("missing Hab Setting", Rules::GetHabName(i));
 				return false;

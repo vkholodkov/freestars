@@ -40,6 +40,7 @@ using namespace std;
 #include "Cost.h"
 #include "FSTypes.h"
 #include "Component.h"
+#include "MessageSink.h"
 class TiXmlNode;
 
 namespace FreeStars {
@@ -62,7 +63,7 @@ public:
 	Race();
 	virtual ~Race();
 	void ResetDefaults();
-	bool ParseNode(const TiXmlNode * node, bool other);
+	bool ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSink = NullMessageSink::Instance());
 	void WriteNode(TiXmlNode * node) const;
 	void WriteHabs(TiXmlNode * node) const;
 

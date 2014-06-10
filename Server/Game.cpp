@@ -85,7 +85,7 @@ Game::~Game()
 	delete [] mSeed;
 }
 
-Message * Game::AddMessage(string type)
+Message * Game::AddMessage(const string &type)
 {
 	Message * mess = new Message(type);
 	mMessages.push_back(mess);

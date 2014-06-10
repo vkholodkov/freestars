@@ -22,6 +22,7 @@ SET(fsserver_SOURCES
 	Invasion.cpp
 	Location.cpp
 	Message.cpp
+	MessageSink.cpp
 	MineField.cpp
 	MineFieldType.cpp
 	Order.cpp

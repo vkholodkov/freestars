@@ -36,6 +36,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #include "Component.h"
 #include "Player.h"
 #include "VictoryConditions.h"
+#include "MessageSink.h"
 
 class TiXmlNode;
 
@@ -47,7 +48,7 @@ class MineField;
 /**
  * The game object.
  */
-class Game {
+class Game : public MessageSink {
 public:
 	Game();
 	virtual ~Game();
@@ -83,7 +84,7 @@ public:
 	bool WritePlayerFiles();
 	long GetRandomEvents() const	{ return mRandomEvents; }
 
-	Message * AddMessage(string type);
+	Message * AddMessage(const string &type);
 	void StoreMessageLocation(const Location * loc);
 
 	const Component * ParseComponent(const char * name) const;
