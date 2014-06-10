@@ -14,15 +14,7 @@ class CargoWidget : public QWidget {
     Q_PROPERTY(QString unit READ unit WRITE setUnit)
 
 public:
-    CargoWidget(QWidget *parent = 0)
-        : QWidget(parent)
-        , m_changeable(false)
-        , m_cargoColor(Qt::black)
-        , m_cargo(0)
-        , m_maxCargo(0)
-        , m_unit("")
-    {
-    }
+    CargoWidget(QWidget *parent = 0);
 
     bool changeable() const { return m_changeable; }
     void setChangeable(bool _changeable) { m_changeable = _changeable; }
@@ -38,6 +30,8 @@ public:
 
     const QString &unit() const { return m_unit; }
     void setUnit(const QString &_unit) { m_unit = _unit; }
+
+    QSize sizeHint() const;
 
 protected:
     void paintEvent(QPaintEvent *event);    

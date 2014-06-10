@@ -3,6 +3,29 @@
 
 #include "cargo_widget.h"
 
+CargoWidget::CargoWidget(QWidget *parent)
+    : QWidget(parent)
+    , m_changeable(false)
+    , m_cargoColor(Qt::black)
+    , m_cargo(0)
+    , m_maxCargo(0)
+    , m_unit("")
+{
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+}
+
+QSize CargoWidget::sizeHint() const
+{
+    QFontMetrics fm(this->font());
+
+    QString text(tr("%0 of %2%3")
+        .arg(m_cargo)
+        .arg(m_maxCargo)
+        .arg(m_unit));
+
+    return QSize(fm.width(text), fm.height() + 2);
+}
+
 void CargoWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
