@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Valery Kholodkov
  */
+#include <algorithm>
 
 #include <QPainter>
 #include <QVBoxLayout>
