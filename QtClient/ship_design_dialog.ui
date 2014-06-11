@@ -1006,10 +1006,10 @@
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QComboBox" name="comboBox_4"/>
+                     <widget class="QComboBox" name="chooseComponentBox1"/>
                     </item>
                     <item>
-                     <widget class="QListView" name="listView_2">
+                     <widget class="QListWidget" name="componentListWidget1">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
