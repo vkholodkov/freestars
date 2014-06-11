@@ -31,8 +31,9 @@
 
 namespace FreeStars {
 
-GameView::GameView(Player *_player)
+GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
     : QSplitter(Qt::Horizontal)
+    , graphicsArray(_graphicsArray)
     , player(_player)
     , mapView(0)
     , mapScroller(0)
@@ -588,7 +589,7 @@ void GameView::showProductionDialog(bool)
 
 void GameView::shipDesignDialog()
 {
-    ShipDesignDialog shipDesignDialog(player);
+    ShipDesignDialog shipDesignDialog(player, graphicsArray);
     shipDesignDialog.exec();
 }
 

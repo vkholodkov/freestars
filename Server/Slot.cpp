@@ -23,6 +23,8 @@ Contact:
 Email Elliott at 9jm0tjj02@sneakemail.com
 */
 
+#include <cmath>
+
 #include "FSServer.h"
 
 #if defined(_DEBUG) && defined(DEBUG_NEW)
@@ -86,9 +88,9 @@ Slot::Slot(const TiXmlNode * node, long Pos)
 
 			count = atol(ptr);
 		} else if (stricmp(child1->Value(), "SlotLeft") == 0) {
-			mSlotLeft = GetLong(child1);
+			mSlotLeft = ::round(GetDouble(child1) * 64);
 		} else if (stricmp(child1->Value(), "SlotTop") == 0) {
-			mSlotTop = GetLong(child1);
+			mSlotTop = ::round(GetDouble(child1) * 64);
 		} else {
 			Message * mess = TheGame->AddMessage("Warning: Unknown section");
 			mess->AddItem("Slot", child1->Value());

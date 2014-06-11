@@ -4,6 +4,10 @@
 #include <cmath>
 
 #include <QSignalMapper>
+#include <QPainter>
+
+#include "FSServer.h"
+#include "Hull.h"
 
 #include "ship_design_dialog.h"
 
@@ -41,8 +45,9 @@ static CompCategory shipCategories[] = {
     { NULL, 0 }
 };
 
-ShipDesignDialog::ShipDesignDialog(Player *_player, QWidget *parent)
+ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphicsArray, QWidget *parent)
     : QDialog(parent)
+    , graphicsArray(_graphicsArray)
     , player(_player)
     , currentDesignMode(SDDDM_SHIPS)
     , currentViewMode(SDDVM_EXISTING)
@@ -107,6 +112,10 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
     }
     else {
         chooseDesignBox->clear();
+        chooseDesignBox->disconnect();
+
+        currentShip = NULL;
+        update(contentsRect());
 
         if (oldViewMode == SDDVM_AVAILABLE || oldViewMode == SDDVM_ENEMY) {
             deleteDesignButton->setEnabled(true);
@@ -158,7 +167,14 @@ void ShipDesignDialog::setComponentCategory(int index)
 
     for (std::deque<Component*>::const_iterator i = components.begin() ; i != components.end() ; i++) {
         if ((*i)->IsBuildable(player) && ((*i)->GetType() & mask)) {
-            componentListWidget1->addItem(new QListWidgetItem(QString((*i)->GetName().c_str())));
+            const QIcon *icon = graphicsArray->GetGraphics((*i)->GetName());
+
+            if(icon != NULL) {
+                componentListWidget1->addItem(new QListWidgetItem(*icon, QString((*i)->GetName().c_str())));
+            }
+            else {
+                componentListWidget1->addItem(new QListWidgetItem((*i)->GetName().c_str()));
+            }
         }
     }
 }
@@ -172,8 +188,18 @@ void ShipDesignDialog::populateExistingDesigns(int designMode)
         const Ship *ship = designMode == SDDDM_SHIPS ? player->GetShipDesign(i) : player->GetBaseDesign(i);
 
         if (ship != NULL) {
-            chooseDesignBox->addItem(QString(ship->GetName().c_str()));
+            chooseDesignBox->addItem(QString(ship->GetName().c_str()),
+                QVariant(reinterpret_cast<qlonglong>(ship)));
         }
+    }
+
+    if(designMode == SDDDM_SHIPS) {
+        connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setShipDesign(int)));
+        setShipDesign(chooseDesignBox->currentIndex());
+    }
+    else if(designMode == SDDDM_STARBASES) {
+        connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setStarbaseDesign(int)));
+        setStarbaseDesign(chooseDesignBox->currentIndex());
     }
 }
 
@@ -188,6 +214,24 @@ void ShipDesignDialog::populateAvailableHullTypes(int designMode)
     }
 }
 
+void ShipDesignDialog::setShipDesign(int index)
+{
+    QVariant userData = chooseDesignBox->itemData(index);
+
+    currentShip = reinterpret_cast<Ship*>(userData.toULongLong());
+
+    update(contentsRect());
+}
+
+void ShipDesignDialog::setStarbaseDesign(int index)
+{
+    QVariant userData = chooseDesignBox->itemData(index);
+
+    currentShip = reinterpret_cast<Ship*>(userData.toULongLong());
+
+    update(contentsRect());
+}
+
 void ShipDesignDialog::copyDesign()
 {
 }
@@ -198,6 +242,80 @@ void ShipDesignDialog::editDesign()
 
 void ShipDesignDialog::deleteDesign()
 {
+}
+
+void ShipDesignDialog::paintEvent(QPaintEvent *event)
+{
+    QDialog::paintEvent(event);
+
+    if(currentShip == NULL) {
+        return;
+    }
+
+    QPainter painter(this);
+    QFont bold(font());
+    bold.setBold(true);
+    QFontMetrics fm(bold);
+
+    const Hull *hull = currentShip->GetHull();
+    unsigned int numSlots = hull->GetNumberSlots();
+
+    std::vector<QRect> dimensions(numSlots, QRect());
+    QRect boundaries;
+
+    for(int i = 0 ; i != numSlots ; i++) {
+        const Slot &slot = currentShip->GetSlot(i);
+
+        QPoint slotOrigin(slot.GetLeft(), slot.GetTop());
+
+        dimensions[i].setTopLeft(slotOrigin);
+        dimensions[i].setSize(QSize(64, 64));
+
+        boundaries = boundaries.united(dimensions[i]);
+    }
+
+    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
+    QRect rect(shipDisplayWidget->mapTo(this, shipDisplayRect.topLeft()),
+        shipDisplayRect.size());
+
+    rect.setTop(chooseDesignBox->mapTo(this, chooseDesignBox->pos()).y());
+
+    QPoint origin(rect.center());
+
+    origin.rx() -= (boundaries.width() / 2);
+
+    for(int i = 0 ; i != numSlots ; i++) {
+        const Slot &slot = currentShip->GetSlot(i);
+        const Slot &hullSlot = hull->GetSlot(i);
+
+        dimensions[i].translate(origin);
+
+        painter.fillRect(dimensions[i], QBrush(Qt::gray));
+        painter.setPen(Qt::black);
+        painter.drawRect(dimensions[i]);
+
+        painter.setFont(font());
+
+        QPoint base(dimensions[i].center().x(), dimensions[i].bottom() - 3);
+
+        QString text(tr("up to %0").arg(hullSlot.GetCount()));
+
+        int width = fm.width(text);
+
+        base.rx() -= (width / 2);
+
+        painter.setFont(bold);
+        painter.drawText(base, text);
+    }
+
+    QPoint cargoOrigin(origin.x() + 64 * hull->GetCargoLeft(),
+        origin.y() + 64 * hull->GetCargoTop());
+    QRect cargoRect(cargoOrigin, QSize(64 * hull->GetCargoWidth(),
+        64 * hull->GetCargoHeight()));
+
+    painter.fillRect(cargoRect, QBrush(Qt::lightGray));
+    painter.setPen(Qt::black);
+    painter.drawRect(cargoRect);
 }
 
 };

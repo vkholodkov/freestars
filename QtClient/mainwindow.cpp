@@ -17,6 +17,8 @@ namespace FreeStars {
 
 MainWindow::MainWindow()
 {
+    loadGraphics();
+
     tabWidget = new QTabWidget;
     tabWidget->setTabsClosable(tabWidget);
     tabWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(212, 208, 200);"));
@@ -114,6 +116,42 @@ void MainWindow::about()
 void MainWindow::documentWasModified()
 {
     //setWindowModified(textEdit->document()->isModified());
+}
+
+void MainWindow::loadGraphics()
+{
+
+    QString fileName("rules/Graphics.xml");
+  
+    TiXmlDocument doc(fileName.toAscii().constData());
+    doc.SetCondenseWhiteSpace(false);
+    if (!doc.LoadFile()) {
+        QMessageBox::critical(this, tr("Error"),
+            tr("Cannot open graphics file %0").arg(fileName));
+        return;
+    }
+
+    const TiXmlNode *rootNode = doc.FirstChild("GraphicsFile");
+    if (!rootNode) {
+        QMessageBox::critical(this, tr("Error"),
+            tr("Invalid graphics file %0").arg(fileName));
+        return;
+    }
+
+    const TiXmlNode *componentPicturesNode = rootNode->FirstChild("ComponentPictures");
+    if (!componentPicturesNode) {
+        QMessageBox::critical(this, tr("Error"),
+            tr("Invalid graphics file %0").arg(fileName));
+        return;
+    }
+
+    componentPictures.reset(new GraphicsArray);
+
+    if(componentPictures->ParseNode(componentPicturesNode)) {
+        QMessageBox::critical(this, tr("Error"),
+            tr("Unable to load component pictures from file %0").arg(fileName));
+        return;
+    }
 }
 
 void MainWindow::createActions()
@@ -449,7 +487,7 @@ void MainWindow::updateModel() {
 
 void MainWindow::openGameView() {
     Player *player = TheGame->GetCurrentPlayer();
-    GameView *gameView = new GameView(player);
+    GameView *gameView = new GameView(player, componentPictures.get());
     tabWidget->addTab(gameView, QString("%0 -- %1")
         .arg(strippedName(curFile))
         .arg(player->GetPluralName().c_str()));

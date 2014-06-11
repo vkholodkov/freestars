@@ -10,6 +10,7 @@
 
 #include "FSServer.h"
 
+#include "graphics_array.h"
 #include "map_view.h"
 #include "planet_production_widget.h"
 
@@ -24,7 +25,7 @@ class GameView  : public QSplitter {
     Q_OBJECT
 
 public:
-    GameView(Player*);
+    GameView(Player*, const GraphicsArray*);
 
     void setupMessages();
     void displayMessage(const Message&);
@@ -71,6 +72,7 @@ private:
     void clearDetailedSelection();
 
 private:
+    const GraphicsArray *graphicsArray;
     Player *player;
     std::vector<Message*> messages;
     PlanetProductionWidget *planetProductionWidget;

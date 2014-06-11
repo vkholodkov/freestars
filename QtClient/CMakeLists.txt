@@ -29,6 +29,7 @@ SET(freestars_SOURCES
     map_view.cpp
     research_dialog.cpp
     ship_design_dialog.cpp
+    graphics_array.cpp
 )
 
 SET(freestars_HEADERS

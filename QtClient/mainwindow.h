@@ -9,7 +9,10 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 
+#include <memory>
+
 #include "FSServer.h"
+#include "graphics_array.h"
 
 class QAction;
 class QMenu;
@@ -41,6 +44,7 @@ private slots:
     void closeTab(int);
 
 private:
+    void loadGraphics();
     void createActions();
     void createMenus();
     void createToolBars();
@@ -59,6 +63,8 @@ private:
     void closeAllViews();
 
     QString strippedName(const QString &fullFileName);
+
+    std::auto_ptr<GraphicsArray> componentPictures;
 
     QTabWidget *tabWidget;
     QString curFile;

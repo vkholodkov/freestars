@@ -10,6 +10,8 @@
 
 #include "FSServer.h"
 
+#include "graphics_array.h"
+
 #include "ui_ship_design_dialog.h"
 
 namespace FreeStars {
@@ -28,12 +30,17 @@ class ShipDesignDialog : public QDialog, private Ui_ShipDesignDialog {
     } view_mode_t;
 
 public:
-    ShipDesignDialog(Player*, QWidget *parent = 0);
+    ShipDesignDialog(Player*, const GraphicsArray*, QWidget *parent = 0);
+
+protected:
+    void paintEvent(QPaintEvent*);
 
 private slots:
     void setDesignMode(int);
     void setViewMode(int);
     void setComponentCategory(int);
+    void setShipDesign(int);
+    void setStarbaseDesign(int);
     void copyDesign();
     void editDesign();
     void deleteDesign();
@@ -44,8 +51,10 @@ private:
     void populateAvailableHullTypes(int);
 
 private:
+    const GraphicsArray *graphicsArray;
     Player *player;
     int currentDesignMode, currentViewMode;
+    Ship *currentShip;
 };
 
 };
