@@ -45,6 +45,21 @@ static CompCategory shipCategories[] = {
     { NULL, 0 }
 };
 
+static CompCategory slotCategories[] = {
+    { "Armor", CT_ARMOR },
+    { "Shield", CT_SHIELD },
+    { "Weapon", CT_WEAPON },
+    { "Bomb", CT_BOMB },
+    { "Elect", CT_ELEC },
+    { "Engine", CT_ENGINE },
+    { "Mine layer", CT_MINELAY },
+    { "Mining", CT_MINER },
+    { "Scanner", CT_SCANNER },
+    { "Mech", CT_MECH },
+    { "Orbital", CT_ORBITAL },
+    { NULL, 0 }
+};
+
 ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphicsArray, QWidget *parent)
     : QDialog(parent)
     , graphicsArray(_graphicsArray)
@@ -53,6 +68,7 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     , currentViewMode(SDDVM_EXISTING)
     , currentShip(0)
     , currentHull(0)
+    , plateImage(":/images/plate.png")
 {
     setupUi(this);
 
@@ -380,7 +396,7 @@ void ShipDesignDialog::drawShip(const Ship *ship)
 
     dimensions[numSlots].translate(origin);
 
-    painter.fillRect(dimensions[numSlots], QBrush(Qt::lightGray));
+    painter.fillRect(dimensions[numSlots], QBrush(Qt::gray, Qt::Dense7Pattern));
     painter.setPen(Qt::black);
     painter.drawRect(dimensions[numSlots]);
 }
@@ -441,26 +457,51 @@ void ShipDesignDialog::collectSlotDimensions(const Hull *hull, std::vector<QRect
     boundaries = boundaries.united(dimensions[numSlots]);
 }
 
+QString ShipDesignDialog::describeSlot(const Slot &slot) 
+{
+    QStringList typeList;
+    struct CompCategory *category = slotCategories;
+    int count = 0;
+
+    while (category->title != NULL) {
+        if(slot.IsAllowed(category->mask)) {
+            typeList << tr(category->title);
+            count++;
+        }
+
+        category++;
+    }
+
+    return count == 1 ? typeList.at(0) : 
+        count == 2 ? typeList.join("\nor\n") :
+        count == 3 ? typeList.join("\n") :
+        tr("General\nPurpose");
+}
+
 void ShipDesignDialog::drawSlot(QPainter &painter, const Slot &slot, const QRect &dimensions)
 {
     QFont bold(font());
     bold.setBold(true);
+    QFont smaller(font());
+    smaller.setPointSize(font().pointSize() - 1);
     QFontMetrics fm(bold);
 
     painter.fillRect(dimensions, QBrush(Qt::gray));
     painter.setPen(Qt::black);
     painter.drawRect(dimensions);
 
-    painter.setFont(font());
-
     QPoint base(dimensions.center().x(), dimensions.bottom() - 3);
 
+    QString description(describeSlot(slot));
     QString text(tr(slot.IsAllowed(CT_ENGINE) ? "needs %0" : "up to %0").arg(slot.GetCount()));
 
     int width = fm.width(text);
 
     base.rx() -= (width / 2);
 
+    painter.setFont(smaller);
+    painter.drawText(dimensions.adjusted(0, 2, 0, -fm.height()),
+        Qt::TextWordWrap | Qt::AlignCenter | Qt::AlignBottom, description);
     painter.setFont(bold);
     painter.drawText(base, text);
 }
@@ -471,9 +512,13 @@ void ShipDesignDialog::drawComponent(QPainter &painter, const Component *comp, c
     bold.setBold(true);
     QFontMetrics fm(bold);
 
-    painter.fillRect(dimensions, QBrush(Qt::gray));
-    painter.setPen(Qt::black);
-    painter.drawRect(dimensions);
+    painter.drawImage(dimensions.topLeft(), plateImage);
+
+    const QIcon *icon = graphicsArray->GetGraphics(comp->GetName());
+
+    if(icon != NULL) {
+        painter.drawPixmap(dimensions.topLeft() + QPoint(6, 0), icon->pixmap(52, 52));
+    }
 
     painter.setFont(font());
 

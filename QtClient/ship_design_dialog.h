@@ -57,7 +57,10 @@ private:
     void drawSlot(QPainter&, const Slot&, const QRect&);
     void drawComponent(QPainter&, const Component*, const Slot&, const QRect&);
 
+    static QString describeSlot(const Slot&);
+
 private:
+    QImage plateImage;
     const GraphicsArray *graphicsArray;
     Player *player;
     int currentDesignMode, currentViewMode;
