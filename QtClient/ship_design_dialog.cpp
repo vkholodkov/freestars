@@ -413,7 +413,7 @@ void ShipDesignDialog::drawHull(const Hull *hull)
 
     dimensions[numSlots].translate(origin);
 
-    painter.fillRect(dimensions[numSlots], QBrush(Qt::lightGray));
+    painter.fillRect(dimensions[numSlots], QBrush(Qt::gray, Qt::Dense7Pattern));
     painter.setPen(Qt::black);
     painter.drawRect(dimensions[numSlots]);
 }
