@@ -734,32 +734,34 @@ long Ship::GetRating() const
 		double value;
 		for (deque<Slot>::const_iterator i = mSlots.begin(); i != mSlots.end(); ++i) {
 			value = 0.0;
-			switch (i->GetComp()->GetWeaponType()) {
-			case WT_BEAM:
-				value = (i->GetComp()->GetRange() + 3.0) / 4.0 * (GetNetSpeed() / 10.0 + 0.4);
-				value *= GetCapacitors();
-				break;
-			case WT_SAPPER:
-				value = (i->GetComp()->GetRange() - 1.0) / 4.0 * (GetNetSpeed() / 10.0 + 0.4);
-				value *= GetCapacitors();
-				break;
-			case WT_GATLING:
-				value = (i->GetComp()->GetRange() + 4.0) / 4.0 * (GetNetSpeed() / 10.0 + 0.4);
-				value *= GetCapacitors();
-				break;
-			case WT_TORP:
-			case WT_MISSILE:
-				value = (i->GetComp()->GetRange() - 2.0) / 2.0;
-				break;
-			default:
-				break;
-			}
+            if (i->GetComp() != NULL) {
+                switch (i->GetComp()->GetWeaponType()) {
+                case WT_BEAM:
+                    value = (i->GetComp()->GetRange() + 3.0) / 4.0 * (GetNetSpeed() / 10.0 + 0.4);
+                    value *= GetCapacitors();
+                    break;
+                case WT_SAPPER:
+                    value = (i->GetComp()->GetRange() - 1.0) / 4.0 * (GetNetSpeed() / 10.0 + 0.4);
+                    value *= GetCapacitors();
+                    break;
+                case WT_GATLING:
+                    value = (i->GetComp()->GetRange() + 4.0) / 4.0 * (GetNetSpeed() / 10.0 + 0.4);
+                    value *= GetCapacitors();
+                    break;
+                case WT_TORP:
+                case WT_MISSILE:
+                    value = (i->GetComp()->GetRange() - 2.0) / 2.0;
+                    break;
+                default:
+                    break;
+                }
+            }
 
 			if (value > 0.0) {
 				const_cast<Ship *>(this)->CVShoot = 1;
 				Rating += long(i->GetComp()->GetPower() * value);
 			}
-			if (i->GetComp()->GetBombType() != 0)
+            if (i->GetComp() != NULL && i->GetComp()->GetBombType() != 0)
 			{
 				Rating += long(i->GetComp()->GetKillPercentage() * .2) + i->GetComp()->GetKillInstallation() * 2;
 			}

@@ -40,7 +40,7 @@ private slots:
     void setViewMode(int);
     void setComponentCategory(int);
     void setShipDesign(int);
-    void setStarbaseDesign(int);
+    void setHull(int);
     void copyDesign();
     void editDesign();
     void deleteDesign();
@@ -49,12 +49,20 @@ private:
     void switchMode(int, int, int, int);
     void populateExistingDesigns(int);
     void populateAvailableHullTypes(int);
+    void clearProperties();
+
+    void drawShip(const Ship*);
+    void drawHull(const Hull*);
+    void collectSlotDimensions(const Hull*, std::vector<QRect>&, QRect&);
+    void drawSlot(QPainter&, const Slot&, const QRect&);
+    void drawComponent(QPainter&, const Component*, const Slot&, const QRect&);
 
 private:
     const GraphicsArray *graphicsArray;
     Player *player;
     int currentDesignMode, currentViewMode;
     Ship *currentShip;
+    Hull *currentHull;
 };
 
 };

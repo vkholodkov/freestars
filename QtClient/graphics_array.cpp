@@ -25,6 +25,8 @@ bool GraphicsArray::ParseNode(const TiXmlNode *node)
             graphics_map.insert(std::make_pair(name, QIcon(path.c_str())));
         }
     }
+
+    return true;
 }
 
 const QIcon *GraphicsArray::GetGraphics(const std::string &name) const {

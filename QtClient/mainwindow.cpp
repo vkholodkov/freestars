@@ -147,7 +147,7 @@ void MainWindow::loadGraphics()
 
     componentPictures.reset(new GraphicsArray);
 
-    if(componentPictures->ParseNode(componentPicturesNode)) {
+    if(!componentPictures->ParseNode(componentPicturesNode)) {
         QMessageBox::critical(this, tr("Error"),
             tr("Unable to load component pictures from file %0").arg(fileName));
         return;

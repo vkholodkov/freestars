@@ -26,6 +26,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #include "FSServer.h"
 
 #include <stdlib.h>
+#include <cmath>
 #include "Hull.h"
 #include "RacialTrait.h"
 
@@ -281,13 +282,13 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 			} else if (stricmp(child2->Value(), "CargoCapacity") == 0) {
 				temp->CargoCapacity = GetLong(child2);
 			} else if (stricmp(child2->Value(), "CargoLeft") == 0 && temp->Type == CT_HULL) {
-				dynamic_cast<Hull *>(temp)->SetCargoLeft(GetLong(child2));
+                dynamic_cast<Hull *>(temp)->SetCargoLeft(::round(GetDouble(child2) * 64));
 			} else if (stricmp(child2->Value(), "CargoTop") == 0 && temp->Type == CT_HULL) {
-				dynamic_cast<Hull *>(temp)->SetCargoTop(GetLong(child2));
+                dynamic_cast<Hull *>(temp)->SetCargoTop(::round(GetDouble(child2) * 64));
 			} else if (stricmp(child2->Value(), "CargoWidth") == 0 && temp->Type == CT_HULL) {
-				dynamic_cast<Hull *>(temp)->SetCargoWidth(GetLong(child2));
+                dynamic_cast<Hull *>(temp)->SetCargoWidth(::round(GetDouble(child2) * 64));
 			} else if (stricmp(child2->Value(), "CargoHeight") == 0 && temp->Type == CT_HULL) {
-				dynamic_cast<Hull *>(temp)->SetCargoHeight(GetLong(child2));
+                dynamic_cast<Hull *>(temp)->SetCargoHeight(::round(GetDouble(child2) * 64));
 			} else if (stricmp(child2->Value(), "FuelCapacity") == 0) {
 				temp->FuelCapacity = GetLong(child2);
 			} else if (stricmp(child2->Value(), "FuelGeneration") == 0) {

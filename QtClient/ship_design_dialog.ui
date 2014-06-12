@@ -24,6 +24,9 @@
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout_12">
+       <property name="spacing">
+        <number>6</number>
+       </property>
        <property name="bottomMargin">
         <number>0</number>
        </property>
@@ -36,6 +39,9 @@
           </sizepolicy>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="spacing">
+           <number>11</number>
+          </property>
           <property name="margin">
            <number>0</number>
           </property>
@@ -184,7 +190,7 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="label_15">
+                 <widget class="QLabel" name="costTitleLabel2">
                   <property name="font">
                    <font>
                     <family>Arial</family>
@@ -742,7 +748,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLabel" name="label_2">
+                     <widget class="QLabel" name="costTitleLabel1">
                       <property name="font">
                        <font>
                         <family>Arial</family>
@@ -759,14 +765,26 @@
                     <item>
                      <widget class="QWidget" name="widget_10" native="true">
                       <layout class="QHBoxLayout" name="horizontalLayout_4">
+                       <property name="spacing">
+                        <number>50</number>
+                       </property>
                        <property name="margin">
                         <number>0</number>
                        </property>
                        <item>
                         <widget class="QWidget" name="widget_11" native="true">
-                         <layout class="QVBoxLayout" name="verticalLayout_9">
-                          <property name="spacing">
-                           <number>0</number>
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <layout class="QFormLayout" name="formLayout">
+                          <property name="fieldGrowthPolicy">
+                           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                          </property>
+                          <property name="rowWrapPolicy">
+                           <enum>QFormLayout::DontWrapRows</enum>
                           </property>
                           <property name="topMargin">
                            <number>0</number>
@@ -777,7 +795,7 @@
                           <property name="bottomMargin">
                            <number>0</number>
                           </property>
-                          <item>
+                          <item row="0" column="0">
                            <widget class="QLabel" name="label_4">
                             <property name="font">
                              <font>
@@ -787,12 +805,25 @@
                               <bold>true</bold>
                              </font>
                             </property>
+                            <property name="styleSheet">
+                             <string notr="true">color: blue</string>
+                            </property>
                             <property name="text">
                              <string>Ironium</string>
                             </property>
                            </widget>
                           </item>
-                          <item>
+                          <item row="0" column="1">
+                           <widget class="QLabel" name="ironiumLabel1">
+                            <property name="text">
+                             <string>TextLabel</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="0">
                            <widget class="QLabel" name="label_5">
                             <property name="font">
                              <font>
@@ -802,12 +833,25 @@
                               <bold>true</bold>
                              </font>
                             </property>
+                            <property name="styleSheet">
+                             <string notr="true">color: green</string>
+                            </property>
                             <property name="text">
                              <string>Boranium</string>
                             </property>
                            </widget>
                           </item>
-                          <item>
+                          <item row="1" column="1">
+                           <widget class="QLabel" name="boraniumLabel1">
+                            <property name="text">
+                             <string>TextLabel</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="2" column="0">
                            <widget class="QLabel" name="label_7">
                             <property name="font">
                              <font>
@@ -817,12 +861,25 @@
                               <bold>true</bold>
                              </font>
                             </property>
+                            <property name="styleSheet">
+                             <string notr="true">color: yellow</string>
+                            </property>
                             <property name="text">
                              <string>Germanuim</string>
                             </property>
                            </widget>
                           </item>
-                          <item>
+                          <item row="2" column="1">
+                           <widget class="QLabel" name="germaniumLabel1">
+                            <property name="text">
+                             <string>TextLabel</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="3" column="0">
                            <widget class="QLabel" name="label_8">
                             <property name="font">
                              <font>
@@ -837,7 +894,17 @@
                             </property>
                            </widget>
                           </item>
-                          <item>
+                          <item row="3" column="1">
+                           <widget class="QLabel" name="resourcesLabel1">
+                            <property name="text">
+                             <string>TextLabel</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="4" column="0">
                            <widget class="QLabel" name="label_13">
                             <property name="font">
                              <font>
@@ -852,35 +919,29 @@
                             </property>
                            </widget>
                           </item>
-                          <item>
-                           <spacer name="verticalSpacer_3">
-                            <property name="orientation">
-                             <enum>Qt::Vertical</enum>
+                          <item row="4" column="1">
+                           <widget class="QLabel" name="massLabel1">
+                            <property name="text">
+                             <string>TextLabel</string>
                             </property>
-                            <property name="sizeType">
-                             <enum>QSizePolicy::Minimum</enum>
+                            <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                             </property>
-                            <property name="sizeHint" stdset="0">
-                             <size>
-                              <width>20</width>
-                              <height>40</height>
-                             </size>
-                            </property>
-                           </spacer>
+                           </widget>
                           </item>
                          </layout>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QWidget" name="widget_12" native="true">
-                         <layout class="QVBoxLayout" name="verticalLayout_10">
-                          <property name="spacing">
-                           <number>0</number>
+                        <widget class="QWidget" name="propertiesWidget1" native="true">
+                         <layout class="QFormLayout" name="formLayout_2">
+                          <property name="fieldGrowthPolicy">
+                           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                           </property>
                           <property name="margin">
                            <number>0</number>
                           </property>
-                          <item>
+                          <item row="0" column="0">
                            <widget class="QLabel" name="label_3">
                             <property name="font">
                              <font>
@@ -895,78 +956,13 @@
                             </property>
                            </widget>
                           </item>
-                          <item>
-                           <widget class="QLabel" name="label_6">
-                            <property name="font">
-                             <font>
-                              <family>Arial</family>
-                              <pointsize>10</pointsize>
-                              <weight>75</weight>
-                              <bold>true</bold>
-                             </font>
-                            </property>
+                          <item row="0" column="1">
+                           <widget class="QLabel" name="fuelCapLabel1">
                             <property name="text">
-                             <string>Armor:</string>
+                             <string>TextLabel</string>
                             </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLabel" name="label_9">
-                            <property name="font">
-                             <font>
-                              <family>Arial</family>
-                              <pointsize>10</pointsize>
-                              <weight>75</weight>
-                              <bold>true</bold>
-                             </font>
-                            </property>
-                            <property name="text">
-                             <string>Shields:</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLabel" name="label_10">
-                            <property name="font">
-                             <font>
-                              <family>Arial</family>
-                              <pointsize>10</pointsize>
-                              <weight>75</weight>
-                              <bold>true</bold>
-                             </font>
-                            </property>
-                            <property name="text">
-                             <string>Rating:</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLabel" name="label_11">
-                            <property name="font">
-                             <font>
-                              <family>Arial</family>
-                              <pointsize>10</pointsize>
-                              <weight>75</weight>
-                              <bold>true</bold>
-                             </font>
-                            </property>
-                            <property name="text">
-                             <string>Cloak/Jam:</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLabel" name="label_12">
-                            <property name="font">
-                             <font>
-                              <family>Arial</family>
-                              <pointsize>10</pointsize>
-                              <weight>75</weight>
-                              <bold>true</bold>
-                             </font>
-                            </property>
-                            <property name="text">
-                             <string>Initiatives/Moves:</string>
+                            <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                             </property>
                            </widget>
                           </item>

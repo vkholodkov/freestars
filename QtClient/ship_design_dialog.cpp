@@ -51,6 +51,8 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     , player(_player)
     , currentDesignMode(SDDDM_SHIPS)
     , currentViewMode(SDDVM_EXISTING)
+    , currentShip(0)
+    , currentHull(0)
 {
     setupUi(this);
 
@@ -115,6 +117,7 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
         chooseDesignBox->disconnect();
 
         currentShip = NULL;
+        currentHull = NULL;        
         update(contentsRect());
 
         if (oldViewMode == SDDVM_AVAILABLE || oldViewMode == SDDVM_ENEMY) {
@@ -193,14 +196,8 @@ void ShipDesignDialog::populateExistingDesigns(int designMode)
         }
     }
 
-    if(designMode == SDDDM_SHIPS) {
-        connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setShipDesign(int)));
-        setShipDesign(chooseDesignBox->currentIndex());
-    }
-    else if(designMode == SDDDM_STARBASES) {
-        connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setStarbaseDesign(int)));
-        setStarbaseDesign(chooseDesignBox->currentIndex());
-    }
+    connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setShipDesign(int)));
+    setShipDesign(chooseDesignBox->currentIndex());
 }
 
 void ShipDesignDialog::populateAvailableHullTypes(int designMode)
@@ -209,25 +206,115 @@ void ShipDesignDialog::populateAvailableHullTypes(int designMode)
 
     for (std::deque<Component*>::const_iterator i = components.begin(); i != components.end(); i++) {
         if ((*i)->IsBuildable(player) && ((*i)->IsType(designMode == SDDDM_SHIPS ? CT_HULL : CT_BASE))) {
-            chooseDesignBox->addItem(QString((*i)->GetName().c_str()));
+            Hull *hull = reinterpret_cast<Hull*>(*i);
+
+            if (hull != NULL) {
+                chooseDesignBox->addItem(QString((*i)->GetName().c_str()),
+                    QVariant(reinterpret_cast<qlonglong>(hull)));
+            }
         }
     }
+
+    connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setHull(int)));
+    setHull(chooseDesignBox->currentIndex());
+}
+
+void ShipDesignDialog::clearProperties()
+{
+    while (QWidget* w = propertiesWidget1->findChild<QWidget*>())
+        delete w;
 }
 
 void ShipDesignDialog::setShipDesign(int index)
 {
+    clearProperties();
+
     QVariant userData = chooseDesignBox->itemData(index);
 
     currentShip = reinterpret_cast<Ship*>(userData.toULongLong());
+
+    if (currentShip != NULL) {
+        Cost cost(currentShip->GetCost(player));
+
+        costTitleLabel1->setText(tr("Cost of one %0").arg(currentShip->GetName().c_str()));
+        ironiumLabel1->setText(tr("%0kt").arg(cost[0]));
+        boraniumLabel1->setText(tr("%0kt").arg(cost[1]));
+        germaniumLabel1->setText(tr("%0kt").arg(cost[2]));
+        resourcesLabel1->setText(QString::number(cost.GetResources()));
+        massLabel1->setText(tr("%0kt").arg(currentShip->GetMass()));
+
+        QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget1->layout());
+
+        if (formLayout != 0) {
+            if (currentShip->GetFuelCapacity() != 0) {
+                QLabel *label = new QLabel(tr("Max Fuel:"));
+                label->setStyleSheet("QLabel { font-weight: bold; }");
+                QLabel *text = new QLabel(tr("%0mg").arg(currentShip->GetFuelCapacity()));
+                text->setAlignment(Qt::AlignRight);
+                formLayout->addRow(label, text);
+            }
+
+            if (currentShip->GetArmor(player) != 0) {
+                QLabel *label = new QLabel(tr("Armor:"));
+                label->setStyleSheet("QLabel { font-weight: bold; }");
+                QLabel *text = new QLabel(tr("%0dp").arg(currentShip->GetArmor(player)));
+                text->setAlignment(Qt::AlignRight);
+                formLayout->addRow(label, text);
+            }
+
+            if (currentShip->GetShield(player) != 0) {
+                QLabel *label = new QLabel(tr("Shield:"));
+                label->setStyleSheet("QLabel { font-weight: bold; }");
+                QLabel *text = new QLabel(tr("%0dp").arg(currentShip->GetShield(player)));
+                text->setAlignment(Qt::AlignRight);
+                formLayout->addRow(label, text);
+            }
+
+            if (currentShip->GetRating() != 0) {
+                QLabel *label = new QLabel(tr("Rating:"));
+                label->setStyleSheet("QLabel { font-weight: bold; }");
+                QLabel *text = new QLabel(QString::number(currentShip->GetRating()));
+                text->setAlignment(Qt::AlignRight);
+                formLayout->addRow(label, text);
+            }
+
+            if (currentShip->GetCloaking() != 0 || currentShip->GetJamming() != 0) {
+                QLabel *label = new QLabel(tr("Cloak/Jam:"));
+                label->setStyleSheet("QLabel { font-weight: bold; }");
+                QLabel *text = new QLabel(tr("%0%/%1%").arg(currentShip->GetCloaking()).arg(currentShip->GetJamming() * 100));
+                text->setAlignment(Qt::AlignRight);
+                formLayout->addRow(label, text);
+            }
+
+            QLabel *label = new QLabel(tr("Initiative/Moves:"));
+            label->setStyleSheet("QLabel { font-weight: bold; }");
+            QLabel *text = new QLabel(tr("%0 / %1").arg(currentShip->GetNetInitiative()).arg(currentShip->GetNetSpeed()));
+            text->setAlignment(Qt::AlignRight);
+            formLayout->addRow(label, text);
+        }
+    }
 
     update(contentsRect());
 }
 
-void ShipDesignDialog::setStarbaseDesign(int index)
+void ShipDesignDialog::setHull(int index)
 {
+    clearProperties();
+
     QVariant userData = chooseDesignBox->itemData(index);
 
-    currentShip = reinterpret_cast<Ship*>(userData.toULongLong());
+    currentHull = reinterpret_cast<Hull*>(userData.toULongLong());
+
+    if (currentHull != NULL) {
+        Cost cost(currentHull->GetCost(player));
+
+        costTitleLabel1->setText(tr("Cost of one %0").arg(currentHull->GetName().c_str()));
+        ironiumLabel1->setText(tr("%0kt").arg(cost[0]));
+        boraniumLabel1->setText(tr("%0kt").arg(cost[1]));
+        germaniumLabel1->setText(tr("%0kt").arg(cost[2]));
+        resourcesLabel1->setText(QString::number(cost.GetResources()));
+        massLabel1->setText(tr("%0kt").arg(currentHull->GetMass()));
+    }
 
     update(contentsRect());
 }
@@ -248,23 +335,97 @@ void ShipDesignDialog::paintEvent(QPaintEvent *event)
 {
     QDialog::paintEvent(event);
 
-    if(currentShip == NULL) {
-        return;
+    if(currentShip != NULL) {
+        drawShip(currentShip);
     }
+    else if (currentHull != NULL) {
+        drawHull(currentHull);
+    }
+}
 
+void ShipDesignDialog::drawShip(const Ship *ship)
+{
     QPainter painter(this);
-    QFont bold(font());
-    bold.setBold(true);
-    QFontMetrics fm(bold);
-
-    const Hull *hull = currentShip->GetHull();
-    unsigned int numSlots = hull->GetNumberSlots();
-
-    std::vector<QRect> dimensions(numSlots, QRect());
+    std::vector<QRect> dimensions;
     QRect boundaries;
 
-    for(int i = 0 ; i != numSlots ; i++) {
+    collectSlotDimensions(ship->GetHull(), dimensions, boundaries);
+
+    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
+    QRect rect(shipDisplayWidget->mapTo(this, shipDisplayRect.topLeft()),
+        shipDisplayRect.size());
+
+    rect.setTop(chooseDesignBox->mapTo(this, chooseDesignBox->rect().bottomRight()).y());
+
+    QPoint origin(rect.center());
+
+    origin.rx() -= (boundaries.width() / 2);
+    origin.ry() -= 32; /* half a cell */
+
+    const Hull *hull = ship->GetHull();
+    unsigned int numSlots = hull->GetNumberSlots();
+
+    for (int i = 0; i != numSlots; i++) {
         const Slot &slot = currentShip->GetSlot(i);
+
+        dimensions[i].translate(origin);
+
+        if (slot.GetComp() != NULL) {
+            drawComponent(painter, slot.GetComp(), hull->GetSlot(i), dimensions[i]);
+        }
+        else {
+            drawSlot(painter, hull->GetSlot(i), dimensions[i]);
+        }        
+    }
+
+    dimensions[numSlots].translate(origin);
+
+    painter.fillRect(dimensions[numSlots], QBrush(Qt::lightGray));
+    painter.setPen(Qt::black);
+    painter.drawRect(dimensions[numSlots]);
+}
+
+void ShipDesignDialog::drawHull(const Hull *hull)
+{
+    QPainter painter(this);
+    std::vector<QRect> dimensions;
+    QRect boundaries;
+
+    collectSlotDimensions(hull, dimensions, boundaries);
+
+    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
+    QRect rect(shipDisplayWidget->mapTo(this, shipDisplayRect.topLeft()),
+        shipDisplayRect.size());
+
+    rect.setTop(chooseDesignBox->mapTo(this, chooseDesignBox->rect().bottomRight()).y());
+
+    QPoint origin(rect.center());
+
+    origin.rx() -= boundaries.width() / 2;
+    origin.ry() -= 32; /* half a cell */
+
+    unsigned int numSlots = hull->GetNumberSlots();
+
+    for (int i = 0; i != numSlots; i++) {
+        dimensions[i].translate(origin);
+        drawSlot(painter, hull->GetSlot(i), dimensions[i]);
+    }
+
+    dimensions[numSlots].translate(origin);
+
+    painter.fillRect(dimensions[numSlots], QBrush(Qt::lightGray));
+    painter.setPen(Qt::black);
+    painter.drawRect(dimensions[numSlots]);
+}
+
+void ShipDesignDialog::collectSlotDimensions(const Hull *hull, std::vector<QRect> &dimensions, QRect &boundaries)
+{
+    unsigned int numSlots = hull->GetNumberSlots();
+
+    dimensions.resize(numSlots + 1, QRect());
+
+    for (int i = 0; i != numSlots; i++) {
+        const Slot &slot = hull->GetSlot(i);
 
         QPoint slotOrigin(slot.GetLeft(), slot.GetTop());
 
@@ -274,48 +435,58 @@ void ShipDesignDialog::paintEvent(QPaintEvent *event)
         boundaries = boundaries.united(dimensions[i]);
     }
 
-    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
-    QRect rect(shipDisplayWidget->mapTo(this, shipDisplayRect.topLeft()),
-        shipDisplayRect.size());
+    dimensions[numSlots].setTopLeft(QPoint(hull->GetCargoLeft(), hull->GetCargoTop()));
+    dimensions[numSlots].setSize(QSize(hull->GetCargoWidth(), hull->GetCargoHeight()));
 
-    rect.setTop(chooseDesignBox->mapTo(this, chooseDesignBox->pos()).y());
+    boundaries = boundaries.united(dimensions[numSlots]);
+}
 
-    QPoint origin(rect.center());
+void ShipDesignDialog::drawSlot(QPainter &painter, const Slot &slot, const QRect &dimensions)
+{
+    QFont bold(font());
+    bold.setBold(true);
+    QFontMetrics fm(bold);
 
-    origin.rx() -= (boundaries.width() / 2);
-
-    for(int i = 0 ; i != numSlots ; i++) {
-        const Slot &slot = currentShip->GetSlot(i);
-        const Slot &hullSlot = hull->GetSlot(i);
-
-        dimensions[i].translate(origin);
-
-        painter.fillRect(dimensions[i], QBrush(Qt::gray));
-        painter.setPen(Qt::black);
-        painter.drawRect(dimensions[i]);
-
-        painter.setFont(font());
-
-        QPoint base(dimensions[i].center().x(), dimensions[i].bottom() - 3);
-
-        QString text(tr("up to %0").arg(hullSlot.GetCount()));
-
-        int width = fm.width(text);
-
-        base.rx() -= (width / 2);
-
-        painter.setFont(bold);
-        painter.drawText(base, text);
-    }
-
-    QPoint cargoOrigin(origin.x() + 64 * hull->GetCargoLeft(),
-        origin.y() + 64 * hull->GetCargoTop());
-    QRect cargoRect(cargoOrigin, QSize(64 * hull->GetCargoWidth(),
-        64 * hull->GetCargoHeight()));
-
-    painter.fillRect(cargoRect, QBrush(Qt::lightGray));
+    painter.fillRect(dimensions, QBrush(Qt::gray));
     painter.setPen(Qt::black);
-    painter.drawRect(cargoRect);
+    painter.drawRect(dimensions);
+
+    painter.setFont(font());
+
+    QPoint base(dimensions.center().x(), dimensions.bottom() - 3);
+
+    QString text(tr(slot.IsAllowed(CT_ENGINE) ? "needs %0" : "up to %0").arg(slot.GetCount()));
+
+    int width = fm.width(text);
+
+    base.rx() -= (width / 2);
+
+    painter.setFont(bold);
+    painter.drawText(base, text);
+}
+
+void ShipDesignDialog::drawComponent(QPainter &painter, const Component *comp, const Slot &hullSlot, const QRect &dimensions)
+{
+    QFont bold(font());
+    bold.setBold(true);
+    QFontMetrics fm(bold);
+
+    painter.fillRect(dimensions, QBrush(Qt::gray));
+    painter.setPen(Qt::black);
+    painter.drawRect(dimensions);
+
+    painter.setFont(font());
+
+    QPoint base(dimensions.center().x(), dimensions.bottom() - 3);
+
+    QString text(tr("up to %0").arg(hullSlot.GetCount()));
+
+    int width = fm.width(text);
+
+    base.rx() -= (width / 2);
+
+    painter.setFont(bold);
+    painter.drawText(base, text);
 }
 
 };
