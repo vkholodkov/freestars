@@ -5,6 +5,8 @@
 #ifndef _SHIP_DESIGN_DIALOG_H_
 #define _SHIP_DESIGN_DIALOG_H_
 
+#include <memory>
+
 #include <QDialog>
 #include <QButtonGroup>
 #include <QDragEnterEvent>
@@ -65,7 +67,7 @@ private:
     QPoint getWireframeOrigin(const QRect&) const;
     void collectSlotDimensions(const Hull*, std::vector<QRect>&, QRect&);
     void drawSlot(QPainter&, const Slot&, const QRect&);
-    void drawComponent(QPainter&, const Component*, const Slot&, const QRect&);    
+    void drawComponent(QPainter&, const Slot&, const Slot&, const QRect&);
 
     static QString describeSlot(const Slot&);
 

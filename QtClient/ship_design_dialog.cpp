@@ -445,7 +445,7 @@ void ShipDesignDialog::drawShip(const Ship *ship)
         dimensions[i].translate(origin);
 
         if (slot.GetComp() != NULL) {
-            drawComponent(painter, slot.GetComp(), hull->GetSlot(i), dimensions[i]);
+            drawComponent(painter, slot, hull->GetSlot(i), dimensions[i]);
         }
         else {
             drawSlot(painter, hull->GetSlot(i), dimensions[i]);
@@ -571,7 +571,7 @@ void ShipDesignDialog::drawSlot(QPainter &painter, const Slot &slot, const QRect
     painter.drawText(base, text);
 }
 
-void ShipDesignDialog::drawComponent(QPainter &painter, const Component *comp, const Slot &hullSlot, const QRect &dimensions)
+void ShipDesignDialog::drawComponent(QPainter &painter, const Slot &shipSlot, const Slot &hullSlot, const QRect &dimensions)
 {
     QFont bold(font());
     bold.setBold(true);
@@ -579,6 +579,7 @@ void ShipDesignDialog::drawComponent(QPainter &painter, const Component *comp, c
 
     painter.drawImage(dimensions.topLeft(), plateImage);
 
+    const Component *comp = shipSlot.GetComp();
     const QIcon *icon = graphicsArray->GetGraphics(comp->GetName());
 
     if(icon != NULL) {
@@ -589,7 +590,9 @@ void ShipDesignDialog::drawComponent(QPainter &painter, const Component *comp, c
 
     QPoint base(dimensions.center().x(), dimensions.bottom() - 3);
 
-    QString text(tr("up to %0").arg(hullSlot.GetCount()));
+    QString text(tr("%0 of %1")
+        .arg(shipSlot.GetCount())
+        .arg(hullSlot.GetCount()));
 
     int width = fm.width(text);
 
