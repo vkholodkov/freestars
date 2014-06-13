@@ -68,7 +68,9 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     , currentViewMode(SDDVM_EXISTING)
     , currentShip(0)
     , currentHull(0)
+    , shipBeingEdited(0)
     , plateImage(":/images/plate.png")
+    , editing(false)
 {
     setupUi(this);
 
@@ -134,7 +136,7 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
 
         currentShip = NULL;
         currentHull = NULL;        
-        update(contentsRect());
+        update(contentsRect());        
 
         if (oldViewMode == SDDVM_AVAILABLE || oldViewMode == SDDVM_ENEMY) {
             deleteDesignButton->setEnabled(true);
@@ -168,8 +170,13 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
             populateAvailableHullTypes(newDesignMode);
         }
 
+        editDesignButton->setEnabled(newViewMode == SDDVM_EXISTING && chooseDesignBox->count() != 0);
+
         if (newViewMode == SDDVM_AVAILABLE || newViewMode == SDDVM_ENEMY) {
             deleteDesignButton->setEnabled(false);
+        }
+        else {
+            deleteDesignButton->setEnabled(chooseDesignBox->count() != 0);
         }
     }
 }
@@ -193,6 +200,30 @@ void ShipDesignDialog::setComponentCategory(int index)
             }
             else {
                 componentListWidget1->addItem(new QListWidgetItem((*i)->GetName().c_str()));
+            }
+        }
+    }
+}
+
+void ShipDesignDialog::setComponentCategory2(int index)
+{
+    QVariant userData = chooseComponentBox2->itemData(index);
+
+    long mask = userData.toULongLong();
+
+    componentListWidget2->clear();
+
+    const std::deque<Component*> &components = TheGame->GetComponents();
+
+    for (std::deque<Component*>::const_iterator i = components.begin(); i != components.end(); i++) {
+        if ((*i)->IsBuildable(player) && ((*i)->GetType() & mask)) {
+            const QIcon *icon = graphicsArray->GetGraphics((*i)->GetName());
+
+            if (icon != NULL) {
+                componentListWidget2->addItem(new QListWidgetItem(*icon, QString((*i)->GetName().c_str())));
+            }
+            else {
+                componentListWidget2->addItem(new QListWidgetItem((*i)->GetName().c_str()));
             }
         }
     }
@@ -233,6 +264,19 @@ void ShipDesignDialog::populateAvailableHullTypes(int designMode)
 
     connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setHull(int)));
     setHull(chooseDesignBox->currentIndex());
+}
+
+void ShipDesignDialog::populateComponentCategoryList()
+{
+    struct CompCategory *categories = currentDesignMode == SDDDM_SHIPS ? shipCategories : starbaseCategories;
+
+    while (categories->title != NULL) {
+        chooseComponentBox2->addItem(tr(categories->title), QVariant((qlonglong)categories->mask));
+        categories++;
+    }
+
+    connect(chooseComponentBox2, SIGNAL(activated(int)), this, SLOT(setComponentCategory(int)));
+    setComponentCategory(0);
 }
 
 void ShipDesignDialog::clearProperties()
@@ -341,6 +385,26 @@ void ShipDesignDialog::copyDesign()
 
 void ShipDesignDialog::editDesign()
 {
+    editing = true;
+    stackedWidget1->setCurrentIndex(0);
+
+    shipBeingEdited.reset(new Ship);
+
+    if (currentShip != NULL) {
+        shipBeingEdited->CopyDesign(currentShip, false);
+        currentShip = NULL;
+    }
+
+    populateComponentCategoryList();
+    shipNameEdit->setText(shipBeingEdited->GetName().c_str());
+
+    connect(chooseComponentBox2, SIGNAL(activated(int)), this, SLOT(setComponentCategory2(int)));
+    setComponentCategory2(0);
+
+    connect(okButton, SIGNAL(clicked()), this, SLOT(saveDesign()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(abandonDesign()));
+
+    setAcceptDrops(true);
 }
 
 void ShipDesignDialog::deleteDesign()
@@ -353,6 +417,9 @@ void ShipDesignDialog::paintEvent(QPaintEvent *event)
 
     if(currentShip != NULL) {
         drawShip(currentShip);
+    }
+    else if (shipBeingEdited.get() != NULL) {
+        drawShip(shipBeingEdited.get());
     }
     else if (currentHull != NULL) {
         drawHull(currentHull);
@@ -367,22 +434,13 @@ void ShipDesignDialog::drawShip(const Ship *ship)
 
     collectSlotDimensions(ship->GetHull(), dimensions, boundaries);
 
-    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
-    QRect rect(shipDisplayWidget->mapTo(this, shipDisplayRect.topLeft()),
-        shipDisplayRect.size());
-
-    rect.setTop(chooseDesignBox->mapTo(this, chooseDesignBox->rect().bottomRight()).y());
-
-    QPoint origin(rect.center());
-
-    origin.rx() -= (boundaries.width() / 2);
-    origin.ry() -= 32; /* half a cell */
+    QPoint origin(getWireframeOrigin(boundaries));
 
     const Hull *hull = ship->GetHull();
     unsigned int numSlots = hull->GetNumberSlots();
 
     for (int i = 0; i != numSlots; i++) {
-        const Slot &slot = currentShip->GetSlot(i);
+        const Slot &slot = ship->GetSlot(i);
 
         dimensions[i].translate(origin);
 
@@ -409,16 +467,7 @@ void ShipDesignDialog::drawHull(const Hull *hull)
 
     collectSlotDimensions(hull, dimensions, boundaries);
 
-    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
-    QRect rect(shipDisplayWidget->mapTo(this, shipDisplayRect.topLeft()),
-        shipDisplayRect.size());
-
-    rect.setTop(chooseDesignBox->mapTo(this, chooseDesignBox->rect().bottomRight()).y());
-
-    QPoint origin(rect.center());
-
-    origin.rx() -= boundaries.width() / 2;
-    origin.ry() -= 32; /* half a cell */
+    QPoint origin(getWireframeOrigin(boundaries));
 
     unsigned int numSlots = hull->GetNumberSlots();
 
@@ -432,6 +481,22 @@ void ShipDesignDialog::drawHull(const Hull *hull)
     painter.fillRect(dimensions[numSlots], QBrush(Qt::gray, Qt::Dense7Pattern));
     painter.setPen(Qt::black);
     painter.drawRect(dimensions[numSlots]);
+}
+
+QPoint ShipDesignDialog::getWireframeOrigin(const QRect &boundaries) const
+{
+    QRect shipDisplayRect(shipDisplayWidget->contentsRect());
+    QRect rect(shipDisplayWidget->mapTo((QWidget*)this, shipDisplayRect.topLeft()),
+        shipDisplayRect.size());
+
+    rect.setTop(chooseDesignBox->mapTo((QWidget*)this, chooseDesignBox->rect().bottomRight()).y());
+
+    QPoint origin(rect.center());
+
+    origin.rx() -= (boundaries.width() / 2);
+    origin.ry() -= 32; /* half a cell */
+
+    return origin;
 }
 
 void ShipDesignDialog::collectSlotDimensions(const Hull *hull, std::vector<QRect> &dimensions, QRect &boundaries)
@@ -532,6 +597,53 @@ void ShipDesignDialog::drawComponent(QPainter &painter, const Component *comp, c
 
     painter.setFont(bold);
     painter.drawText(base, text);
+}
+
+void ShipDesignDialog::saveDesign()
+{
+
+}
+
+void ShipDesignDialog::abandonDesign()
+{
+    shipBeingEdited.reset(0);
+
+    editing = false;
+    stackedWidget1->setCurrentIndex(1);
+    setAcceptDrops(true);
+
+    okButton->disconnect();
+    cancelButton->disconnect();
+}
+
+void ShipDesignDialog::dragEnterEvent(QDragEnterEvent *e)
+{
+    std::cout << "dragEnterEvent" << std::endl;
+
+    e->acceptProposedAction();
+}
+
+void ShipDesignDialog::dragMoveEvent(QDragMoveEvent *e)
+{
+    std::vector<QRect> dimensions;
+    QRect boundaries;
+    const Hull *hull = shipBeingEdited->GetHull();
+
+    std::cout << "dragMoveEvent" << std::endl;
+
+    collectSlotDimensions(hull, dimensions, boundaries);
+
+    QPoint origin(getWireframeOrigin(boundaries));
+
+    unsigned int numSlots = hull->GetNumberSlots();
+
+    for (int i = 0; i != numSlots; i++) {
+        dimensions[i].translate(origin);
+
+        if (e->answerRect().intersects(dimensions[i])) {
+            e->acceptProposedAction();
+        }
+    }
 }
 
 };
