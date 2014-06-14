@@ -225,6 +225,9 @@ void EditableSlotWidget::mouseMoveEvent(QMouseEvent *e)
         < QApplication::startDragDistance())
         return;
 
+    if(shipSlot.GetCount() == 0)
+        return;
+
     QPixmap pixmap(contentsRect().size());
 
     {
@@ -239,10 +242,17 @@ void EditableSlotWidget::mouseMoveEvent(QMouseEvent *e)
     mimeData->setData(mimeType, QString("test").toAscii());
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap);
+    drag->setHotSpot(rect().center());
+
+    shipSlot.SetCount(shipSlot.GetCount() - 1);
+
+    if(shipSlot.GetCount() == 0) {
+        shipSlot.SetComp(NULL);
+    }
+
+    update(contentsRect());
 
     Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
-
-    std::cout << "start drag" << std::endl;
 }
 
 void CargoWidget::paintEvent(QPaintEvent *e)
