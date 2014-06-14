@@ -47,7 +47,7 @@ Ship::Ship()
 Ship::Ship(const Hull *hull)
 	: mHull(hull)
 {
-	mName = hull->GetName();;
+	mName = hull->GetName();
 	mGraphicNumber = 0;
 	mGift = false;
 	mBuilt = 0;
@@ -235,18 +235,18 @@ void Ship::WriteNode(TiXmlNode * node, bool Host, bool Owner, bool SeeDesign) co
 		AddLong(node, "Mass", GetMass());
 }
 
-bool Ship::IsValidDesign() const						// is this design valid (no weapons in the engine slot...)
+bool Ship::IsValidDesign(MessageSink &messageSink) const						// is this design valid (no weapons in the engine slot...)
 {
 	Message * mess;
 
 	if (mHull->GetType() != CT_HULL && mHull->GetType() != CT_BASE) {
-		mess = TheGame->AddMessage("Error: Invalid hull type for ship design");
+		mess = messageSink.AddMessage("Error: Invalid hull type for ship design");
 		mess->AddLong(mName.c_str(), mHull->GetType());
 		return false;
 	}
 
 	if (mSlots.size() > mHull->GetNumberSlots()) {
-		mess = TheGame->AddMessage("Error: Invalid number of slots for ship design");
+		mess = messageSink.AddMessage("Error: Invalid number of slots for ship design");
 		mess->AddLong(mName.c_str(), mSlots.size());
 		return false;
 	}
@@ -260,7 +260,7 @@ bool Ship::IsValidDesign() const						// is this design valid (no weapons in the
 
 		// too many things
 		if (mSlots[i].GetCount() > mHull->GetSlot(i).GetCount()) {
-			mess = TheGame->AddMessage("Error: Too many things in slot for ship design");
+			mess = messageSink.AddMessage("Error: Too many things in slot for ship design");
 			mess->AddItem("Design name", mName.c_str());
 			mess->AddLong("Slot number", i);
 			mess->AddLong("Number of elements", mSlots[i].GetCount());
@@ -269,7 +269,7 @@ bool Ship::IsValidDesign() const						// is this design valid (no weapons in the
 		}
 
 		if (!mSlots[i].GetComp()) {
-			mess = TheGame->AddMessage("Error: wrong design : no component type defined in slot");
+			mess = messageSink.AddMessage("Error: wrong design : no component type defined in slot");
 			mess->AddItem("Design name", mName.c_str());
 			mess->AddLong("Slot number", i);
 			return false;
@@ -277,7 +277,7 @@ bool Ship::IsValidDesign() const						// is this design valid (no weapons in the
 
 		// is this type of component allowed in this slot?
 		if (!mHull->GetSlot(i).IsAllowed(mSlots[i].GetComp()->GetType())) {
-			mess = TheGame->AddMessage("Error: wrong design : illegal component in slot");
+			mess = messageSink.AddMessage("Error: wrong design : illegal component in slot");
 			mess->AddItem("Design name", mName.c_str());
 			mess->AddLong("Slot number", i);
 			mess->AddLong("Illegal component type", mSlots[i].GetComp()->GetType());
@@ -285,7 +285,7 @@ bool Ship::IsValidDesign() const						// is this design valid (no weapons in the
 		}
 
 		if (!(mSlots[i].GetComp()->GetHullType() & mHull->GetHullType())) {
-			mess = TheGame->AddMessage("Error: wrong design : component not allowed on this type of hull");
+			mess = messageSink.AddMessage("Error: wrong design : component not allowed on this type of hull");
 			mess->AddItem("Design name", mName.c_str());
 			mess->AddLong("Slot number", i);
 			mess->AddItem("Component name", mSlots[i].GetComp()->GetName());

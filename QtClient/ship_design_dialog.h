@@ -54,6 +54,7 @@ private slots:
     void deleteDesign();
 
     void saveDesign();
+    void addNewDesign();
     void abandonDesign();
 
 private:
@@ -63,23 +64,25 @@ private:
     void populateAvailableHullTypes(int);
     void clearProperties();
 
-    void enterEditMode();
+    void copyDesign(const Hull*);
+    void copyDesign(const Ship*);
+    void editDesign(const Ship*);
+
+    void enterEditMode(bool);
     void leaveEditMode();
 
     QPoint getWireframeOrigin(const QRect&) const;
     void collectSlotDimensions(const Hull*, std::vector<QRect>&, QRect&);
+    void collectFloatingWidgetBoundaries(QRect&);
     void createHullWidgets(const Hull*);
     void createShipWidgets(Ship*, bool readOnly = true);
     void deleteFloatingWidgets();
 
 private:
-    bool editing;
     QImage plateImage;
     const GraphicsArray *graphicsArray;
     Player *player;
     int currentDesignMode, currentViewMode;
-    Ship *currentShip;
-    Hull *currentHull;
     std::auto_ptr<Ship> shipBeingEdited;
     std::vector<QWidget*> slotWidgets;
 };

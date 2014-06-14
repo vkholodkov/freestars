@@ -5,6 +5,7 @@
 
 #include <QSignalMapper>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "FSServer.h"
 #include "Hull.h"
@@ -51,11 +52,8 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     , player(_player)
     , currentDesignMode(SDDDM_SHIPS)
     , currentViewMode(SDDVM_EXISTING)
-    , currentShip(0)
-    , currentHull(0)
     , shipBeingEdited(0)
     , plateImage(":/images/plate.png")
-    , editing(false)
 {
     setupUi(this);
 
@@ -100,27 +98,22 @@ void ShipDesignDialog::resizeEvent(QResizeEvent *e)
 {
     QDialog::resizeEvent(e);
 
-    const Hull *hull = currentHull != NULL ? currentHull :
-        currentShip != NULL ? currentShip->GetHull() : NULL;
+    QRect boundaries;
 
-    if(hull != NULL) {
-        std::vector<QRect> dimensions;
-        QRect boundaries;
+    collectFloatingWidgetBoundaries(boundaries);
 
-        collectSlotDimensions(hull, dimensions, boundaries);
+    unsigned int numSlots = slotWidgets.size();
 
-        unsigned int numSlots = slotWidgets.size();
+    QPoint origin(getWireframeOrigin(boundaries));
+    QPoint difference(origin - boundaries.topLeft());
 
-        if(dimensions.size() == numSlots) { 
-            QPoint origin(getWireframeOrigin(boundaries));
+    for (int i = 0; i != numSlots; i++) {
+        if(slotWidgets[i] != NULL) {
+            QRect geometry(slotWidgets[i]->geometry());
 
-            for (int i = 0; i != numSlots; i++) {
-                dimensions[i].translate(origin);
+            geometry.translate(difference);
 
-                if(slotWidgets[i] != NULL) {
-                    slotWidgets[i]->setGeometry(dimensions[i]);
-                }
-            }
+            slotWidgets[i]->setGeometry(geometry);
         }
     }
 }
@@ -153,8 +146,6 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
         chooseDesignBox->clear();
         chooseDesignBox->disconnect();
 
-        currentShip = NULL;
-        currentHull = NULL;
         deleteFloatingWidgets();
 
         if (oldViewMode == SDDVM_AVAILABLE || oldViewMode == SDDVM_ENEMY) {
@@ -236,10 +227,11 @@ void ShipDesignDialog::setComponentCategory2(int index)
 
 void ShipDesignDialog::populateExistingDesigns(int designMode)
 {
+    int start = designMode == SDDDM_SHIPS ? 1 : 0;
     int max = designMode == SDDDM_SHIPS ? Rules::GetConstant("MaxShipDesigns") 
-        : Rules::GetConstant("MaxBaseDesigns");
+        : Rules::GetConstant("MaxBaseDesigns") + 1;
 
-    for (long i = 0 ; i != max ; i++) {
+    for (long i = start ; i != max ; i++) {
         const Ship *ship = designMode == SDDDM_SHIPS ? player->GetShipDesign(i) : player->GetBaseDesign(i);
 
         if (ship != NULL) {
@@ -290,22 +282,27 @@ void ShipDesignDialog::clearProperties()
         delete w;
 }
 
-void ShipDesignDialog::enterEditMode()
+void ShipDesignDialog::enterEditMode(bool addNew)
 {
     deleteFloatingWidgets();
 
-    editing = true;
     stackedWidget1->setCurrentIndex(0);
 
     createShipWidgets(shipBeingEdited.get(), false);
 
     populateComponentCategoryList();
-    shipNameEdit->setText(shipBeingEdited->GetName().c_str());
+
+    if(addNew) {
+        shipNameEdit->setText((shipBeingEdited->GetName() + " (2)").c_str());
+    }
+    else {
+        shipNameEdit->setText(shipBeingEdited->GetName().c_str());
+    }
 
     connect(chooseComponentBox2, SIGNAL(activated(int)), this, SLOT(setComponentCategory2(int)));
     setComponentCategory2(0);
 
-    connect(okButton, SIGNAL(clicked()), this, SLOT(saveDesign()));
+    connect(okButton, SIGNAL(clicked()), this, addNew ? SLOT(addNewDesign()) : SLOT(saveDesign()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(abandonDesign()));
 }
 
@@ -313,13 +310,12 @@ void ShipDesignDialog::leaveEditMode()
 {
     deleteFloatingWidgets();
 
-    editing = false;
     stackedWidget1->setCurrentIndex(1);
+
+    chooseComponentBox2->disconnect();
 
     okButton->disconnect();
     cancelButton->disconnect();
-
-    switchMode(currentDesignMode, currentDesignMode, currentViewMode, currentViewMode);
 }
 
 void ShipDesignDialog::setShipDesign(int index)
@@ -329,69 +325,70 @@ void ShipDesignDialog::setShipDesign(int index)
 
     QVariant userData = chooseDesignBox->itemData(index);
 
-    currentShip = reinterpret_cast<Ship*>(userData.toULongLong());
+    Ship *ship = reinterpret_cast<Ship*>(userData.toULongLong());
 
-    if (currentShip != NULL) {
-        Cost cost(currentShip->GetCost(player));
+    if(ship == NULL)
+        return;
 
-        costTitleLabel1->setText(tr("Cost of one %0").arg(currentShip->GetName().c_str()));
-        ironiumLabel1->setText(tr("%0kt").arg(cost[0]));
-        boraniumLabel1->setText(tr("%0kt").arg(cost[1]));
-        germaniumLabel1->setText(tr("%0kt").arg(cost[2]));
-        resourcesLabel1->setText(QString::number(cost.GetResources()));
-        massLabel1->setText(tr("%0kt").arg(currentShip->GetMass()));
+    Cost cost(ship->GetCost(player));
 
-        QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget1->layout());
+    costTitleLabel1->setText(tr("Cost of one %0").arg(ship->GetName().c_str()));
+    ironiumLabel1->setText(tr("%0kt").arg(cost[0]));
+    boraniumLabel1->setText(tr("%0kt").arg(cost[1]));
+    germaniumLabel1->setText(tr("%0kt").arg(cost[2]));
+    resourcesLabel1->setText(QString::number(cost.GetResources()));
+    massLabel1->setText(tr("%0kt").arg(ship->GetMass()));
 
-        if (formLayout != 0) {
-            if (currentShip->GetFuelCapacity() != 0) {
-                QLabel *label = new QLabel(tr("Max Fuel:"));
-                label->setStyleSheet("QLabel { font-weight: bold; }");
-                QLabel *text = new QLabel(tr("%0mg").arg(currentShip->GetFuelCapacity()));
-                text->setAlignment(Qt::AlignRight);
-                formLayout->addRow(label, text);
-            }
+    QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget1->layout());
 
-            if (currentShip->GetArmor(player) != 0) {
-                QLabel *label = new QLabel(tr("Armor:"));
-                label->setStyleSheet("QLabel { font-weight: bold; }");
-                QLabel *text = new QLabel(tr("%0dp").arg(currentShip->GetArmor(player)));
-                text->setAlignment(Qt::AlignRight);
-                formLayout->addRow(label, text);
-            }
-
-            if (currentShip->GetShield(player) != 0) {
-                QLabel *label = new QLabel(tr("Shield:"));
-                label->setStyleSheet("QLabel { font-weight: bold; }");
-                QLabel *text = new QLabel(tr("%0dp").arg(currentShip->GetShield(player)));
-                text->setAlignment(Qt::AlignRight);
-                formLayout->addRow(label, text);
-            }
-
-            if (currentShip->GetRating() != 0) {
-                QLabel *label = new QLabel(tr("Rating:"));
-                label->setStyleSheet("QLabel { font-weight: bold; }");
-                QLabel *text = new QLabel(QString::number(currentShip->GetRating()));
-                text->setAlignment(Qt::AlignRight);
-                formLayout->addRow(label, text);
-            }
-
-            if (currentShip->GetCloaking() != 0 || currentShip->GetJamming() != 0) {
-                QLabel *label = new QLabel(tr("Cloak/Jam:"));
-                label->setStyleSheet("QLabel { font-weight: bold; }");
-                QLabel *text = new QLabel(tr("%0%/%1%").arg(currentShip->GetCloaking()).arg(currentShip->GetJamming() * 100));
-                text->setAlignment(Qt::AlignRight);
-                formLayout->addRow(label, text);
-            }
-
-            QLabel *label = new QLabel(tr("Initiative/Moves:"));
+    if (formLayout != 0) {
+        if (ship->GetFuelCapacity() != 0) {
+            QLabel *label = new QLabel(tr("Max Fuel:"));
             label->setStyleSheet("QLabel { font-weight: bold; }");
-            QLabel *text = new QLabel(tr("%0 / %1").arg(currentShip->GetNetInitiative()).arg(currentShip->GetNetSpeed()));
+            QLabel *text = new QLabel(tr("%0mg").arg(ship->GetFuelCapacity()));
             text->setAlignment(Qt::AlignRight);
             formLayout->addRow(label, text);
-
-            createShipWidgets(currentShip);
         }
+
+        if (ship->GetArmor(player) != 0) {
+            QLabel *label = new QLabel(tr("Armor:"));
+            label->setStyleSheet("QLabel { font-weight: bold; }");
+            QLabel *text = new QLabel(tr("%0dp").arg(ship->GetArmor(player)));
+            text->setAlignment(Qt::AlignRight);
+            formLayout->addRow(label, text);
+        }
+
+        if (ship->GetShield(player) != 0) {
+            QLabel *label = new QLabel(tr("Shield:"));
+            label->setStyleSheet("QLabel { font-weight: bold; }");
+            QLabel *text = new QLabel(tr("%0dp").arg(ship->GetShield(player)));
+            text->setAlignment(Qt::AlignRight);
+            formLayout->addRow(label, text);
+        }
+
+        if (ship->GetRating() != 0) {
+            QLabel *label = new QLabel(tr("Rating:"));
+            label->setStyleSheet("QLabel { font-weight: bold; }");
+            QLabel *text = new QLabel(QString::number(ship->GetRating()));
+            text->setAlignment(Qt::AlignRight);
+            formLayout->addRow(label, text);
+        }
+
+        if (ship->GetCloaking() != 0 || ship->GetJamming() != 0) {
+            QLabel *label = new QLabel(tr("Cloak/Jam:"));
+            label->setStyleSheet("QLabel { font-weight: bold; }");
+            QLabel *text = new QLabel(tr("%0%/%1%").arg(ship->GetCloaking()).arg(ship->GetJamming() * 100));
+            text->setAlignment(Qt::AlignRight);
+            formLayout->addRow(label, text);
+        }
+
+        QLabel *label = new QLabel(tr("Initiative/Moves:"));
+        label->setStyleSheet("QLabel { font-weight: bold; }");
+        QLabel *text = new QLabel(tr("%0 / %1").arg(ship->GetNetInitiative()).arg(ship->GetNetSpeed()));
+        text->setAlignment(Qt::AlignRight);
+        formLayout->addRow(label, text);
+
+        createShipWidgets(ship);
     }
 }
 
@@ -402,41 +399,79 @@ void ShipDesignDialog::setHull(int index)
 
     QVariant userData = chooseDesignBox->itemData(index);
 
-    currentHull = reinterpret_cast<Hull*>(userData.toULongLong());
+    Hull *hull = reinterpret_cast<Hull*>(userData.toULongLong());
 
-    if (currentHull != NULL) {
-        Cost cost(currentHull->GetCost(player));
+    if(hull == NULL)
+        return;
 
-        costTitleLabel1->setText(tr("Cost of one %0").arg(currentHull->GetName().c_str()));
-        ironiumLabel1->setText(tr("%0kt").arg(cost[0]));
-        boraniumLabel1->setText(tr("%0kt").arg(cost[1]));
-        germaniumLabel1->setText(tr("%0kt").arg(cost[2]));
-        resourcesLabel1->setText(QString::number(cost.GetResources()));
-        massLabel1->setText(tr("%0kt").arg(currentHull->GetMass()));
+    Cost cost(hull->GetCost(player));
 
-        createHullWidgets(currentHull);
-    }
+    costTitleLabel1->setText(tr("Cost of one %0").arg(hull->GetName().c_str()));
+    ironiumLabel1->setText(tr("%0kt").arg(cost[0]));
+    boraniumLabel1->setText(tr("%0kt").arg(cost[1]));
+    germaniumLabel1->setText(tr("%0kt").arg(cost[2]));
+    resourcesLabel1->setText(QString::number(cost.GetResources()));
+    massLabel1->setText(tr("%0kt").arg(hull->GetMass()));
+
+    createHullWidgets(hull);
+}
+
+void ShipDesignDialog::copyDesign(const Hull *hull)
+{
+    shipBeingEdited.reset(new Ship(hull));
+    enterEditMode(true);
+}
+
+void ShipDesignDialog::copyDesign(const Ship *ship)
+{
+    shipBeingEdited.reset(new Ship);
+    shipBeingEdited->CopyDesign(ship, false);
+    enterEditMode(true);
+}
+
+void ShipDesignDialog::editDesign(const Ship *ship)
+{
+    shipBeingEdited.reset(new Ship);
+    shipBeingEdited->CopyDesign(ship, false);
+    enterEditMode(false);
 }
 
 void ShipDesignDialog::copyDesign()
 {
-    if (currentShip != NULL) {
-        shipBeingEdited.reset(new Ship);
-        shipBeingEdited->CopyDesign(currentShip, false);
-    }
-    else if(currentHull != NULL) {
-        shipBeingEdited.reset(new Ship(currentHull));
-    }
+    QVariant userData = chooseDesignBox->itemData(chooseDesignBox->currentIndex());
 
-    enterEditMode();
+    if (currentViewMode == SDDVM_EXISTING) {
+        Ship *ship = reinterpret_cast<Ship*>(userData.toULongLong());
+
+        if(ship != NULL) {
+            copyDesign(ship);
+        }
+    }
+    else if(currentViewMode == SDDVM_AVAILABLE) {
+        Hull *hull = reinterpret_cast<Hull*>(userData.toULongLong());
+
+        if(hull != NULL) {
+            copyDesign(hull);
+        }
+    }
 }
 
 void ShipDesignDialog::editDesign()
 {
-    if (currentShip != NULL) {
-        shipBeingEdited.reset(new Ship);
-        shipBeingEdited->CopyDesign(currentShip, false);
-        enterEditMode();
+    if (currentViewMode != SDDVM_EXISTING)
+        return;
+
+    QVariant userData = chooseDesignBox->itemData(chooseDesignBox->currentIndex());
+
+    Ship *ship = reinterpret_cast<Ship*>(userData.toULongLong());
+
+    if(ship != NULL) {
+        if(ship->GetNumberBuilt() != 0) {
+            copyDesign(ship);
+        }
+        else {
+            editDesign(ship);
+        }
     }
 }
 
@@ -481,6 +516,17 @@ void ShipDesignDialog::collectSlotDimensions(const Hull *hull, std::vector<QRect
     dimensions[numSlots].setSize(QSize(hull->GetCargoWidth(), hull->GetCargoHeight()));
 
     boundaries = boundaries.united(dimensions[numSlots]);
+}
+
+void ShipDesignDialog::collectFloatingWidgetBoundaries(QRect &boundaries)
+{
+    boundaries = QRect();
+
+    for(std::vector<QWidget*>::const_iterator i = slotWidgets.begin() ;
+        i != slotWidgets.end() ; i++)
+    {
+        boundaries = boundaries.united((*i)->geometry());
+    }
 }
 
 static int distanceFromOrigin(QWidget *a)
@@ -589,21 +635,82 @@ void ShipDesignDialog::deleteFloatingWidgets()
 
 void ShipDesignDialog::saveDesign()
 {
-    leaveEditMode();
+    Ship *ship = shipBeingEdited.get();
 
-    if(currentShip != NULL) {
-        shipBeingEdited.reset(0);
+    QString name(shipNameEdit->text());
+
+    ship->SetName(name.toStdString());
+
+    int index = chooseDesignBox->currentIndex();
+
+    if(currentDesignMode == SDDDM_SHIPS) {
+        player->SetShipDesign(index + 1, ship);
+    }
+    else {
+        player->SetBaseDesign(index, ship);
+    }
+
+    shipBeingEdited.release();
+
+    leaveEditMode();
+    setViewMode(SDDVM_EXISTING);
+    existingDesignsButton->setChecked(true);
+
+    index = chooseDesignBox->findText(name);
+
+    if(index != -1) {
+        chooseDesignBox->setCurrentIndex(index);
+        setShipDesign(index);
+    }
+}
+
+void ShipDesignDialog::addNewDesign()
+{
+    Ship *ship = shipBeingEdited.get();
+
+    QString name(shipNameEdit->text());
+
+    if(chooseDesignBox->findText(name) != -1) {
+        QMessageBox::critical(this, tr("Error"), tr("A design with such name already exists! Choose another name."));
         return;
     }
 
-    //player->AddShipDesign(shipBeingEdited.get());
-    currentShip = shipBeingEdited.release();
+    ship->SetName(name.toStdString());
+
+    long slot = currentDesignMode == SDDDM_SHIPS ? player->GetFreeShipDesignSlot()
+        : player->GetFreeBaseDesignSlot();
+
+    if(slot == -1) {
+        QMessageBox::critical(this, tr("Error"), tr("There are no empty slots left for this design"));
+        return;
+    }
+
+    if(currentDesignMode == SDDDM_SHIPS) {
+        player->SetShipDesign(slot, ship);
+    }
+    else {
+        player->SetBaseDesign(slot, ship);
+    }
+
+    shipBeingEdited.release();
+
+    leaveEditMode();
+    setViewMode(SDDVM_EXISTING);
+    existingDesignsButton->setChecked(true);
+
+    int index = chooseDesignBox->findText(name);
+
+    if(index != -1) {
+        chooseDesignBox->setCurrentIndex(index);
+        setShipDesign(index);
+    }
 }
 
 void ShipDesignDialog::abandonDesign()
 {
     leaveEditMode();
     shipBeingEdited.reset(0);
+    switchMode(currentDesignMode, currentDesignMode, currentViewMode, currentViewMode);
 }
 
 };

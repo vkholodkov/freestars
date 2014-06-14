@@ -114,12 +114,16 @@ public:
 	Fleet * GetFleetCreate(unsigned long n, const CargoHolder &loc);
 	const Ship * GetShipDesign(unsigned long n) const;
 	const Ship * GetBaseDesign(unsigned long n) const;
+	void SetShipDesign(unsigned long, Ship*);
+	void SetBaseDesign(unsigned long, Ship*);
 	unsigned long GetBaseDesignNumber(const Ship * design) const
 		{ return find(mBaseDesigns.begin(), mBaseDesigns.end(), design) - mBaseDesigns.begin(); }
 	long GetShipNumber(const Ship * design) const
 		{ return find(mShipDesigns.begin(), mShipDesigns.end(), design) - mShipDesigns.begin(); }
 	Ship * GetExistingDesign(const Ship * check) const;
 	Ship * GetExistingBaseDesign(const Ship * check) const;
+	long GetFreeShipDesignSlot() const;
+	long GetFreeBaseDesignSlot() const;
 
 	void DeleteFleet(Fleet * gone);
 	unsigned long GetID() const						{ return mID; }

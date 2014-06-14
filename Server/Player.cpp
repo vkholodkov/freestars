@@ -311,6 +311,24 @@ const Ship * Player::GetBaseDesign(unsigned long n) const
 	return mBaseDesigns[n];
 }
 
+void Player::SetShipDesign(unsigned long n, Ship *ship)
+{
+	if(n <= 0 || n > mShipDesigns.size())
+		return;
+
+    delete mShipDesigns[n-1];
+    mShipDesigns[n-1] = ship;
+}
+
+void Player::SetBaseDesign(unsigned long n, Ship *ship)
+{
+	if(n >= mBaseDesigns.size())
+		return;
+
+    delete mBaseDesigns[n];
+	mBaseDesigns[n] = ship;
+}
+
 void Player::DeleteFleet(Fleet * gone)
 {
 	if (gone != mFleets[gone->GetID()-1]) {
@@ -1443,6 +1461,16 @@ Ship * Player::GetExistingBaseDesign(const Ship * check) const
 	}
 
 	return NULL;
+}
+
+long Player::GetFreeShipDesignSlot() const {
+    deque<Ship*>::const_iterator i = find(mShipDesigns.begin(), mShipDesigns.end(), (Ship*)NULL);
+    return i != mShipDesigns.end() ? (i - mShipDesigns.begin()) + 1 : -1;
+}
+
+long Player::GetFreeBaseDesignSlot() const {
+    deque<Ship*>::const_iterator i = find(mBaseDesigns.begin(), mBaseDesigns.end(), (Ship*)NULL);
+    return i != mBaseDesigns.end() ? i - mBaseDesigns.begin() : -1;
 }
 
 void Player::PlaceHW(Planet * planet)

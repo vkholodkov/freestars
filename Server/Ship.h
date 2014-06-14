@@ -37,6 +37,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 #include "Slot.h"
 #include "Cost.h"
+#include "MessageSink.h"
 
 namespace FreeStars {
 class Component;
@@ -64,7 +65,7 @@ public:
 	 *@retval true Design is valid.
 	 *@retval false Design is invalid.
 	 */
-	bool IsValidDesign() const;
+	bool IsValidDesign(MessageSink& messageSink = NullMessageSink::Instance()) const;
 	/**
 	 *Check if the ship is buildable by a player.
 	 *This function checks whether the specified player can build the ship, taking into consideration
@@ -79,6 +80,7 @@ public:
 	const Cost & GetCost(const Player * owner, const Ship * from =NULL, const Planet * planet =NULL) const;
 	
 	string GetName() const					{ return mName; }
+	void SetName(const string &Name) { mName = Name; }
 	bool IsGift() const						{ return mGift; }
 	bool CanStealShip() const;
 	bool CanStealPlanet() const;
@@ -163,6 +165,7 @@ public:
 	 *@param number The number to increment by.
 	 */
 	void IncrementBuilt(long number)		{ mBuilt += number; }
+	long GetNumberBuilt() const { return mBuilt; }
 
 	const Hull * GetHull() const			{ return mHull; }
 
