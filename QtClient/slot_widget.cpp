@@ -120,7 +120,7 @@ void SlotWidget::drawComponent(QPainter &painter, const QRect &rect)
     painter.drawText(base, text);
 }
 
-Component *SlotWidget::extractComponent(QDropEvent *e)
+Component *EditableSlotWidget::extractComponent(QDropEvent *e)
 {
     static const char *mimeType = "application/x-qabstractitemmodeldatalist";
 
@@ -155,7 +155,7 @@ Component *SlotWidget::extractComponent(QDropEvent *e)
     return NULL;
 }
 
-int SlotWidget::getAmount()
+int EditableSlotWidget::getAmount()
 {
     Qt::KeyboardModifiers modifiers = QApplication::keyboardModifiers();
 
@@ -163,7 +163,7 @@ int SlotWidget::getAmount()
         (modifiers & Qt::ControlModifier) ? 100 : 1;
 }
 
-void SlotWidget::dragEnterEvent(QDragEnterEvent *e)
+void EditableSlotWidget::dragEnterEvent(QDragEnterEvent *e)
 {
     Component *comp = extractComponent(e);
 
@@ -179,7 +179,7 @@ void SlotWidget::dragEnterEvent(QDragEnterEvent *e)
     QWidget::dragEnterEvent(e);
 }
 
-void SlotWidget::dropEvent(QDropEvent *e)
+void EditableSlotWidget::dropEvent(QDropEvent *e)
 {
     Component *comp = extractComponent(e);
 
@@ -205,27 +205,18 @@ void SlotWidget::dropEvent(QDropEvent *e)
     QWidget::dropEvent(e);
 }
 
-void SlotWidget::mousePressEvent(QMouseEvent *e)
+void EditableSlotWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (e->button() == Qt::LeftButton)
-         dragStartPos = e->pos();
-#if 0
-    if (e->button() == Qt::LeftButton && geometry().contains(e->pos())) {
-        QDrag *drag = new QDrag(this);
-        QMimeData *mimeData = new QMimeData;
-
-        mimeData->setText("none");
-        drag->setMimeData(mimeData);
-        //drag->setPixmap(iconPixmap);
-
-        Qt::DropAction dropAction = drag->exec();
+    if (e->button() == Qt::LeftButton) {
+        dragStartPos = e->pos();
+        e->accept();
         return;
     }
-#endif
+
     QWidget::mousePressEvent(e);
 }
 
-void SlotWidget::mouseMoveEvent(QMouseEvent *e)
+void EditableSlotWidget::mouseMoveEvent(QMouseEvent *e)
 {
     if (!(e->buttons() & Qt::LeftButton))
         return;

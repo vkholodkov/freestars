@@ -39,7 +39,7 @@ public:
     virtual ~ShipDesignDialog();
 
 protected:
-    void paintEvent(QPaintEvent*);
+    void resizeEvent(QResizeEvent*);
 
 private slots:
     void setDesignMode(int);
@@ -66,16 +66,11 @@ private:
     void enterEditMode();
     void leaveEditMode();
 
-    void drawShip(const Ship*);
     QPoint getWireframeOrigin(const QRect&) const;
     void collectSlotDimensions(const Hull*, std::vector<QRect>&, QRect&);
     void createHullWidgets(const Hull*);
+    void createShipWidgets(Ship*, bool readOnly = true);
     void deleteFloatingWidgets();
-    
-    void drawSlot(QPainter&, const Slot&, const QRect&);
-    void drawComponent(QPainter&, const Slot&, const Slot&, const QRect&);
-
-    static QString describeSlot(const Slot&);
 
 private:
     bool editing;

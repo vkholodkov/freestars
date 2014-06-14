@@ -42,26 +42,41 @@ public:
         , shipSlot(_shipSlot)
         , graphicsArray(_graphicsArray)
     {
-        setAcceptDrops(true);
     }
 
 protected:
     void paintEvent(QPaintEvent*);
+    void drawComponent(QPainter&, const QRect&);
+
+protected:
+    Slot &shipSlot;
+
+private:
+    QImage plateImage;
+    const GraphicsArray *graphicsArray;
+};
+
+class EditableSlotWidget : public SlotWidget {
+    Q_OBJECT
+
+public:
+    EditableSlotWidget(const GraphicsArray *_graphicsArray, Slot &_shipSlot, const Slot &_hullSlot, QWidget *parent = 0)
+        : SlotWidget(_graphicsArray, _shipSlot, _hullSlot, parent)
+    {
+        setAcceptDrops(true);
+    }
+
+protected:
     void dragEnterEvent(QDragEnterEvent*);
     void dropEvent(QDropEvent*);
     void mousePressEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
 
 private:
-    void drawComponent(QPainter&, const QRect&);
     Component *extractComponent(QDropEvent*);
-
     static int getAmount();
 
 private:
-    QImage plateImage;
-    Slot &shipSlot;
-    const GraphicsArray *graphicsArray;
     QPoint dragStartPos;
 };
 
