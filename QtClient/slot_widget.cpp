@@ -251,7 +251,7 @@ void CargoWidget::paintEvent(QPaintEvent *e)
 
     painter.fillRect(contentsRect(), QBrush(Qt::gray, Qt::Dense7Pattern));
     painter.setPen(Qt::black);
-    painter.drawRect(contentsRect());
+    painter.drawRect(contentsRect().adjusted(0, 0, -1, -1));
 }
 
 };

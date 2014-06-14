@@ -98,6 +98,8 @@ ShipDesignDialog::~ShipDesignDialog()
 
 void ShipDesignDialog::resizeEvent(QResizeEvent *e)
 {
+    QDialog::resizeEvent(e);
+
     const Hull *hull = currentHull != NULL ? currentHull :
         currentShip != NULL ? currentShip->GetHull() : NULL;
 
@@ -121,8 +123,6 @@ void ShipDesignDialog::resizeEvent(QResizeEvent *e)
             }
         }
     }
-    
-    QDialog::resizeEvent(e);
 }
 
 void ShipDesignDialog::setDesignMode(int mode)
@@ -155,6 +155,7 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
 
         currentShip = NULL;
         currentHull = NULL;
+        deleteFloatingWidgets();
 
         if (oldViewMode == SDDVM_AVAILABLE || oldViewMode == SDDVM_ENEMY) {
             deleteDesignButton->setEnabled(true);
@@ -175,7 +176,6 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
         setComponentCategory1(0);
 
         if (oldViewMode != SDDVM_COMPONENTS) {
-            deleteFloatingWidgets();
             copyDesignButton->setEnabled(false);
             editDesignButton->setEnabled(false);
             deleteDesignButton->setEnabled(false);
@@ -483,6 +483,19 @@ void ShipDesignDialog::collectSlotDimensions(const Hull *hull, std::vector<QRect
     boundaries = boundaries.united(dimensions[numSlots]);
 }
 
+static int distanceFromOrigin(QWidget *a)
+{
+    QPoint ap1 = a->mapToParent(a->rect().topRight());
+    QPoint ap2 = a->mapToParent(a->rect().bottomLeft());
+
+    return ap2.x() - ap2.y() * ((ap2.x() - ap1.x())/(ap2.y() - ap1.y()));
+}
+
+static int zsort(QWidget *a, QWidget *b)
+{
+    return distanceFromOrigin(a) < distanceFromOrigin(b);
+}
+
 void ShipDesignDialog::createHullWidgets(const Hull *hull)
 {
     std::vector<QRect> dimensions;
@@ -498,19 +511,28 @@ void ShipDesignDialog::createHullWidgets(const Hull *hull)
      */
     slotWidgets.resize(numSlots + 1, 0);
 
+    std::vector<QWidget*> drawOrder(numSlots + 1, 0);
+
     for (int i = 0; i != numSlots; i++) {
         const Slot &hullSlot = hull->GetSlot(i);
         dimensions[i].translate(origin);
-        slotWidgets[i] = new HullSlotWidget(hullSlot, this);
+        drawOrder[i] = slotWidgets[i] = new HullSlotWidget(hullSlot);
         slotWidgets[i]->setGeometry(dimensions[i]);
-        slotWidgets[i]->show();
     }
 
     dimensions[numSlots].translate(origin);
 
-    slotWidgets[numSlots] = new CargoWidget(this);
+    drawOrder[numSlots] = slotWidgets[numSlots] = new CargoWidget(this);
     slotWidgets[numSlots]->setGeometry(dimensions[numSlots]);
-    slotWidgets[numSlots]->show();
+
+    std::sort(drawOrder.begin(), drawOrder.end(), zsort);
+
+    for(std::vector<QWidget*>::const_iterator i = drawOrder.begin() ;
+        i != drawOrder.end() ; i++)
+    {
+        (*i)->setParent(this);
+        (*i)->show();
+    }
 }
 
 void ShipDesignDialog::createShipWidgets(Ship *ship, bool readOnly)
@@ -529,21 +551,32 @@ void ShipDesignDialog::createShipWidgets(Ship *ship, bool readOnly)
      */
     slotWidgets.resize(numSlots + 1, 0);
 
+    std::vector<QWidget*> drawOrder(numSlots + 1, 0);
+
     for (int i = 0; i != numSlots; i++) {
         Slot &shipSlot = ship->GetSlot(i);
         const Slot &hullSlot = hull->GetSlot(i);
         dimensions[i].translate(origin);
-        slotWidgets[i] = readOnly ? new SlotWidget(graphicsArray, shipSlot, hullSlot, this)
-            : new EditableSlotWidget(graphicsArray, shipSlot, hullSlot, this);
+        drawOrder[i] = slotWidgets[i] = readOnly ? new SlotWidget(graphicsArray, shipSlot, hullSlot)
+            : new EditableSlotWidget(graphicsArray, shipSlot, hullSlot);
         slotWidgets[i]->setGeometry(dimensions[i]);
         slotWidgets[i]->show();
     }
 
     dimensions[numSlots].translate(origin);
 
-    slotWidgets[numSlots] = new CargoWidget(this);
+    drawOrder[numSlots] = slotWidgets[numSlots] = new CargoWidget(this);
     slotWidgets[numSlots]->setGeometry(dimensions[numSlots]);
     slotWidgets[numSlots]->show();
+
+    std::sort(drawOrder.begin(), drawOrder.end(), zsort);
+
+    for(std::vector<QWidget*>::const_iterator i = drawOrder.begin() ;
+        i != drawOrder.end() ; i++)
+    {
+        (*i)->setParent(this);
+        (*i)->show();
+    }
 }
 
 void ShipDesignDialog::deleteFloatingWidgets()

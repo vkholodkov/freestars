@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QDropEvent>
 #include <QDragEnterEvent>
+#include <QGraphicsDropShadowEffect>
 
 #include "FSServer.h"
 
@@ -21,6 +22,10 @@ public:
         : QWidget(parent)
         , hullSlot(_slot)
     {
+        QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect;
+        effect->setBlurRadius(5);
+        effect->setOffset(5);
+        setGraphicsEffect(effect);
     }
 
 protected:
