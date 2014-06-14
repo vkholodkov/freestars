@@ -52,6 +52,7 @@ class Player;
 class Ship {
 public:
 	Ship();
+	Ship(const Hull*);
 	virtual ~Ship();
 	static void Cleanup();
 
@@ -166,6 +167,7 @@ public:
 	const Hull * GetHull() const			{ return mHull; }
 
 	const Slot & GetSlot(int i) const	{ return mSlots[i]; }
+	Slot &GetSlot(int i) { return mSlots[i]; }
 
 	void CopyDesign(const Ship * sd, bool IsGift);
 	void Upgrade(const Player * player);

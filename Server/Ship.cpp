@@ -44,6 +44,26 @@ Ship::Ship()
 	mCannotBuild = NULL;	// for starting ships
 }
 
+Ship::Ship(const Hull *hull)
+	: mHull(hull)
+{
+	mName = hull->GetName();;
+	mGraphicNumber = 0;
+	mGift = false;
+	mBuilt = 0;
+	ReCost = 0;
+	ResetSeen();
+	ResetDefaults();
+
+	mCannotBuild = NULL;	// for starting ships
+
+	unsigned int numSlots =  hull->GetNumberSlots();
+
+	for(int pos = 0 ; pos != numSlots ; pos++) {
+		mSlots.push_back(Slot(NULL, 0, pos, hull->GetSlot(pos)));
+	} 
+}
+
 Ship::~Ship()
 {
 }

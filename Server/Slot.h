@@ -54,6 +54,7 @@ public:
 	const Component * GetComp() const	{ return component; }
 	bool IsAllowed(ComponentType type) const		{ return type & Allowed ? true : false; }
 	int GetCount() const				{ return count; }
+	void SetCount(int _count) { count = _count; }
 	long GetPosition() const			{ return mPosition; }
 	long GetLeft() const { return mSlotLeft; }
 	long GetTop() const { return mSlotTop; }

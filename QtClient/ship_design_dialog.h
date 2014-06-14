@@ -15,6 +15,7 @@
 #include "FSServer.h"
 
 #include "graphics_array.h"
+#include "slot_widget.h"
 
 #include "ui_ship_design_dialog.h"
 
@@ -35,16 +36,16 @@ class ShipDesignDialog : public QDialog, private Ui_ShipDesignDialog {
 
 public:
     ShipDesignDialog(Player*, const GraphicsArray*, QWidget *parent = 0);
+    virtual ~ShipDesignDialog();
 
 protected:
     void paintEvent(QPaintEvent*);
-    void dragEnterEvent(QDragEnterEvent*);
-    void dragMoveEvent(QDragMoveEvent*);
 
 private slots:
     void setDesignMode(int);
     void setViewMode(int);
-    void setComponentCategory(int);
+    void setComponentCategory(QComboBox*, QListWidget*, int);
+    void setComponentCategory1(int);
     void setComponentCategory2(int);
     void setShipDesign(int);
     void setHull(int);
@@ -62,10 +63,15 @@ private:
     void populateAvailableHullTypes(int);
     void clearProperties();
 
+    void enterEditMode();
+    void leaveEditMode();
+
     void drawShip(const Ship*);
-    void drawHull(const Hull*);
     QPoint getWireframeOrigin(const QRect&) const;
     void collectSlotDimensions(const Hull*, std::vector<QRect>&, QRect&);
+    void createHullWidgets(const Hull*);
+    void deleteFloatingWidgets();
+    
     void drawSlot(QPainter&, const Slot&, const QRect&);
     void drawComponent(QPainter&, const Slot&, const Slot&, const QRect&);
 
@@ -80,6 +86,7 @@ private:
     Ship *currentShip;
     Hull *currentHull;
     std::auto_ptr<Ship> shipBeingEdited;
+    std::vector<QWidget*> slotWidgets;
 };
 
 };
