@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2014 Valery Kholodkov
  */
+#include <set>
+
 #include <QMenu>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -68,22 +70,40 @@ QVariant Page5Model::data(const QModelIndex &index, int role) const
     }
     else if (role == Qt::EditRole) {
         switch(index.column()) {
+    //        case 0: return QVariant((int)race->GrowthRate() * 100);
             case 0: return QVariant((int)race->PopEfficiency());
             case 1: return QVariant((int)race->FactoryRate());
             case 2: return QVariant((int)race->FactoryCost().GetResources());
             case 3: return QVariant((int)race->FactoriesRun());
-            case 4: return QVariant((int)race->FactoryCost()[2] < 4);
-            case 5: return QVariant((int)race->MineRate());
-            case 6: return QVariant((int)race->MineCost().GetResources());
+            case 4: return QVariant((int)race->FactoryCost()[2] == 4);
+            case 6: return QVariant((int)race->MineRate());
+            case 7: return QVariant((int)race->MineCost().GetResources());
             default: return QVariant((int)race->MinesRun());
         }
     }
     return QVariant();
 }
 
+TechFactorWidget::TechFactorWidget(const QString &title, QWidget *parent)
+    : QGroupBox(title, parent)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    QRadioButton *extra = new QRadioButton(tr("Costs 75% extra"));
+    QRadioButton *normal = new QRadioButton(tr("Costs standard amount"));
+    QRadioButton *less = new QRadioButton(tr("Costs 50% less"));
+
+    layout->addWidget(extra);
+    layout->addWidget(normal);
+    layout->addWidget(less);
+
+    setLayout(layout);
+}
+
 RaceWizard::RaceWizard(Race *_race, QWidget *parent)
     : QDialog(parent)
     , page5DataModel(new Page5Model(_race, this))
+    , race(_race)
 {
     pagesWidget = new QStackedWidget;
     pagesWidget->setContentsMargins(QMargins(0, 0, 0, 0));
@@ -102,11 +122,7 @@ RaceWizard::RaceWizard(Race *_race, QWidget *parent)
     pagesWidget->addWidget(page4Widget);
 
     createPage5();
-
-    QWidget *page6Widget = new QWidget;
-    Ui_RaceWizardPage6 page6;
-    page6.setupUi(page6Widget);
-    pagesWidget->addWidget(page6Widget);
+    createPage6();
 
     QWidget *buttonsPane = new QWidget;
     buttonsPane->setContentsMargins(QMargins(0, 0, 0, 0));
@@ -165,6 +181,10 @@ void RaceWizard::createPage2()
             column2Layout->addWidget(radioButton);
         }
 
+        if(race->GetPRT() == prt) {
+            radioButton->setChecked(true);
+        }
+
         buttonGroup->addButton(radioButton, i);
     }
 
@@ -183,6 +203,14 @@ void RaceWizard::createPage3()
 
     QButtonGroup *buttonGroup = new QButtonGroup(this);
 
+    std::set<const RacialTrait*> lrts;
+
+    unsigned int LRTcount = race->GetLRTCount();
+
+    for(unsigned int i = 0 ; i != LRTcount ; i++) {
+        lrts.insert(race->GetLRT(i));
+    }
+
     unsigned int numLRTs = RacialTrait::LesserTraitCount();
 
     for(unsigned int i = 0 ; i != numLRTs ; i++) {
@@ -197,12 +225,17 @@ void RaceWizard::createPage3()
             column2Layout->addWidget(checkBox);
         }
 
+        if(lrts.find(lrt) != lrts.end()) {
+            checkBox->setChecked(true);
+        }
+
         buttonGroup->addButton(checkBox, i);
     }
 
     buttonGroup->setExclusive(false);
 
-    connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(LRTChanged(QAbstractButton*))); 
+    connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+        this, SLOT(LRTChanged(QAbstractButton*))); 
 }
 
 void RaceWizard::createPage5()
@@ -225,6 +258,23 @@ void RaceWizard::createPage5()
     page5DataMapper->addMapping(page5.minesRunBox, 7);
 
     page5DataMapper->toFirst();
+}
+
+void RaceWizard::createPage6()
+{
+    QWidget *page6Widget = new QWidget;
+    Ui_RaceWizardPage6 page6;
+    page6.setupUi(page6Widget);
+    pagesWidget->addWidget(page6Widget);
+
+    QGridLayout *layout = new QGridLayout;
+
+    for(int tt = 0 ; tt != Rules::MaxTechType ; tt++) {
+        QString title(tr("%0 Research").arg(Rules::GetTechName(tt).c_str()));
+        layout->addWidget(new TechFactorWidget(title, this), tt / 2, tt % 2);
+    }
+
+    page6.techFactorControlsWidget->setLayout(layout);
 }
 
 void RaceWizard::helpClicked(bool)

@@ -158,7 +158,17 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBox"/>
+             <widget class="QSpinBox" name="growthRateBox">
+              <property name="suffix">
+               <string>%</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>20</number>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="horizontalSpacer">
@@ -179,7 +189,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>You can exoect that 1 in 3 plantes will be habitable to your race</string>
+            <string>You can expect that 1 in 3 plantes will be habitable to your race</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <QLabel>
+#include <QGroupBox>
 #include <QDialog>
 #include <QStackedWidget>
 #include <QAbstractButton>
@@ -16,6 +16,13 @@
 #include "FSServer.h"
 
 namespace FreeStars {
+
+class TechFactorWidget : public QGroupBox {
+    Q_OBJECT
+
+public:
+    TechFactorWidget(const QString &_title, QWidget *parent = 0);
+};
 
 class RaceWizard : public QDialog {
     Q_OBJECT
@@ -37,10 +44,13 @@ private:
     void createPage2();
     void createPage3();
     void createPage5();
+    void createPage6();
 
     void pageChanged();
 
 private:
+    Race *race;
+
     QPushButton *nextButton;
     QPushButton *backButton;
     QStackedWidget *pagesWidget;
