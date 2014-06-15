@@ -29,9 +29,13 @@ bool GraphicsArray::ParseNode(const TiXmlNode *node)
     return true;
 }
 
-const QIcon *GraphicsArray::GetGraphics(const std::string &name) const {
+const QIcon *GraphicsArray::GetComponentIcon(const std::string &name) const {
     std::map<std::string, QIcon>::const_iterator i = graphics_map.find(name);
     return (i != graphics_map.end() ? &i->second : NULL);
+}
+
+const QIcon *GraphicsArray::GetRaceAvatar(const std::string &name) const {
+    return NULL;
 }
 
 };

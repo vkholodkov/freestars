@@ -127,27 +127,18 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="label_14">
+                 <widget class="ShipAvatarWidget" name="shipAvatarWidget2" native="true">
                   <property name="minimumSize">
                    <size>
-                    <width>68</width>
-                    <height>68</height>
+                    <width>64</width>
+                    <height>64</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>68</width>
-                    <height>68</height>
+                    <width>64</width>
+                    <height>64</height>
                    </size>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::Panel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Sunken</enum>
-                  </property>
-                  <property name="text">
-                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -685,27 +676,18 @@
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QLabel" name="label">
+                     <widget class="ShipAvatarWidget" name="shipAvatarWidget1" native="true">
                       <property name="minimumSize">
                        <size>
-                        <width>68</width>
-                        <height>68</height>
+                        <width>64</width>
+                        <height>64</height>
                        </size>
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>68</width>
-                        <height>68</height>
+                        <width>64</width>
+                        <height>64</height>
                        </size>
-                      </property>
-                      <property name="frameShape">
-                       <enum>QFrame::Panel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Sunken</enum>
-                      </property>
-                      <property name="text">
-                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -1094,6 +1076,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ShipAvatarWidget</class>
+   <extends>QWidget</extends>
+   <header>ship_avatar_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

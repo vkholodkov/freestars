@@ -46,6 +46,10 @@ static CompCategory shipCategories[] = {
     { NULL, 0 }
 };
 
+void (ShipDesignDialog::*ShipDesignDialog::propertyFiller[])(QFormLayout*) = {
+    NULL
+};
+
 ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphicsArray, QWidget *parent)
     : QDialog(parent)
     , graphicsArray(_graphicsArray)
@@ -56,6 +60,9 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     , plateImage(":/images/plate.png")
 {
     setupUi(this);
+
+    shipAvatarWidget1->setGraphicsArray(_graphicsArray);
+    shipAvatarWidget2->setGraphicsArray(_graphicsArray);
 
     QSignalMapper *designModeMapper = new QSignalMapper(this);
 
@@ -203,7 +210,7 @@ void ShipDesignDialog::setComponentCategory(QComboBox *chooseComponentBox, QList
 
     for (std::deque<Component*>::const_iterator i = components.begin() ; i != components.end() ; i++) {
         if ((*i)->IsBuildable(player) && ((*i)->GetType() & mask)) {
-            const QIcon *icon = graphicsArray->GetGraphics((*i)->GetName());
+            const QIcon *icon = graphicsArray->GetComponentIcon((*i)->GetName());
 
             if(icon != NULL) {
                 componentListWidget->addItem(new QListWidgetItem(*icon, QString((*i)->GetName().c_str())));
@@ -288,6 +295,8 @@ void ShipDesignDialog::enterEditMode(bool addNew)
 
     stackedWidget1->setCurrentIndex(0);
 
+    shipAvatarWidget2->setHullName(shipBeingEdited->GetHull()->GetName().c_str());
+
     createShipWidgets(shipBeingEdited.get(), false);
 
     populateComponentCategoryList();
@@ -312,6 +321,8 @@ void ShipDesignDialog::leaveEditMode()
 
     stackedWidget1->setCurrentIndex(1);
 
+    shipAvatarWidget2->setHullName("");
+
     chooseComponentBox2->disconnect();
 
     okButton->disconnect();
@@ -329,6 +340,8 @@ void ShipDesignDialog::setShipDesign(int index)
 
     if(ship == NULL)
         return;
+
+    shipAvatarWidget1->setHullName(ship->GetHull()->GetName().c_str());
 
     Cost cost(ship->GetCost(player));
 
@@ -403,6 +416,8 @@ void ShipDesignDialog::setHull(int index)
 
     if(hull == NULL)
         return;
+
+    shipAvatarWidget1->setHullName(hull->GetName().c_str());
 
     Cost cost(hull->GetCost(player));
 

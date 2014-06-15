@@ -11,6 +11,7 @@
 #include <QButtonGroup>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
+#include <QFormLayout>
 
 #include "FSServer.h"
 
@@ -85,6 +86,7 @@ private:
     int currentDesignMode, currentViewMode;
     std::auto_ptr<Ship> shipBeingEdited;
     std::vector<QWidget*> slotWidgets;
+    static void (ShipDesignDialog::*propertyFiller[])(QFormLayout*);
 };
 
 };

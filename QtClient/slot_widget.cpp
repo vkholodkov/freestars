@@ -98,7 +98,7 @@ void SlotWidget::drawComponent(QPainter &painter, const QRect &rect)
     painter.drawImage(rect.topLeft(), plateImage);
 
     const Component *comp = shipSlot.GetComp();
-    const QIcon *icon = graphicsArray->GetGraphics(comp->GetName());
+    const QIcon *icon = graphicsArray->GetComponentIcon(comp->GetName());
 
     if(icon != NULL) {
         painter.drawPixmap(rect.topLeft() + QPoint(6, 0), icon->pixmap(52, 52));
