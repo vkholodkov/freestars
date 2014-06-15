@@ -58,6 +58,8 @@ private slots:
     void addNewDesign();
     void abandonDesign();
 
+    void updateFloatingWidgetsGeometry();
+
 private:
     void switchMode(int, int, int, int);
     void populateComponentCategoryList();

@@ -6,6 +6,7 @@
 #include <QSignalMapper>
 #include <QPainter>
 #include <QMessageBox>
+#include <QPropertyAnimation>
 
 #include "FSServer.h"
 #include "Hull.h"
@@ -94,6 +95,24 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     connect(doneButton, SIGNAL(clicked(bool)), this, SLOT(accept()));
 
     populateExistingDesigns(SDDDM_SHIPS);
+
+    unsigned int numSlots = slotWidgets.size();
+
+    for (int i = 0; i != numSlots; i++) {
+        if(slotWidgets[i] != NULL) {
+            QGraphicsOpacityEffect *fadeEffect = new QGraphicsOpacityEffect(slotWidgets[i]);
+            slotWidgets[i]->setGraphicsEffect(fadeEffect);
+
+            QPropertyAnimation *animation = new QPropertyAnimation(fadeEffect, "opacity");
+            animation->setEasingCurve(QEasingCurve::InOutQuad);
+            animation->setDuration(500);
+            animation->setStartValue(0.01);
+            animation->setEndValue(1.0);
+            animation->start(QPropertyAnimation::DeleteWhenStopped);
+
+            connect(animation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(updateFloatingWidgetsGeometry()));
+        }
+    }
 }
 
 ShipDesignDialog::~ShipDesignDialog()
@@ -104,7 +123,11 @@ ShipDesignDialog::~ShipDesignDialog()
 void ShipDesignDialog::resizeEvent(QResizeEvent *e)
 {
     QDialog::resizeEvent(e);
+    updateFloatingWidgetsGeometry();
+}
 
+void ShipDesignDialog::updateFloatingWidgetsGeometry()
+{
     QRect boundaries;
 
     collectFloatingWidgetBoundaries(boundaries);
