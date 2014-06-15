@@ -39,7 +39,6 @@ private slots:
     void openRecentFile();
     void about();
     void documentWasModified();
-    void openPopulationTransportationView();
     void activateTab(int);
     void closeTab(int);
 

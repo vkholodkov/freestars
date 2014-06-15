@@ -493,29 +493,6 @@ void MainWindow::openGameView() {
         .arg(player->GetPluralName().c_str()));
 }
 
-void MainWindow::openPopulationTransportationView() {
-#if 0
-    QStringList players;
-
-    curGame->populatePlayerNames(players);
-//    items << tr("Spring") << tr("Summer") << tr("Fall") << tr("Winter");
-
-    bool ok;
-    QString item = QInputDialog::getItem(this, tr("Input"),
-                                         tr("Select player:"), players, 0, false, &ok);
-    if (ok && !item.isEmpty()) {
-        const Player *player = curGame->getPlayerByName(item.toStdString());
-
-        QTableView *tableView = new QTableView;
-        tableView->setModel(player->computeVogelApproximation());
-
-        int idx = tabWidget->addTab(tableView, "Population transportation");
-
-        tabWidget->setCurrentIndex(idx);
-    }
-#endif
-}
-
 void MainWindow::closeAllViews() {
     std::list<QWidget*> widgets;
 
