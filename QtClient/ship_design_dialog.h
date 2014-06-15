@@ -63,7 +63,7 @@ private slots:
 private:
     void switchMode(int, int, int, int);
     void populateComponentCategoryList();
-    void populateExistingDesigns(int);
+    void populateExistingDesigns(int, bool initial = false);
     void populateAvailableHullTypes(int);
     void clearProperties();
 

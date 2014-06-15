@@ -94,25 +94,13 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
 
     connect(doneButton, SIGNAL(clicked(bool)), this, SLOT(accept()));
 
-    populateExistingDesigns(SDDDM_SHIPS);
+    populateExistingDesigns(SDDDM_SHIPS, true);
 
-    unsigned int numSlots = slotWidgets.size();
-
-    for (int i = 0; i != numSlots; i++) {
-        if(slotWidgets[i] != NULL) {
-            QGraphicsOpacityEffect *fadeEffect = new QGraphicsOpacityEffect(slotWidgets[i]);
-            slotWidgets[i]->setGraphicsEffect(fadeEffect);
-
-            QPropertyAnimation *animation = new QPropertyAnimation(fadeEffect, "opacity");
-            animation->setEasingCurve(QEasingCurve::InOutQuad);
-            animation->setDuration(500);
-            animation->setStartValue(0.01);
-            animation->setEndValue(1.0);
-            animation->start(QPropertyAnimation::DeleteWhenStopped);
-
-            connect(animation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(updateFloatingWidgetsGeometry()));
-        }
-    }
+    QPropertyAnimation *animation = new QPropertyAnimation(chooseDesignBox, "currentIndex");
+    animation->setDuration(500);
+    animation->setStartValue(-1);
+    animation->setEndValue(0);
+    animation->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
 ShipDesignDialog::~ShipDesignDialog()
@@ -255,7 +243,7 @@ void ShipDesignDialog::setComponentCategory2(int index)
     setComponentCategory(chooseComponentBox2, componentListWidget2, index);
 }
 
-void ShipDesignDialog::populateExistingDesigns(int designMode)
+void ShipDesignDialog::populateExistingDesigns(int designMode, bool initial)
 {
     int start = designMode == SDDDM_SHIPS ? 1 : 0;
     int max = designMode == SDDDM_SHIPS ? Rules::GetConstant("MaxShipDesigns") 
@@ -270,8 +258,11 @@ void ShipDesignDialog::populateExistingDesigns(int designMode)
         }
     }
 
-    connect(chooseDesignBox, SIGNAL(activated(int)), this, SLOT(setShipDesign(int)));
-    setShipDesign(chooseDesignBox->currentIndex());
+    connect(chooseDesignBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setShipDesign(int)));
+
+    if(!initial) {
+        setShipDesign(chooseDesignBox->currentIndex());
+    }
 }
 
 void ShipDesignDialog::populateAvailableHullTypes(int designMode)
