@@ -597,7 +597,7 @@ void ShipDesignDialog::createHullWidgets(const Hull *hull)
 
     dimensions[numSlots].translate(origin);
 
-    drawOrder[numSlots] = slotWidgets[numSlots] = new CargoWidget(this);
+    drawOrder[numSlots] = slotWidgets[numSlots] = new CargoWidget(hull->GetCargoCapacity(), this);
     slotWidgets[numSlots]->setGeometry(dimensions[numSlots]);
 
     std::sort(drawOrder.begin(), drawOrder.end(), zsort);
@@ -640,7 +640,7 @@ void ShipDesignDialog::createShipWidgets(Ship *ship, bool readOnly)
 
     dimensions[numSlots].translate(origin);
 
-    drawOrder[numSlots] = slotWidgets[numSlots] = new CargoWidget(this);
+    drawOrder[numSlots] = slotWidgets[numSlots] = new CargoWidget(hull->GetCargoCapacity(), this);
     slotWidgets[numSlots]->setGeometry(dimensions[numSlots]);
     slotWidgets[numSlots]->show();
 

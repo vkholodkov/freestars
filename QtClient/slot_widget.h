@@ -89,13 +89,15 @@ class CargoWidget : public QWidget {
     Q_OBJECT
 
 public:
-    CargoWidget(QWidget *parent = 0)
+    CargoWidget(long _cargo, QWidget *parent = 0)
         : QWidget(parent)
+        , cargo(_cargo)
     {
     }
 
 protected:
     void paintEvent(QPaintEvent*);
+    long cargo;
 };
 
 };

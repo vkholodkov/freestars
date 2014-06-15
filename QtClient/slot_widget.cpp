@@ -258,10 +258,19 @@ void EditableSlotWidget::mouseMoveEvent(QMouseEvent *e)
 void CargoWidget::paintEvent(QPaintEvent *e)
 {
     QPainter painter(this);
+    QFont bold(font());
+    bold.setBold(true);
+    QFontMetrics fm(bold);
 
     painter.fillRect(contentsRect(), QBrush(Qt::gray, Qt::Dense7Pattern));
     painter.setPen(Qt::black);
     painter.drawRect(contentsRect().adjusted(0, 0, -1, -1));
+
+    QString text(tr("Cargo\n%0kT\nmax").arg(cargo));
+
+    painter.setFont(bold);
+    painter.drawText(contentsRect(),
+        Qt::TextWordWrap | Qt::AlignCenter | Qt::AlignVCenter, text);
 }
 
 };
