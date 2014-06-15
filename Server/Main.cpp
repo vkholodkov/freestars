@@ -66,9 +66,10 @@ int main (int argc, char * argv[])
 
 		TheGame->InitialSeen();
 
-		cout << "Writing XY File" << endl;
-		if (!error)
+		if (!error) {
+			cout << "Writing XY File" << endl;
 			TheGame->WriteXYFile();
+		}
 	} else if (stricmp(FileType.c_str(), ".hst") == 0) {
 		cout << "Loading Host File" << endl;
 		if (!TheGame->LoadHostFile(argv[1]))
