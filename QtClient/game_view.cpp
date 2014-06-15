@@ -618,7 +618,7 @@ void GameView::playerRelationsDialog()
 
 void GameView::submitTurn()
 {
-    std::cout << "GameView::submitTurn" << std::endl;
+    player->SaveXFile();
 }
 
 };
