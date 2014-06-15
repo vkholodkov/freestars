@@ -10,6 +10,7 @@
 
 #include "folding_widget.h"
 #include "cargo_widget.h"
+#include "graphics_array.h"
 
 #include "FSServer.h"
 
@@ -19,7 +20,7 @@ class FleetWidget : public FoldingWidget {
     Q_OBJECT
 
 public:
-    FleetWidget(const Fleet*, const Player*, QWidget *parent = 0);
+    FleetWidget(const GraphicsArray*, const Fleet*, const Player*, QWidget *parent = 0);
 
 signals:
     void nextObject();

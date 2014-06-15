@@ -205,6 +205,13 @@ void GameView::setBriefSelection(const Fleet *_fleet) {
     QWidget *newPage = new QWidget;
     Ui_FleetReport ui_FleetReport;
     ui_FleetReport.setupUi(newPage);
+#if 0
+    const Stack *stack = _fleet->GetStack(0);
+    const Ship *ship = stack->GetDesign();
+
+    ui_FleetReport.shipAvatarWidget->setGraphicsArray(graphicsArray);
+    ui_FleetReport.shipAvatarWidget->setHullName(ship->GetHull()->GetName().c_str());
+#endif
     statusBed->addWidget(newPage);
 
     currentSelection = _fleet;
@@ -337,7 +344,7 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     /*
      * Fleet widget
      */
-    FleetWidget *fleetWidget = new FleetWidget(_fleet, player);
+    FleetWidget *fleetWidget = new FleetWidget(graphicsArray, _fleet, player);
     fleetWidget->setObjectName("w1_column1");
     verticalFlowLayout->addWidget(fleetWidget);
     
