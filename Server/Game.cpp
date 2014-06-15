@@ -647,8 +647,10 @@ bool Game::LoadDefFile(const char * deffile)
 	string NameFile;
 	NameFile = mFileLoc;
 	NameFile += GetString(df->FirstChild("PlanetNames"));
-	if (!mCreation->LoadNames(NameFile.c_str()))
+	if (!mCreation->LoadNames(NameFile.c_str())) {
+		Message * mess = TheGame->AddMessage("Error: Cannot load planet names");
 		return false;
+	}
 
 	// if they include a galaxy use that
 	if (df->FirstChild("Galaxy") != NULL) {
