@@ -22,6 +22,7 @@
 
 #include "research_dialog.h"
 #include "ship_design_dialog.h"
+#include "race_wizard.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -614,6 +615,12 @@ void GameView::battlePlansDialog()
 void GameView::playerRelationsDialog()
 {
     std::cout << "GameView::playerRelationsDialog" << std::endl;
+}
+
+void GameView::viewRaceDialog()
+{
+    RaceWizard raceWizard(player);
+    raceWizard.exec();
 }
 
 void GameView::submitTurn()

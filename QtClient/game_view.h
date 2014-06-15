@@ -60,6 +60,7 @@ public slots:
     void researchDialog();
     void battlePlansDialog();
     void playerRelationsDialog();
+    void viewRaceDialog();
 
     void submitTurn();
 

@@ -69,6 +69,7 @@ private:
     QString curFile;
 
     QMenu *fileMenu;
+    QMenu *viewMenu;
     QMenu *turnMenu;
     QMenu *commandsMenu;
     QMenu *helpMenu;
@@ -78,6 +79,8 @@ private:
     QAction *saveAct;
     QAction *saveAsAct;
     QAction *exitAct;
+
+    QAction *viewRaceAction;
 
     QAction *submitTurnAction;
 

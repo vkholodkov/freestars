@@ -9,6 +9,7 @@ SET(freestars_SOURCES
     main.cpp
     mainwindow.cpp
     advanced_new_game_wizard.cpp
+    race_wizard.cpp
     game_view.cpp
     folding_widget.cpp
     vertical_flow_layout.cpp
@@ -37,6 +38,7 @@ SET(freestars_SOURCES
 SET(freestars_HEADERS
     mainwindow.h
     advanced_new_game_wizard.h
+    race_wizard.h
     game_view.h
     folding_widget.h
     habitation_bar.h
@@ -60,6 +62,12 @@ SET(freestars_HEADERS
 SET(freestars_FORMS
     angw_page1.ui
     angw_page3.ui
+    rw_page1.ui
+    rw_page2.ui
+    rw_page3.ui
+    rw_page4.ui
+    rw_page5.ui
+    rw_page6.ui
     planet_widget.ui
     planet_report.ui
     fleet_widget.ui

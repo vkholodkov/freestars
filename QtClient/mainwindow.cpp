@@ -189,6 +189,14 @@ void MainWindow::createActions()
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
     /*
+     * View menu
+     */
+    viewRaceAction = new QAction(tr("&Race..."), this);
+    viewRaceAction->setShortcut(QKeySequence(Qt::Key_F8));
+    viewRaceAction->setStatusTip(tr("View your race"));
+    viewRaceAction->setEnabled(false);
+
+    /*
      * Turn menu
      */
     submitTurnAction = new QAction(tr("&Submit"), this);
@@ -286,6 +294,9 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
     updateRecentFileActions();
+
+    viewMenu = menuBar()->addMenu(tr("&View"));
+    viewMenu->addAction(viewRaceAction);
 
     turnMenu = menuBar()->addMenu(tr("&Turn"));
     turnMenu->addAction(submitTurnAction);
@@ -523,6 +534,8 @@ void MainWindow::activateTab(int index)
             battlePlansAction->disconnect();
             playerRelationsAction->disconnect();
 
+            connect(viewRaceAction, SIGNAL(triggered()), gameView, SLOT(viewRaceDialog()));
+
             connect(viewModeMapper, SIGNAL(mapped(int)), mapView, SLOT(setViewMode(int)));
 
             connect(submitTurnAction, SIGNAL(triggered()), gameView, SLOT(submitTurn()));
@@ -530,6 +543,8 @@ void MainWindow::activateTab(int index)
             connect(researchAction, SIGNAL(triggered()), gameView, SLOT(researchDialog()));
             connect(battlePlansAction, SIGNAL(triggered()), gameView, SLOT(battlePlansDialog()));
             connect(playerRelationsAction, SIGNAL(triggered()), gameView, SLOT(playerRelationsDialog()));
+
+            viewRaceAction->setEnabled(true);
 
             viewModeGroup->setEnabled(true);
 
@@ -542,6 +557,8 @@ void MainWindow::activateTab(int index)
             return;
         }
     }
+
+    viewRaceAction->setEnabled(false);
 
     viewModeGroup->setEnabled(false);
 
