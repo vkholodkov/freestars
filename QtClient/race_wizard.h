@@ -19,16 +19,23 @@ namespace FreeStars {
 
 class TechFactorWidget : public QGroupBox {
     Q_OBJECT
+    Q_PROPERTY(double techCostFactor READ techCostFactor WRITE setTechCostFactor)
 
 public:
     TechFactorWidget(const QString &_title, QWidget *parent = 0);
+
+    double techCostFactor() const;
+    void setTechCostFactor(double);
+
+private:
+    QAbstractButton *extra, *normal, *less;
 };
 
 class RaceWizard : public QDialog {
     Q_OBJECT
 
 public:
-    RaceWizard(Race*, QWidget *parent = 0);
+    RaceWizard(Race*, bool readOnly = false, QWidget *parent = 0);
 
 private slots:
     void helpClicked(bool);

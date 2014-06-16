@@ -619,7 +619,7 @@ void GameView::playerRelationsDialog()
 
 void GameView::viewRaceDialog()
 {
-    RaceWizard raceWizard(player);
+    RaceWizard raceWizard(player, true);
     raceWizard.exec();
 }
 

@@ -57,7 +57,7 @@ int Page5Model::rowCount(const QModelIndex &parent) const
 
 int Page5Model::columnCount(const QModelIndex &parent) const
 {
-    return 8;
+    return 8 + Rules::MaxTechType;
 }
 
 QVariant Page5Model::data(const QModelIndex &index, int role) const
@@ -70,15 +70,15 @@ QVariant Page5Model::data(const QModelIndex &index, int role) const
     }
     else if (role == Qt::EditRole) {
         switch(index.column()) {
-    //        case 0: return QVariant((int)race->GrowthRate() * 100);
             case 0: return QVariant((int)race->PopEfficiency());
             case 1: return QVariant((int)race->FactoryRate());
             case 2: return QVariant((int)race->FactoryCost().GetResources());
             case 3: return QVariant((int)race->FactoriesRun());
             case 4: return QVariant((int)race->FactoryCost()[2] == 4);
-            case 6: return QVariant((int)race->MineRate());
-            case 7: return QVariant((int)race->MineCost().GetResources());
-            default: return QVariant((int)race->MinesRun());
+            case 5: return QVariant((int)race->MineRate());
+            case 6: return QVariant((int)race->MineCost().GetResources());
+            case 7: return QVariant((int)race->MinesRun());
+            default: return QVariant((int)race->TechCostFactor(index.column() - 8));
         }
     }
     return QVariant();
@@ -89,9 +89,9 @@ TechFactorWidget::TechFactorWidget(const QString &title, QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
-    QRadioButton *extra = new QRadioButton(tr("Costs 75% extra"));
-    QRadioButton *normal = new QRadioButton(tr("Costs standard amount"));
-    QRadioButton *less = new QRadioButton(tr("Costs 50% less"));
+    extra = new QRadioButton(tr("Costs 75% extra"));
+    normal = new QRadioButton(tr("Costs standard amount"));
+    less = new QRadioButton(tr("Costs 50% less"));
 
     layout->addWidget(extra);
     layout->addWidget(normal);
@@ -100,7 +100,20 @@ TechFactorWidget::TechFactorWidget(const QString &title, QWidget *parent)
     setLayout(layout);
 }
 
-RaceWizard::RaceWizard(Race *_race, QWidget *parent)
+double TechFactorWidget::techCostFactor() const
+{
+    return extra->isChecked() ? 1.75 : normal->isChecked() ? 1.0 : less->isChecked() ? 0.5 : 1.0;
+}
+
+void TechFactorWidget::setTechCostFactor(double techCostFactor)
+{
+    extra->setChecked((techCostFactor >= 1.75 - epsilon) ? true : false);
+    less->setChecked((techCostFactor <= 0.5 + epsilon) ? true : false);
+    normal->setChecked(((techCostFactor >= 1.75 - epsilon) ||
+        (techCostFactor <= 0.5 + epsilon)) ? false : true);
+}
+
+RaceWizard::RaceWizard(Race *_race, bool readOnly, QWidget *parent)
     : QDialog(parent)
     , page5DataModel(new Page5Model(_race, this))
     , race(_race)
@@ -146,6 +159,8 @@ RaceWizard::RaceWizard(Race *_race, QWidget *parent)
     mainLayout->addWidget(buttonsPane);
     setLayout(mainLayout);
 
+    page5DataMapper->toFirst();
+
     pageChanged();
 
     connect(helpButton, SIGNAL(clicked(bool)), this, SLOT(helpClicked(bool)));
@@ -153,6 +168,8 @@ RaceWizard::RaceWizard(Race *_race, QWidget *parent)
     connect(backButton, SIGNAL(clicked(bool)), this, SLOT(backClicked(bool)));
     connect(nextButton, SIGNAL(clicked(bool)), this, SLOT(nextClicked(bool)));
     connect(finishButton, SIGNAL(clicked(bool)), this, SLOT(finishClicked(bool)));
+
+    pagesWidget->setEnabled(!readOnly);
 }
 
 void RaceWizard::createPage2()
@@ -256,8 +273,6 @@ void RaceWizard::createPage5()
     page5DataMapper->addMapping(page5.mineRateBox, 5);
     page5DataMapper->addMapping(page5.mineCostResourcesBox, 6);
     page5DataMapper->addMapping(page5.minesRunBox, 7);
-
-    page5DataMapper->toFirst();
 }
 
 void RaceWizard::createPage6()
@@ -271,7 +286,9 @@ void RaceWizard::createPage6()
 
     for(int tt = 0 ; tt != Rules::MaxTechType ; tt++) {
         QString title(tr("%0 Research").arg(Rules::GetTechName(tt).c_str()));
-        layout->addWidget(new TechFactorWidget(title, this), tt / 2, tt % 2);
+        QWidget *techFactorWidget = new TechFactorWidget(title, this);
+        layout->addWidget(techFactorWidget, tt / 2, tt % 2);
+        page5DataMapper->addMapping(techFactorWidget, 8 + tt, "techCostFactor");
     }
 
     page6.techFactorControlsWidget->setLayout(layout);
@@ -311,7 +328,7 @@ void RaceWizard::pageChanged()
 {
     backButton->setEnabled(pagesWidget->currentIndex() > 0);
     nextButton->setEnabled(pagesWidget->currentIndex() < pagesWidget->count()-1);
-    setWindowTitle(tr("View Race-- Step %0 of %1")
+    setWindowTitle(tr("View Race -- Step %0 of %1")
         .arg(pagesWidget->currentIndex() + 1)
         .arg(pagesWidget->count()));
 }

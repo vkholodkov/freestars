@@ -635,7 +635,6 @@ void ShipDesignDialog::createShipWidgets(Ship *ship, bool readOnly)
         drawOrder[i] = slotWidgets[i] = readOnly ? new SlotWidget(graphicsArray, shipSlot, hullSlot)
             : new EditableSlotWidget(graphicsArray, shipSlot, hullSlot);
         slotWidgets[i]->setGeometry(dimensions[i]);
-        slotWidgets[i]->show();
     }
 
     dimensions[numSlots].translate(origin);
