@@ -597,13 +597,13 @@ void GameView::showProductionDialog(bool)
 
 void GameView::shipDesignDialog()
 {
-    ShipDesignDialog shipDesignDialog(player, graphicsArray);
+    ShipDesignDialog shipDesignDialog(player, graphicsArray, this);
     shipDesignDialog.exec();
 }
 
 void GameView::researchDialog()
 {
-    ResearchDialog researchDialog(player);
+    ResearchDialog researchDialog(player, this);
     researchDialog.exec();
 }
 
@@ -619,7 +619,7 @@ void GameView::playerRelationsDialog()
 
 void GameView::viewRaceDialog()
 {
-    RaceWizard raceWizard(player, true);
+    RaceWizard raceWizard(player, true, this);
     raceWizard.exec();
 }
 

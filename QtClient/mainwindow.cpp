@@ -21,7 +21,7 @@ MainWindow::MainWindow()
 
     tabWidget = new QTabWidget;
     tabWidget->setTabsClosable(tabWidget);
-    tabWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(212, 208, 200);"));
+    //tabWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(212, 208, 200);"));
     setCentralWidget(tabWidget);
 
     createActions();
