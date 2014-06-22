@@ -38,6 +38,7 @@ signals:
 
 public slots:
     void selectObject(const SpaceObject*);
+    void selectWaypoint(const Location*);
     void listObjectsInLocation(const SpaceObject*, const QPoint&);
     void renameObject(const SpaceObject*);
 

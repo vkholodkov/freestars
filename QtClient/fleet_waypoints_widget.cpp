@@ -30,6 +30,8 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
 
     connect(ui_FleetWaypointsWidget.repeatOrdersBox, SIGNAL(stateChanged(int)),
         this, SLOT(setRepeatOrders(int)));
+    connect(ui_FleetWaypointsWidget.waypointListBox, SIGNAL(currentRowChanged(int)),
+        this, SLOT(wayorderChanged(int)));
 
     this->addWidget(widget);
 }
@@ -37,6 +39,15 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
 void FleetWaypointsWidget::setRepeatOrders(int state)
 {
     fleet->SetRepeat(state == Qt::Checked);
+}
+
+void FleetWaypointsWidget::wayorderChanged(int row)
+{
+    const std::deque<WayOrder *> &orders = fleet->GetOrders();
+
+    if(row >= 0 && row < orders.size()) {
+        emit selectWaypoint(orders[row]->GetLocation());
+    }
 }
 
 QString FleetWaypointsWidget::getLocationName(const Location *loc) const

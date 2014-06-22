@@ -401,6 +401,9 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     FleetWaypointsWidget *fleetWaypointsWidget = new FleetWaypointsWidget(const_cast<Fleet*>(_fleet), player);
     fleetWaypointsWidget->setObjectName("w3_column1");
     verticalFlowLayout->addWidget(fleetWaypointsWidget);
+
+    connect(fleetWaypointsWidget, SIGNAL(selectWaypoint(const Location*)),
+        this, SLOT(selectWaypoint(const Location*)));
 }
 
 void GameView::clearBriefSelection()
@@ -500,6 +503,11 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
     if(ai != actions.end()) {
         emit selectionChanged(ai->second);
     }
+}
+
+void GameView::selectWaypoint(const Location *loc)
+{
+    std::cout << "GameView::selectWaypoint loc=" << loc << std::endl;
 }
 
 void GameView::renameObject(const SpaceObject *o)
