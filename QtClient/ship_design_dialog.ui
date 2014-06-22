@@ -599,16 +599,16 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="editDesignButton">
+                 <widget class="QPushButton" name="deleteDesignButton">
                   <property name="text">
-                   <string>&amp;Edit Selected Design</string>
+                   <string>&amp;Delete Selected Design</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="deleteDesignButton">
+                 <widget class="QPushButton" name="editDesignButton">
                   <property name="text">
-                   <string>&amp;Delete Selected Design</string>
+                   <string>&amp;Edit Selected Design</string>
                   </property>
                  </widget>
                 </item>
