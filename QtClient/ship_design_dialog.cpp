@@ -506,6 +506,23 @@ void ShipDesignDialog::editDesign()
 
 void ShipDesignDialog::deleteDesign()
 {
+    if (currentViewMode != SDDVM_EXISTING)
+        return;
+
+    QVariant userData = chooseDesignBox->itemData(chooseDesignBox->currentIndex());
+
+    Ship *ship = reinterpret_cast<Ship*>(userData.toULongLong());
+
+    if(ship != NULL) {
+        int built = ship->GetNumberBuilt();
+
+        if(built == 0 || QMessageBox::question(this, tr("Delete Design"), tr("You currently " \
+                "have %0 %1s. If you delete this design these ships will be destroyed. " \
+                "Are you sure?").arg(built).arg(ship->GetName().c_str()), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            std::cout << "delete design " << ship->GetName() << std::endl;
+        }
+    }
 }
 
 QPoint ShipDesignDialog::getWireframeOrigin(const QRect &boundaries) const
