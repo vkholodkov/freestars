@@ -507,7 +507,26 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
 
 void GameView::selectWaypoint(const Location *loc)
 {
-    std::cout << "GameView::selectWaypoint loc=" << loc << std::endl;
+    QPoint pos(mapView->galaxyToScreen(QPoint(loc->GetPosX(), loc->GetPosY())));
+
+    clearBriefSelection();
+
+    mapScroller->ensureVisible(pos.x(), pos.y());
+    mapView->setSelection(loc);
+
+    const Planet *p = dynamic_cast<const Planet*>(loc);
+
+    if(p != NULL) {
+        setBriefSelection(p);
+        return;
+    }
+
+    const Fleet *f = dynamic_cast<const Fleet*>(loc);
+
+    if(f != NULL) {
+        setBriefSelection(f);
+        return;
+    }
 }
 
 void GameView::renameObject(const SpaceObject *o)

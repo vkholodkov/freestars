@@ -86,7 +86,7 @@ void MapView::clearSelection()
     }
 }
 
-void MapView::setSelection(const SpaceObject *o) {
+void MapView::setSelection(const Location *o) {
     selection = o;
 
     QPoint pos(galaxyToScreen(QPoint(o->GetPosX(), o->GetPosY())));

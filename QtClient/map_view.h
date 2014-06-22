@@ -44,7 +44,7 @@ public:
     int galaxyToScreen(int) const;
 
     void clearSelection();
-    void setSelection(const SpaceObject*);
+    void setSelection(const Location*);
     const SpaceObject *findSelection(const QPoint&) const;
 
 signals:
@@ -88,7 +88,7 @@ private:
     const Galaxy *galaxy;
     const Game *game;
     const Player *player;
-    const SpaceObject *selection;
+    const Location *selection;
     int mapMode;
     unsigned mapOptions;
 };
