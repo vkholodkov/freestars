@@ -19,6 +19,7 @@
 #include "orbiting_widget.h"
 #include "fleet_cargo_widget.h"
 #include "fleet_composition_widget.h"
+#include "fleet_waypoints_widget.h"
 
 #include "research_dialog.h"
 #include "ship_design_dialog.h"
@@ -393,6 +394,13 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
         this, SLOT(splitAllFleet(const Fleet*)));
     connect(fleetCompositionWidget, SIGNAL(mergeFleet(const Fleet*)),
         this, SLOT(mergeFleet(const Fleet*)));
+
+    /*
+     * Fleet waypoints widget
+     */
+    FleetWaypointsWidget *fleetWaypointsWidget = new FleetWaypointsWidget(_fleet, player);
+    fleetWaypointsWidget->setObjectName("w3_column1");
+    verticalFlowLayout->addWidget(fleetWaypointsWidget);
 }
 
 void GameView::clearBriefSelection()

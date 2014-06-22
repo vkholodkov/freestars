@@ -24,6 +24,7 @@ SET(freestars_SOURCES
     fleet_widget.cpp
     fleet_cargo_widget.cpp
     fleet_composition_widget.cpp
+    fleet_waypoints_widget.cpp
     orbiting_widget.cpp
     production_queue_model.cpp
     space_object_sorter.cpp
@@ -50,6 +51,7 @@ SET(freestars_HEADERS
     fleet_widget.h
     fleet_cargo_widget.h
     fleet_composition_widget.h
+    fleet_waypoints_widget.h
     orbiting_widget.h
     production_queue_model.h
     map_view.h
@@ -73,6 +75,7 @@ SET(freestars_FORMS
     fleet_widget.ui
     fleet_cargo_widget.ui
     fleet_composition_widget.ui
+    fleet_waypoints_widget.ui
     fleet_report.ui
     planet_production_widget.ui
     message_widget.ui
