@@ -8,6 +8,7 @@
 #include <list>
 
 #include <QWidget>
+#include <QCursor>
 
 #include "FSServer.h"
 
@@ -37,6 +38,7 @@ public:
 
 public:
     MapView(const Galaxy*, const Game*, const Player*, QWidget *parent = 0);
+    ~MapView();
 
     QSize sizeHint() const;
 
@@ -50,6 +52,7 @@ public:
 signals:
     void selectionChanged(const SpaceObject*);
     void listObjectsInLocation(const SpaceObject*, const QPoint&);
+    void waypointAdded(const Location*);
 
 public slots:
     void setViewMode(int);
@@ -68,8 +71,11 @@ protected:
     void mouseReleaseEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
     void contextMenuEvent(QContextMenuEvent*);
+    bool eventFilter(QObject*, QEvent*);
 
 private:
+    void setAddWaypointMode(bool);
+
     void drawArrow(QPainter&, const QPoint&);
     void drawDot(QPainter&, const QPoint&, const QColor&);
     void drawCircle(QPainter&, const QPoint&, int);
@@ -85,12 +91,14 @@ private:
 
 private:
     static void (MapView::*planetDrawers[])(QPainter&, const Planet*, const QPoint&);
+    QCursor arrow_up, cross;
     const Galaxy *galaxy;
     const Game *game;
     const Player *player;
     const Location *selection;
     int mapMode;
     unsigned mapOptions;
+    bool addWaypointMode;
 };
 
 };

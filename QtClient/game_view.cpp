@@ -404,6 +404,8 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
 
     connect(fleetWaypointsWidget, SIGNAL(selectWaypoint(const Location*)),
         this, SLOT(selectWaypoint(const Location*)));
+    connect(mapView, SIGNAL(waypointAdded(const Location*)),
+        fleetWaypointsWidget, SLOT(wayorderAdded(const Location*)));
 }
 
 void GameView::clearBriefSelection()

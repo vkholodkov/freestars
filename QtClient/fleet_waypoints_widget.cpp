@@ -2,6 +2,8 @@
  * Copyright (C) 2014 Valery Kholodkov
  */
 
+#include <memory>
+
 #include <QKeyEvent>
 
 #include "fleet_waypoints_widget.h"
@@ -58,6 +60,22 @@ bool FleetWaypointsWidget::eventFilter(QObject *obj, QEvent *event)
 void FleetWaypointsWidget::setRepeatOrders(int state)
 {
     fleet->SetRepeat(state == Qt::Checked);
+}
+
+void FleetWaypointsWidget::wayorderAdded(const Location *location)
+{
+    std::deque<WayOrder *> &orders = fleet->GetOrders();
+
+    int row = waypointListBox->currentRow();
+    
+    if(row >= 0 && row < orders.size()) {
+        std::auto_ptr<WayOrder> order(new WayOrder(const_cast<Location*>(location), false));
+        waypointListBox->insertItem(row + 1, getLocationName(order->GetLocation()));
+        orders.insert(orders.begin() + row + 1, order.get());
+        order.release();
+
+        waypointListBox->setCurrentRow(row + 1);
+    }
 }
 
 void FleetWaypointsWidget::wayorderSelected(int row)

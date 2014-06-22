@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QScrollArea>
+#include <QApplication>
 
 #include "map_view.h"
 
@@ -34,9 +35,31 @@ static const char * arrow_up_xpm[] = {
 "  ..       ..   ",
 "  .         ..  "};
 
+static const char * cross_xpm[] = {
+"16 16 2 1",
+" 	c None",
+".	c #FFFFFF",
+"                ",
+"                ",
+"                ",
+"                ",
+"                ",
+"       .        ",
+"       .        ",
+"       .        ",
+"    .......     ",
+"       .        ",
+"       .        ",
+"       .        ",
+"                ",
+"                ",
+"                ",
+"                "};
 
 MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player, QWidget *parent)
     : QWidget(parent)
+    , arrow_up(QPixmap(arrow_up_xpm), 8, 0)
+    , cross(QPixmap(cross_xpm), 7, 8)
     , galaxy(_galaxy)
     , game(_game)
     , player(_player)
@@ -44,7 +67,14 @@ MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player
     , mapMode(MM_NORMAL)
 {
     setContextMenuPolicy(Qt::DefaultContextMenu);
-    setCursor(QCursor(QPixmap(arrow_up_xpm), 8, 0));
+    setAddWaypointMode(false);
+
+    qApp->installEventFilter(this);
+}
+
+MapView::~MapView()
+{
+    qApp->removeEventFilter(this);
 }
 
 QSize MapView::sizeHint() const {
@@ -360,11 +390,21 @@ void MapView::fillCircle(QPainter &painter, const QPoint &center, int diameter, 
 void MapView::mousePressEvent(QMouseEvent *e)
 {
     if(e->button() == Qt::LeftButton) {
-        const SpaceObject *newSelection = findSelection(e->pos());
+        if(!addWaypointMode) {
+            const SpaceObject *newSelection = findSelection(e->pos());
 
-        if(newSelection != NULL) {
-            emit selectionChanged(newSelection);
-            return;
+            if(newSelection != NULL) {
+                emit selectionChanged(newSelection);
+                return;
+            }
+        }
+        else {
+            const SpaceObject *newSelection = findSelection(e->pos());
+
+            if(newSelection != NULL) {
+                emit waypointAdded(newSelection);
+                return;
+            }
         }
     }
 
@@ -388,12 +428,45 @@ void MapView::contextMenuEvent(QContextMenuEvent *e)
     }
 }
 
+bool MapView::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+        if(keyEvent->key() == Qt::Key_Shift) {
+            setAddWaypointMode(true);
+        }
+        else if(keyEvent->key() == Qt::Key_Control) {
+        }
+        return false;
+    }
+    else if (event->type() == QEvent::KeyRelease) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+        if(keyEvent->key() == Qt::Key_Shift) {
+            setAddWaypointMode(false);
+        }
+        else if(keyEvent->key() == Qt::Key_Control) {
+        }
+        return false;
+    }
+
+    return QObject::eventFilter(object, event);
+}
+
 void MapView::setViewMode(int _mapMode)
 {
     mapMode = _mapMode;
 
     update(contentsRect());
     parentWidget()->update(parentWidget()->contentsRect());
+}
+
+void MapView::setAddWaypointMode(bool enabled)
+{
+    addWaypointMode = enabled;
+
+    setCursor(enabled ? cross : arrow_up);
 }
 
 void MapView::collectTracks(std::list<track_t> &orders)

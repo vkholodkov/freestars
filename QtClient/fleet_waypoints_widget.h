@@ -26,6 +26,7 @@ signals:
 
 private slots:
     void setRepeatOrders(int);
+    void wayorderAdded(const Location*);
     void wayorderSelected(int);
     void wayorderDeleted();
 
