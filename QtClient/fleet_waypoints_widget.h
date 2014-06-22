@@ -6,7 +6,7 @@
 #define _FLEET_WAYPOINTS_WIDGET_H_
 
 #include <QWidget>
-#include <QComboBox>
+#include <QListWidget>
 
 #include "folding_widget.h"
 #include "cargo_widget.h"
@@ -26,12 +26,17 @@ signals:
 
 private slots:
     void setRepeatOrders(int);
-    void wayorderChanged(int);
+    void wayorderSelected(int);
+    void wayorderDeleted();
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private:
     QString getLocationName(const Location*) const;
 
 private:
+    QListWidget *waypointListBox;
     Fleet *fleet;
     const Player *player;
 };

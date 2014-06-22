@@ -193,6 +193,7 @@ public:
 	const Stack * GetStack(int i) const	{ return &mStacks[i]; }
 	Stack * GetStack(int i)				{ return &mStacks[i]; }
 	const deque<WayOrder *> & GetOrders() const		{ return mOrders; }
+	deque<WayOrder *> & GetOrders() { return mOrders; }
 	const WayOrder* GetFirstOrder() { return mOrders[0]; }
 	void SetStartOrders(Planet * planet);
 	void SetNextRoute(Planet * planet);
