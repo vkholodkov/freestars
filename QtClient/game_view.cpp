@@ -398,7 +398,7 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     /*
      * Fleet waypoints widget
      */
-    FleetWaypointsWidget *fleetWaypointsWidget = new FleetWaypointsWidget(_fleet, player);
+    FleetWaypointsWidget *fleetWaypointsWidget = new FleetWaypointsWidget(const_cast<Fleet*>(_fleet), player);
     fleetWaypointsWidget->setObjectName("w3_column1");
     verticalFlowLayout->addWidget(fleetWaypointsWidget);
 }

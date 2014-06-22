@@ -8,7 +8,7 @@
 
 namespace FreeStars {
 
-FleetWaypointsWidget::FleetWaypointsWidget(const Fleet *_fleet, const Player *_player, QWidget *parent)
+FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player, QWidget *parent)
     : FoldingWidget(tr("Fleet Waypoints"))
     , fleet(_fleet)
     , player(_player)
@@ -26,7 +26,17 @@ FleetWaypointsWidget::FleetWaypointsWidget(const Fleet *_fleet, const Player *_p
 
     ui_FleetWaypointsWidget.waypointListBox->setCurrentRow(0);
 
+    ui_FleetWaypointsWidget.repeatOrdersBox->setChecked(fleet->GetRepeat());
+
+    connect(ui_FleetWaypointsWidget.repeatOrdersBox, SIGNAL(stateChanged(int)),
+        this, SLOT(setRepeatOrders(int)));
+
     this->addWidget(widget);
+}
+
+void FleetWaypointsWidget::setRepeatOrders(int state)
+{
+    fleet->SetRepeat(state == Qt::Checked);
 }
 
 QString FleetWaypointsWidget::getLocationName(const Location *loc) const

@@ -19,13 +19,16 @@ class FleetWaypointsWidget : public FoldingWidget {
     Q_OBJECT
 
 public:
-    FleetWaypointsWidget(const Fleet*, const Player*, QWidget *parent = 0);
+    FleetWaypointsWidget(Fleet*, const Player*, QWidget *parent = 0);
 
 private:
     QString getLocationName(const Location*) const;
 
+private slots:
+    void setRepeatOrders(int);
+
 private:
-    const Fleet *fleet;
+    Fleet *fleet;
     const Player *player;
 };
 

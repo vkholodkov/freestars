@@ -80,7 +80,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="repeaeOrdersBox">
+       <widget class="QCheckBox" name="repeatOrdersBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
