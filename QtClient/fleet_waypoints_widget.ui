@@ -39,7 +39,7 @@
        <number>3</number>
       </property>
       <item>
-       <widget class="QListView" name="waypointsListView">
+       <widget class="QListWidget" name="waypointListBox">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>

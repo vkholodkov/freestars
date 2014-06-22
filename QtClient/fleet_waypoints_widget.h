@@ -22,6 +22,9 @@ public:
     FleetWaypointsWidget(const Fleet*, const Player*, QWidget *parent = 0);
 
 private:
+    QString getLocationName(const Location*) const;
+
+private:
     const Fleet *fleet;
     const Player *player;
 };
