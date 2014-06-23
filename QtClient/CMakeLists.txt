@@ -98,9 +98,10 @@ add_definitions(-DTIXML_USE_STL)
 QT4_WRAP_CPP(freestars_HEADERS_MOC ${freestars_HEADERS})
 QT4_WRAP_UI(freestars_FORMS_HEADERS ${freestars_FORMS})
 QT4_ADD_RESOURCES(freestars_RESOURCES_RCC ${freestars_RESOURCES})
-QT4_CREATE_TRANSLATION(messages.qm)
+QT4_CREATE_TRANSLATION(${freestars_SOURCES} ${freestars_FORMS_HEADERS} freestars.ts)
+QT4_ADD_TRANSLATION(messages.qm messages.ts)
 
-add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS_MOC} ${freestars_FORMS_HEADERS} ${freestars_RESOURCES_RCC})
+add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS_MOC} ${freestars_FORMS_HEADERS} ${freestars_RESOURCES_RCC} freestars.qm messages.qm)
 
 target_link_libraries(fs-client-qt fsserver MersenneTwister tinyxml Qt4::QtGui Qt4::QtCore)
 

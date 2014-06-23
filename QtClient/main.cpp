@@ -23,9 +23,14 @@ int main(int argc, char *argv[]) {
             QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
+    QTranslator messagesTranslator;
+    //freestarsTranslator.load("messages_" + QLocale::system().name());
+    messagesTranslator.load("messages", qApp->applicationDirPath());
+    app.installTranslator(&messagesTranslator);
+
     QTranslator freestarsTranslator;
     //freestarsTranslator.load("messages_" + QLocale::system().name());
-    freestarsTranslator.load("messages", qApp->applicationDirPath());
+    freestarsTranslator.load("freestars", qApp->applicationDirPath());
     app.installTranslator(&freestarsTranslator);
 
     FreeStars::MainWindow mainWin;
