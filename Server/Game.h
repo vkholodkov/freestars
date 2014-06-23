@@ -66,7 +66,7 @@ public:
 	bool LoadRacialTraits(const TiXmlNode * node);
 	bool LoadComponents(const TiXmlNode * node);
 	bool LoadCreation(const TiXmlNode * options);
-	bool LoadStartShips(const TiXmlNode * node);
+	static bool LoadStartShips(const TiXmlNode * node);
 //	bool LoadOptions();
 //	bool LoadPlayer(const char * file);
 	bool LoadTurns();
