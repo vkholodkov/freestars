@@ -376,7 +376,7 @@ void ShipDesignDialog::setShipDesign(int index)
 
     if (formLayout != 0) {
         ShipDescriber shipDescriber(player, this);
-        shipDescriber.describeShip(ship, NULL, formLayout);
+        shipDescriber.describe(ship, NULL, formLayout);
     }
 
     createShipWidgets(ship);
@@ -405,6 +405,13 @@ void ShipDesignDialog::setHull(int index)
     resourcesLabel1->setText(QString::number(cost.GetResources()));
     massLabel1->setText(tr("%0kt").arg(hull->GetMass()));
 
+    QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget1->layout());
+
+    if (formLayout != 0) {
+        HullDescriber hullDescriber(player, this);
+        hullDescriber.describe(hull, NULL, formLayout);
+    }
+
     createHullWidgets(hull);
 }
 
@@ -429,7 +436,7 @@ void ShipDesignDialog::updateDesignProperties()
 
     if (formLayout != 0) {
         ShipDescriber shipDescriber(player, this);
-        shipDescriber.describeShip(ship, NULL, formLayout);
+        shipDescriber.describe(ship, NULL, formLayout);
     }
 }
 
