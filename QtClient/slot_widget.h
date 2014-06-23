@@ -71,6 +71,9 @@ public:
         setAcceptDrops(true);
     }
 
+signals:
+    void slotChanged();
+
 protected:
     void dragEnterEvent(QDragEnterEvent*);
     void dropEvent(QDropEvent*);

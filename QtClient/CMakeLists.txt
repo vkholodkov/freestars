@@ -34,6 +34,7 @@ SET(freestars_SOURCES
     graphics_array.cpp
     slot_widget.cpp
     ship_avatar_widget.cpp
+    ship_describer.cpp
 )
 
 SET(freestars_HEADERS
@@ -59,6 +60,7 @@ SET(freestars_HEADERS
     ship_design_dialog.h
     slot_widget.h
     ship_avatar_widget.h
+    ship_describer.h
 )
 
 SET(freestars_FORMS

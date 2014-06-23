@@ -176,6 +176,7 @@ public:
 	void Upgrade(const Player * player);
 	void SetCannotBuild(const Component * comp)	{ mCannotBuild = comp; }
 	const Component * GetCannotBuild() const	{ return mCannotBuild; }
+	void SlotsUpdated() { ResetDefaults(); }
 
 	friend bool operator==(const Ship & s1, const Ship & s2);
 

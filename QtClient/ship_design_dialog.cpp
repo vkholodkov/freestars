@@ -11,6 +11,8 @@
 #include "FSServer.h"
 #include "Hull.h"
 
+#include "ship_describer.h"
+
 #include "ship_design_dialog.h"
 
 namespace FreeStars {
@@ -301,6 +303,8 @@ void ShipDesignDialog::clearProperties()
 {
     while (QWidget* w = propertiesWidget1->findChild<QWidget*>())
         delete w;
+    while (QWidget* w = propertiesWidget2->findChild<QWidget*>())
+        delete w;
 }
 
 void ShipDesignDialog::enterEditMode(bool addNew)
@@ -310,6 +314,8 @@ void ShipDesignDialog::enterEditMode(bool addNew)
     stackedWidget1->setCurrentIndex(0);
 
     shipAvatarWidget2->setHullName(shipBeingEdited->GetHull()->GetName().c_str());
+
+    updateDesignProperties();
 
     createShipWidgets(shipBeingEdited.get(), false);
 
@@ -369,54 +375,11 @@ void ShipDesignDialog::setShipDesign(int index)
     QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget1->layout());
 
     if (formLayout != 0) {
-        if (ship->GetFuelCapacity() != 0) {
-            QLabel *label = new QLabel(tr("Max Fuel:"));
-            label->setStyleSheet("QLabel { font-weight: bold; }");
-            QLabel *text = new QLabel(tr("%0mg").arg(ship->GetFuelCapacity()));
-            text->setAlignment(Qt::AlignRight);
-            formLayout->addRow(label, text);
-        }
-
-        if (ship->GetArmor(player) != 0) {
-            QLabel *label = new QLabel(tr("Armor:"));
-            label->setStyleSheet("QLabel { font-weight: bold; }");
-            QLabel *text = new QLabel(tr("%0dp").arg(ship->GetArmor(player)));
-            text->setAlignment(Qt::AlignRight);
-            formLayout->addRow(label, text);
-        }
-
-        if (ship->GetShield(player) != 0) {
-            QLabel *label = new QLabel(tr("Shield:"));
-            label->setStyleSheet("QLabel { font-weight: bold; }");
-            QLabel *text = new QLabel(tr("%0dp").arg(ship->GetShield(player)));
-            text->setAlignment(Qt::AlignRight);
-            formLayout->addRow(label, text);
-        }
-
-        if (ship->GetRating() != 0) {
-            QLabel *label = new QLabel(tr("Rating:"));
-            label->setStyleSheet("QLabel { font-weight: bold; }");
-            QLabel *text = new QLabel(QString::number(ship->GetRating()));
-            text->setAlignment(Qt::AlignRight);
-            formLayout->addRow(label, text);
-        }
-
-        if (ship->GetCloaking() != 0 || ship->GetJamming() != 0) {
-            QLabel *label = new QLabel(tr("Cloak/Jam:"));
-            label->setStyleSheet("QLabel { font-weight: bold; }");
-            QLabel *text = new QLabel(tr("%0%/%1%").arg(ship->GetCloaking()).arg(ship->GetJamming() * 100));
-            text->setAlignment(Qt::AlignRight);
-            formLayout->addRow(label, text);
-        }
-
-        QLabel *label = new QLabel(tr("Initiative/Moves:"));
-        label->setStyleSheet("QLabel { font-weight: bold; }");
-        QLabel *text = new QLabel(tr("%0 / %1").arg(ship->GetNetInitiative()).arg(ship->GetNetSpeed()));
-        text->setAlignment(Qt::AlignRight);
-        formLayout->addRow(label, text);
-
-        createShipWidgets(ship);
+        ShipDescriber shipDescriber(player, this);
+        shipDescriber.describeShip(ship, NULL, formLayout);
     }
+
+    createShipWidgets(ship);
 }
 
 void ShipDesignDialog::setHull(int index)
@@ -443,6 +406,31 @@ void ShipDesignDialog::setHull(int index)
     massLabel1->setText(tr("%0kt").arg(hull->GetMass()));
 
     createHullWidgets(hull);
+}
+
+void ShipDesignDialog::updateDesignProperties()
+{
+    clearProperties();
+
+    Ship *ship = shipBeingEdited.get();
+
+    ship->SlotsUpdated();
+
+    Cost cost(ship->GetCost(player));
+
+    costTitleLabel2->setText(tr("Cost of one %0").arg(ship->GetName().c_str()));
+    ironiumLabel2->setText(tr("%0kt").arg(cost[0]));
+    boraniumLabel2->setText(tr("%0kt").arg(cost[1]));
+    germaniumLabel2->setText(tr("%0kt").arg(cost[2]));
+    resourcesLabel2->setText(QString::number(cost.GetResources()));
+    massLabel2->setText(tr("%0kt").arg(ship->GetMass()));
+
+    QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget2->layout());
+
+    if (formLayout != 0) {
+        ShipDescriber shipDescriber(player, this);
+        shipDescriber.describeShip(ship, NULL, formLayout);
+    }
 }
 
 void ShipDesignDialog::copyDesign(const Hull *hull)
@@ -667,6 +655,12 @@ void ShipDesignDialog::createShipWidgets(Ship *ship, bool readOnly)
     {
         (*i)->setParent(this);
         (*i)->show();
+
+        EditableSlotWidget *editable = dynamic_cast<EditableSlotWidget*>(*i);
+
+        if(editable != NULL) {
+            connect(editable, SIGNAL(slotChanged()), this, SLOT(updateDesignProperties()));
+        }
     }
 }
 

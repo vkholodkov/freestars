@@ -189,6 +189,7 @@ void EditableSlotWidget::dropEvent(QDropEvent *e)
         if(shipSlot.GetComp() == NULL && amount <= hullSlot.GetCount()) {
             shipSlot.SetComp(comp);
             shipSlot.SetCount(amount);
+            emit slotChanged();
             update(contentsRect());
             e->acceptProposedAction();
             return;
@@ -196,6 +197,7 @@ void EditableSlotWidget::dropEvent(QDropEvent *e)
         else if((comp == shipSlot.GetComp() && shipSlot.GetCount() + amount <= hullSlot.GetCount()))
         {
             shipSlot.SetCount(shipSlot.GetCount() + amount);
+            emit slotChanged();
             update(contentsRect());
             e->acceptProposedAction();
             return;
@@ -250,6 +252,7 @@ void EditableSlotWidget::mouseMoveEvent(QMouseEvent *e)
         shipSlot.SetComp(NULL);
     }
 
+    emit slotChanged();
     update(contentsRect());
 
     Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
