@@ -26,6 +26,7 @@ PlanetProductionWidget::PlanetProductionWidget(const Planet *_planet, const Play
 
     ui_PlanetProductionWidget.productionQueueView->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     ui_PlanetProductionWidget.productionQueueView->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+    ui_PlanetProductionWidget.productionQueueView->resizeColumnsToContents();
 
     ui_PlanetProductionWidget.completionLabel->setText("");
     ui_PlanetProductionWidget.routeToLabel->setText(
