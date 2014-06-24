@@ -408,7 +408,7 @@ void ShipDesignDialog::setHull(int index)
     QFormLayout *formLayout = dynamic_cast<QFormLayout*>(propertiesWidget1->layout());
 
     if (formLayout != 0) {
-        HullDescriber hullDescriber(player, this);
+        HullDescriber hullDescriber(this);
         hullDescriber.describe(hull, NULL, formLayout);
     }
 

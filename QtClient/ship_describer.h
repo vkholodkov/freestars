@@ -50,9 +50,8 @@ class HullDescriber : public QObject {
     } HullProperty;
 
 public:
-    HullDescriber(const Player *_player, QObject *parent = 0)
+    HullDescriber(QObject *parent = 0)
         : QObject(parent)
-        , player(_player)
     {
     }
 
@@ -63,9 +62,6 @@ private:
     QString armorHandler(const Hull*) const;
 
     static const HullProperty interestingHullProperties[];
-
-private:
-    const Player *player;
 };
 
 };
