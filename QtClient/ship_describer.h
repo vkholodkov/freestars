@@ -70,6 +70,7 @@ class ComponentDescriber : public QObject {
     typedef struct {
         QString name;
         QString (ComponentDescriber::*handler)(const Component*) const;
+        const char *style;
         bool left;
     } ComponentProperty;
 
@@ -88,6 +89,16 @@ private:
     QString germaniumHandler(const Component*) const;
     QString resourcesHandler(const Component*) const;
     QString massHandler(const Component*) const;
+
+    QString armorHandler(const Component*) const;
+    QString shieldHandler(const Component*) const;
+    QString powerHandler(const Component*) const;
+    QString rangeHandler(const Component*) const;
+    QString initiativeHandler(const Component*) const;
+    QString accuracyHandler(const Component*) const;
+    QString cargoCapacityHandler(const Component*) const;
+    QString fuelCapacityHandler(const Component*) const;
+    QString scanSpaceHandler(const Component*) const;
 
     static const ComponentProperty interestingComponentProperties[];
 
