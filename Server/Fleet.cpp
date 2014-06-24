@@ -48,7 +48,8 @@ Fleet::Fleet(int id, const CargoHolder &loc) : CargoHolder(loc), mStartPos(loc)
 	Init();
 }
 
-Fleet::Fleet()
+Fleet::Fleet(Galaxy *galaxy)
+    : CargoHolder(galaxy)
 {
 	Init();
 }
@@ -174,7 +175,7 @@ bool Fleet::ParseNode(const TiXmlNode * node, Player * player, bool other)
 	if (!other) {
 		WayOrderList ords;
 		ords.SetFleet(GetID());
-		ords.ParseNode(node, player);
+		ords.ParseNode(node, player, mGalaxy);
 		ChangeWaypoints(ords);
 		mBattlePlan = GetLong(node->FirstChild("BattlePlan"));
 	}
@@ -630,7 +631,7 @@ void Fleet::Scrap(bool colonize)
 			planet->AdjustPopulation(GetCost().GetCrew());	// recover crew too
 		}
 	} else {
-		Salvage * salvage = TheGalaxy->AddSalvage(*this);
+		Salvage * salvage = mGalaxy->AddSalvage(*this);
 		double percent = Rules::ScrapRecover(NULL, false);
 		for (int i = 0; i < Rules::MaxMinType; ++i) {
 			long temp = GetContain(i);
@@ -879,7 +880,7 @@ bool Fleet::Move()
 				if (lost > 0) {
 					mess->AddItem("Ships lost name", mStacks[i].GetDesign()->GetName());
 					mess->AddLong("Ships lost number", lost);
-					if (mStacks[i].KillShips(lost, false)) {
+					if (mStacks[i].KillShips(lost, false, mGalaxy)) {
 						mStacks.erase(mStacks.begin()+i);
 						i--;	// adjust loop counter if the whole stack is gone
 					}
@@ -1008,7 +1009,7 @@ double Fleet::ReClosestMinefield(double dist)
 {
 	///@todo OPTIMIZE: don't recalc this every step, just every 10ly or so
 
-	double Result = TheGalaxy->MaxX() + TheGalaxy->MaxY();
+	double Result = mGalaxy->MaxX() + mGalaxy->MaxY();
 
 	int i;
 	double d;
@@ -1581,7 +1582,7 @@ void Fleet::TakeMinefieldDamage(const MineField * field)
 			temp -= min(mStacks[i].GetDesign()->GetShield(GetOwner()), long((temp + 1) / 2));
 			long lost = mStacks[i].DamageAllShips(temp);
 			ReportedKills += lost;
-			if (mStacks[i].KillShips(lost, true)) {
+			if (mStacks[i].KillShips(lost, true, mGalaxy)) {
 				mStacks.erase(mStacks.begin()+i);
 				i--;	// adjust loop counter if the whole stack is gone
 			}

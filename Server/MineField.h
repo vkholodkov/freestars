@@ -50,7 +50,7 @@ class MineFieldType;
 class MineField : public SpaceObject
 {
 public:
-	MineField(Player * owner);
+	MineField(Galaxy *, Player*);
 	~MineField();//only to make gameobject happy. mmineType points to an
 			//element in a reference list not a unique object in the class
 

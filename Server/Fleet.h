@@ -57,7 +57,7 @@ class WayOrderList;
  */
 class Fleet : public CargoHolder, public Chaser {
 public:
-	Fleet();
+	Fleet(Galaxy*);
 	Fleet(int id, const CargoHolder &loc);
 	virtual ~Fleet();
 

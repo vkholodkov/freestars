@@ -62,7 +62,7 @@ enum WHStability
 };
 
 public:
-	Wormhole(); ///< Constructor.
+	Wormhole(Galaxy*); ///< Constructor.
 //	Wormhole(const Location & end)
 //		: SpaceObject(), mStability(WORM_VERYSTABLE), mMaxStability(WORM_VERYSTABLE), mMinStability(WORM_VERYUNSTABLE)
 //		{  Init(); SetLocation(end); mID = TheGalaxy->GetWormholeID(); }

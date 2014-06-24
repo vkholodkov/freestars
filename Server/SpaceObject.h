@@ -64,8 +64,8 @@ const long SEEN_HOST			= 0xFFFFFFFF;	///< what the Host sees
  */
 class SpaceObject : public Location {
 public:
-	SpaceObject() : Location(), mOwner(NULL), mAlsoHere(NULL) { Init(); }
-	SpaceObject(const SpaceObject &source) : Location(source), mOwner(source.mOwner), mAlsoHere(NULL) { Init(); }
+	SpaceObject(Galaxy *galaxy) : Location(), mGalaxy(galaxy), mOwner(NULL), mAlsoHere(NULL) { Init(); }
+	SpaceObject(const SpaceObject &source) : Location(source), mGalaxy(source.mGalaxy), mOwner(source.mOwner), mAlsoHere(NULL) { Init(); }
 //	SpaceObject(int x, int y, Player * owner) : Location(x, y), mOwner(owner) { Init(); }
 	virtual ~SpaceObject();
 	void Init();
@@ -103,6 +103,7 @@ public:
 	virtual const Planet * InOrbit() const; ///< Get planet this object is in orbit of, or NULL if none.
 
 protected:
+    Galaxy *mGalaxy;
 	deque<long> mSeenBy;
 	deque<Chaser *> mChasers; ///< Chasers following this SpaceObject.
 	Player * mOwner; ///< Owner of this SpaceObject.

@@ -47,6 +47,7 @@ namespace FreeStars {
 class Player;
 class Hull;
 class RacialTrait;
+class TestPlanet;
 
 const long LOPB_MINERALS		= 1;
 const long LOPB_CONCENTRATIONS	= 2;
@@ -180,8 +181,9 @@ public:
 	void SetLeftoverPoints(long lop)		{ mLeftoverPoints = lop; }
 
 protected:
-	double HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> &testHabWidth, deque<long> &testHabStart, deque<long> &iterNum, deque<long> &TFDone, Planet * testPlanet) const;
+	double HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> &testHabWidth, deque<long> &testHabStart, deque<long> &iterNum, deque<long> &TFDone, TestPlanet * testPlanet) const;
 	//double HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> testHabWidth, deque<long> testHabStart, deque<long> iterNum, deque<long> TFDone, Planet * testPlanet) const;
+	long HabFactor(const TestPlanet*) const;		// gives how habitable this test planet is
 	const RacialTrait * mPRT;
 	deque<const RacialTrait *> mLRTs;
 	string mSingularName;

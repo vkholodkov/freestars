@@ -33,9 +33,11 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #define FreeStars_Galaxy_h
 
 #include <deque>
+
 using namespace std;
 
 namespace FreeStars {
+class Location;
 class Planet;
 class Salvage;
 class Wormhole;
@@ -159,7 +161,5 @@ protected:
 	long mMaxY;
 };
 }
-
-extern FreeStars::Galaxy *TheGalaxy;
 
 #endif // !defined(FreeStars_Galaxy_h)

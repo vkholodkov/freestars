@@ -53,7 +53,7 @@ public:
 	 * Planet placement function.
 	 * Overload this function if you need to change the planet placement algorithm.
 	 */
-	void SetLocation(Planet * p);
+	void SetLocation(Planet * p, Galaxy*);
 
 	long mWorlds;	///< Number of planets to generate
 
@@ -100,7 +100,7 @@ public:
 	long mMinSWDistance;
 	long mMaxSWDistance;
 
-	string GetNextName();
+	string GetNextName(Galaxy*);
 	void AddHW(Planet * p)	{ mPrePlacedHWs.push_back(p); }
 	Planet * GetNextHW()	{ return mHW == mPrePlacedHWs.end() ? NULL : *mHW++; }
 	Planet * GetSecond(const Player * p);

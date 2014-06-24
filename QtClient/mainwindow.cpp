@@ -46,7 +46,6 @@ MainWindow::~MainWindow() {
     Ship::Cleanup();
 
     delete TheGame;
-    delete TheGalaxy;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -391,10 +390,8 @@ void MainWindow::loadPlayerFile(const QString &fileName)
     file.close();
 
     delete TheGame;
-    delete TheGalaxy;
 
     TheGame = new Game;
-    TheGalaxy = new Galaxy;
 
     try {
         std::string filename_ascii(fileName.toAscii());
@@ -478,6 +475,7 @@ void MainWindow::updateRecentFileActions()
 {
     QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
+    files.removeAll("");
 
     int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
 

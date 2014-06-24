@@ -134,7 +134,7 @@ string MessItem::ToString() const
 	return m;
 }
 
-MessItem * MessItem::ParseNode(const TiXmlNode * node)
+MessItem * MessItem::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 {
 	if (node == NULL)
 		return NULL;
@@ -149,7 +149,7 @@ MessItem * MessItem::ParseNode(const TiXmlNode * node)
 	else if (stricmp(node->Value(), "String") == 0)
 		mi = MessString::ParseNode(node);
 	else
-		mi = MessLoc::ParseNode(node);
+		mi = MessLoc::ParseNode(node, galaxy);
 
 	if (mi != NULL) {
 		const TiXmlElement * tie = node->ToElement();
@@ -227,7 +227,7 @@ void MessLoc::WriteNode(TiXmlNode * node) const
 	AddDesc(lNode->ToElement());
 }
 
-MessLoc * MessLoc::ParseNode(const TiXmlNode * node)
+MessLoc * MessLoc::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 {
 	MessLoc * mi = NULL;
 	const TiXmlElement * tie;
@@ -236,7 +236,7 @@ MessLoc * MessLoc::ParseNode(const TiXmlNode * node)
 		if (tie != NULL) {
 			int pnum;
 			tie->Attribute("IDNumber", &pnum);
-			const Planet * p = TheGalaxy->GetPlanet(pnum);
+			const Planet * p = galaxy->GetPlanet(pnum);
 			if (p != NULL)
 				mi = new MessLoc("", p);
 		}
@@ -257,7 +257,7 @@ MessLoc * MessLoc::ParseNode(const TiXmlNode * node)
 	} else if (stricmp(node->Value(), "Salvage") == 0) {
 	} else if (stricmp(node->Value(), "Location") == 0) {
 		Location * loc = new Location();
-		loc->ParseNode(node);
+		loc->ParseNode(node, galaxy);
 		mi = new MessLoc("", loc, true);
 	}
 
@@ -459,7 +459,7 @@ void Message::WriteNode(TiXmlNode * node) const
 	node->LinkEndChild(mNode);
 }
 
-bool Message::ParseNode(const TiXmlNode * node)
+bool Message::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 {
 	if (node == NULL)
 		return false;
@@ -475,7 +475,7 @@ bool Message::ParseNode(const TiXmlNode * node)
 	const TiXmlNode * child;
 	MessItem * mi;
 	for (child = node->FirstChild(); child != NULL; child = child->NextSibling()) {
-		mi = MessItem::ParseNode(child);
+		mi = MessItem::ParseNode(child, galaxy);
 		if (mi != NULL)
 			AddItem(mi);
 	}

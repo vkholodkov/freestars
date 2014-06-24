@@ -42,6 +42,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 namespace FreeStars {
 
 Game::Game()
+	: galaxy(new Galaxy())
 {
 	mTurnPhase = 0;
 	mCreation = NULL;
@@ -83,6 +84,8 @@ Game::~Game()
 	mOrders.clear();
 
 	delete [] mSeed;
+
+	delete galaxy;
 }
 
 Message * Game::AddMessage(const string &type)
@@ -127,7 +130,7 @@ bool Game::LoadCreation(const TiXmlNode * options)
 	const TiXmlNode * child3;
 	const TiXmlText * text;
 
-	if (!TheGalaxy->ParseSize(options->FirstChild("Size")))
+	if (!galaxy->ParseSize(options->FirstChild("Size")))
 		return false;
 
 	RandomEventsStart = 0;
@@ -394,7 +397,7 @@ bool Game::LoadHostFile(const char * hostfile)
 		mess->AddItem("Section", "Galaxy");
 		return false;
 	}
-	if (!TheGalaxy->ParseNode(node))
+	if (!galaxy->ParseNode(node))
 		return false;
 
 	if (mNumberOfPlayers != mPlayers.size())
@@ -484,7 +487,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 		mess->AddItem("Section", "Galaxy");
 		return false;
 	}
-	if (!TheGalaxy->ParseNode(node))
+	if (!galaxy->ParseNode(node))
 		return false;
 
 	mPlayers[mCurrentPlayer-1]->ParseMessages(ptf->FirstChild("Messages"));
@@ -654,12 +657,12 @@ bool Game::LoadDefFile(const char * deffile)
 
 	// if they include a galaxy use that
 	if (df->FirstChild("Galaxy") != NULL) {
-		if (!TheGalaxy->ParseNode(df->FirstChild("Galaxy")))
+		if (!galaxy->ParseNode(df->FirstChild("Galaxy")))
 			return false;
 	}
 
-	if (mCreation->mWorlds > TheGalaxy->GetPlanetCount())
-		TheGalaxy->Build(mCreation);	// make one
+	if (mCreation->mWorlds > galaxy->GetPlanetCount())
+		galaxy->Build(mCreation);	// make one
 
 	PlacePlayers();
 
@@ -678,7 +681,7 @@ void Game::PlacePlayers()
 	Random_Shuffle(PNums.begin(), PNums.end());
 
 	for (i = 0; i < NumberPlayers(); ++i) {
-		TheGalaxy->PlacePlayer(NCGetPlayer(PNums[i]));
+		galaxy->PlacePlayer(NCGetPlayer(PNums[i]));
 	}
 
 	// for all left over home worlds
@@ -883,7 +886,7 @@ bool Game::LoadXYFile()
 	if (!LoadCreation(xy->FirstChild("Creation")))
 		return false;
 
-	if (!TheGalaxy->ParseNode(xy->FirstChild("Galaxy")))
+	if (!galaxy->ParseNode(xy->FirstChild("Galaxy")))
 		return false;
 
 	return true;
@@ -916,10 +919,10 @@ void Game::WriteXYFile()
 	AddDouble(cre, "TechAdvances", TechFactor);
 
 	TiXmlElement * size = new TiXmlElement("Size");
-	AddLong(size, "MinX", TheGalaxy->MinX());
-	AddLong(size, "MaxX", TheGalaxy->MaxX());
-	AddLong(size, "MinY", TheGalaxy->MinY());
-	AddLong(size, "MaxY", TheGalaxy->MaxY());
+	AddLong(size, "MinX", galaxy->MinX());
+	AddLong(size, "MaxX", galaxy->MaxX());
+	AddLong(size, "MinY", galaxy->MinY());
+	AddLong(size, "MaxY", galaxy->MaxY());
 	cre->LinkEndChild(size);
 
 	TiXmlElement * re = new TiXmlElement("RandomEvents");
@@ -975,9 +978,9 @@ void Game::WriteXYFile()
 	Rules::WriteMinSettings(cre);
 	XYFile->LinkEndChild(cre);
 
-	TiXmlElement * galaxy = new TiXmlElement("Galaxy");
-	TheGalaxy->WriteXYFile(galaxy);
-	XYFile->LinkEndChild(galaxy);
+	TiXmlElement * galaxyElement = new TiXmlElement("Galaxy");
+	galaxy->WriteXYFile(galaxyElement);
+	XYFile->LinkEndChild(galaxyElement);
 	doc.LinkEndChild(XYFile);
 
 // For debug, save to a new file,
@@ -1039,9 +1042,9 @@ bool Game::WriteHostFile()
 		HostFile->LinkEndChild(player);
 	}
 
-	TiXmlElement * galaxy = new TiXmlElement("Galaxy");
-	TheGalaxy->WriteNode(galaxy, NULL);
-	HostFile->LinkEndChild(galaxy);
+	TiXmlElement * galaxyElement = new TiXmlElement("Galaxy");
+	galaxy->WriteNode(galaxyElement, NULL);
+	HostFile->LinkEndChild(galaxyElement);
 
 	TiXmlElement * eMess = new TiXmlElement("ErrorMessages");
 	for (i = 0; i < mMessages.size(); ++i)
@@ -1278,9 +1281,9 @@ bool Game::WritePlayerFiles()
 		(*pi)->WriteNode(player, *pi);
 		TurnFile->LinkEndChild(player);
 
-		TiXmlElement * galaxy = new TiXmlElement("Galaxy");
-		TheGalaxy->WriteNode(galaxy, *pi);
-		TurnFile->LinkEndChild(galaxy);
+		TiXmlElement * galaxyElement = new TiXmlElement("Galaxy");
+		galaxy->WriteNode(galaxyElement, *pi);
+		TurnFile->LinkEndChild(galaxyElement);
 
 		deque<Player *>::const_iterator pi2;
 		for (pi2 = mPlayers.begin(); pi2 != mPlayers.end(); ++pi2) {
@@ -1399,7 +1402,7 @@ bool Game::ProcessWaypoints(long pnumber)
 	for (node = orders->FirstChild("Waypoints"); node; node = node->NextSibling("Waypoints")) {
 		WayOrderList & wol = *mOrders.insert(mOrders.end(), WayOrderList());
 		wol.SetFleet(GetLong(node->FirstChild("Fleet")));
-		wol.ParseNode(node, player);
+		wol.ParseNode(node, player, galaxy);
 	}
 
 	return true;
@@ -1568,7 +1571,7 @@ bool Game::ProcessTurn()
 			break;
 
 		case TP_WAY0_INVADE:
-			TheGalaxy->ResolveInvasions();
+			galaxy->ResolveInvasions();
 			break;
 
 		case TP_WAY0_LOAD:
@@ -1590,12 +1593,12 @@ bool Game::ProcessTurn()
 
 		case TP_PACKETS1:
 			// Packets
-			TheGalaxy->MovePackets(false);
+			galaxy->MovePackets(false);
 			break;
 
 		case TP_DEADCHECK:
 			// Check for dead worlds
-			TheGalaxy->DeadCheck();
+			galaxy->DeadCheck();
 			break;
 
 		case TP_MOVEMENT:
@@ -1628,12 +1631,12 @@ bool Game::ProcessTurn()
 
 		case TP_SALVAGEDECAY:
 			// Salvage decay
-			TheGalaxy->DecaySalvage();
+			galaxy->DecaySalvage();
 			break;
 
 		case TP_WORMHOLES:
 			// Wormholes shift
-			TheGalaxy->JiggleWormholes();
+			galaxy->JiggleWormholes();
 			break;
 
 		case TP_RESETSEEN:
@@ -1650,7 +1653,7 @@ bool Game::ProcessTurn()
 
 		case TP_MINING:
 			// Mining
-			if (!TheGalaxy->Mine())
+			if (!galaxy->Mine())
 				return false;
 
 			//deque<Player *>::iterator pi;
@@ -1664,14 +1667,14 @@ bool Game::ProcessTurn()
 
 		case TP_PRODUCTION:
 			// Production and Research
-			TheGalaxy->DoProduction();
+			galaxy->DoProduction();
 			break;
 
 		case TP_SPYBONUS:
 			// SS Spy bonus obtained
 			for (i = 0; i < NumberPlayers(); ++i) {
 				if (mPlayers[i]->SpyTechBonus() > epsilon)
-					TheGalaxy->GainSpyTech(mPlayers[i]);
+					galaxy->GainSpyTech(mPlayers[i]);
 			}
 			break;
 
@@ -1683,12 +1686,12 @@ bool Game::ProcessTurn()
 
 			//  Population grows/dies
 		case TP_POPULATION:
-			TheGalaxy->GrowPop();
+			galaxy->GrowPop();
 			break;
 
 		case TP_INSTA_PACKETS:
 			// Packets that just launched move
-			TheGalaxy->MovePackets(true);
+			galaxy->MovePackets(true);
 			break;
 
 		case TP_RANDOM_EVENTS:
@@ -1714,12 +1717,12 @@ bool Game::ProcessTurn()
 
 		case TP_BOMBING:
 			// Bombing
-			TheGalaxy->DoBombing();
+			galaxy->DoBombing();
 			break;
 
 		case TP_REPAIR:
 			// Starbase and fleet repair
-			TheGalaxy->RepairBases();
+			galaxy->RepairBases();
 			for (i = 0; i < NumberPlayers(); ++i)
 				mPlayers[i]->ForEachFleet(Fleet::FTRepair, false);
 			break;
@@ -1739,7 +1742,7 @@ bool Game::ProcessTurn()
 			break;
 
 		case TP_WAY1_INVADE:
-			TheGalaxy->ResolveInvasions();
+			galaxy->ResolveInvasions();
 			break;
 
 		case TP_UPDATELOADBY:
@@ -1768,7 +1771,7 @@ bool Game::ProcessTurn()
 
 		case TP_MINESWEEP:
 			// Mine sweeping
-			TheGalaxy->SweepMines();
+			galaxy->SweepMines();
 			for (i = 0; i < NumberPlayers(); ++i)
 				mPlayers[i]->ForEachFleet(Fleet::FTSweepMines, true);
 			break;
@@ -1787,7 +1790,7 @@ bool Game::ProcessTurn()
 
 		case TP_INSTA_TERRAFORM:
 			// Instaforming
-			TheGalaxy->Instaform();
+			galaxy->Instaform();
 			break;
 
 		case TP_REMOTE_TERRAFORM:
@@ -1799,7 +1802,7 @@ bool Game::ProcessTurn()
 		case TP_UPDATESCANNING:
 			// Update seen things, must be before patrol, best to be as late as possible, after transfer at least
 			UpdateSeen();
-			TheGalaxy->AdjustWormholeTraverse();
+			galaxy->AdjustWormholeTraverse();
 			break;
 
 		default:
@@ -1915,7 +1918,7 @@ void Game::MoveAlsoHere(SpaceObject * loc)
 
 double Game::GetPossibleMines(deque<MineField *> *pm, const Fleet * f, double dist) const
 {
-	double Result = TheGalaxy->MaxX() + TheGalaxy->MaxY();
+	double Result = galaxy->MaxX() + galaxy->MaxY();
 
 	int i;
 	double d;
@@ -1974,7 +1977,7 @@ SpaceObject * Game::GetPatrolTarget(const Fleet * persuer, int range) const
 	}
 
 	if (Result == NULL && persuer->GetCargoCapacity() > persuer->GetCargoMass()) {
-		Result = TheGalaxy->GetPatrolTarget(persuer, range);
+		Result = galaxy->GetPatrolTarget(persuer, range);
 	}
 
 	return Result;
@@ -1987,7 +1990,7 @@ Component * Game::ObjectFactory(const Component *)
 
 Player * Game::ObjectFactory(const Player *, int PlayerNumber)
 {
-	return new Player(PlayerNumber);
+	return new Player(galaxy, PlayerNumber);
 }
 
 RacialTrait * Game::ObjectFactory(const RacialTrait *)
@@ -2007,22 +2010,22 @@ Ship * Game::ObjectFactory(const Ship *)
 
 Planet * Game::ObjectFactory(const Planet *)
 {
-	return new Planet();
+	return new Planet(galaxy);
 }
 
 Salvage * Game::ObjectFactory(const Salvage *)
 {
-	return new Salvage();
+	return new Salvage(galaxy);
 }
 
 Packet * Game::ObjectFactory(const Packet *)
 {
-	return new Packet();
+	return new Packet(galaxy);
 }
 
 Wormhole * Game::ObjectFactory(const Wormhole *)
 {
-	return new Wormhole();
+	return new Wormhole(galaxy);
 }
 
 }

@@ -57,7 +57,6 @@ int main (int argc, char * argv[])
 	string FileType = HostFile.substr(HostFile.find_last_of('.'));
 
 	TheGame = new Game();
-	TheGalaxy = new Galaxy();
 
 	if (stricmp(FileType.c_str(), ".def") == 0) {
 		cout << "Loading Defination File" << endl;
@@ -154,7 +153,6 @@ int main (int argc, char * argv[])
 	Component::Cleanup();
 	Battle::Cleanup();
 	Ship::Cleanup();
-	delete TheGalaxy;
 	delete TheGame;
 	}
 

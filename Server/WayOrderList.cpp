@@ -81,7 +81,7 @@ WayOrderList::~WayOrderList()
 	</Waypoints>
 */
 
-bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player)
+bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *galaxy)
 {
 	const TiXmlNode * child1;
 	const TiXmlNode * child2;
@@ -124,7 +124,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player)
 					continue;
 
 				Location * nl = new Location();
-				if (!nl->ParseNode(child2)) {
+				if (!nl->ParseNode(child2, galaxy)) {
 					delete nl;
 					continue;
 				}
@@ -134,7 +134,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player)
 				if (loc != NULL)
 					continue;
 
-				Planet * planet = TheGalaxy->GetPlanet(GetString(child2));
+				Planet * planet = galaxy->GetPlanet(GetString(child2));
 				if (!planet) {
 					Message * mess = player->AddMessage("Error: invalid planet");
 					mess->AddItem("", GetString(child2));
@@ -152,7 +152,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player)
 					continue;
 
 				long l = GetLong(child2);
-				Salvage * salvage = TheGalaxy->GetSalvage(l);
+				Salvage * salvage = galaxy->GetSalvage(l);
 				if (!salvage || !salvage->SeenBy(player)) {
 					Message * mess = player->AddMessage("Error: invalid salvage pile");
 					mess->AddLong("Waypoint order", l);
@@ -174,7 +174,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player)
 					continue;
 
 				if (player2 == player) {
-					loc = new TempFleet(GetLong(child2), player);
+					loc = new TempFleet(galaxy, GetLong(child2), player);
 					fmo = true;
 				} else {
 					Fleet * f2 = player2->NCGetFleet(GetLong(child2));

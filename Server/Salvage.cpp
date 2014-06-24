@@ -31,9 +31,10 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Salvage::Salvage()
-:	TurnCreated(TheGame->GetTurn()),
-	MaxSize(0)
+Salvage::Salvage(Galaxy *galaxy)
+    : CargoHolder(galaxy)
+    , TurnCreated(TheGame->GetTurn())
+    , MaxSize(0)
 {
 	SetID(0);
 }
@@ -43,7 +44,7 @@ Salvage::Salvage(const CargoHolder &source)
 	TurnCreated(TheGame->GetTurn()),
 	MaxSize(0)
 {
-	SetID(TheGalaxy->GetSalvageID());
+	SetID(mGalaxy->GetSalvageID());
 }
 
 Salvage::~Salvage()

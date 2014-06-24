@@ -158,7 +158,7 @@ void Stack::SetupShips(const Player * owner, long cargo)
 	bFlee = 0;
 }
 
-bool Stack::KillShips(long count, bool salvage)
+bool Stack::KillShips(long count, bool salvage, Galaxy *galaxy)
 {
 	if (count <= 0)
 		return false;
@@ -168,7 +168,7 @@ bool Stack::KillShips(long count, bool salvage)
 
 	Salvage * sal = NULL;
 	if (salvage)
-		sal = TheGalaxy->AddSalvage(*GetFleetIn());
+		sal = galaxy->AddSalvage(*GetFleetIn());
 
 	// lose a portion of the fleets cargo
 	double cargolost = double(GetDesign()->GetFuelCapacity() * count) / GetFleetIn()->GetFuelCapacity();

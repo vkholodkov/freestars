@@ -168,7 +168,7 @@ bool Creation::LoadNames(const char * NameFile)
 		return true;
 }
 
-void Creation::SetLocation(Planet * p)
+void Creation::SetLocation(Planet * p, Galaxy *galaxy)
 {
 	int count = 0;
 	long dist = 0;
@@ -176,22 +176,22 @@ void Creation::SetLocation(Planet * p)
 
 	while (count++ < 1000 || dist == 0) {	// hard coded max to planet placement for safety
 		if (LastP == NULL || !inCluster) {
-			p->SetPosX(Random(TheGalaxy->MinX(), TheGalaxy->MaxX()));
-			p->SetPosY(Random(TheGalaxy->MinY(), TheGalaxy->MaxY()));
+			p->SetPosX(Random(galaxy->MinX(), galaxy->MaxX()));
+			p->SetPosY(Random(galaxy->MinY(), galaxy->MaxY()));
 		} else {
 			// this gives higher density for nearby planets then distant ones
 			double angle = genrand_real2() * 2.0 * 3.1415926535;
 			long range = Random(mMinDistance, mClusterMaxDistance) + 1;
 			p->SetPosX(LastP->GetPosX() + long(sin(angle) * range));
-			if (p->GetPosX() < TheGalaxy->MinX() || p->GetPosX() >= TheGalaxy->MaxX())
+			if (p->GetPosX() < galaxy->MinX() || p->GetPosX() >= galaxy->MaxX())
 				continue;
 
 			p->SetPosY(LastP->GetPosY() + long(cos(angle) * range));
-			if (p->GetPosY() < TheGalaxy->MinY() || p->GetPosY() >= TheGalaxy->MaxY())
+			if (p->GetPosY() < galaxy->MinY() || p->GetPosY() >= galaxy->MaxY())
 				continue;
 		}
 
-		const Planet * cp = TheGalaxy->ClosestPlanet(p);
+		const Planet * cp = galaxy->ClosestPlanet(p);
 		if (cp == NULL)
 			break; // first planet, place it anywhere
 
@@ -208,7 +208,7 @@ void Creation::SetLocation(Planet * p)
 	LastP = p;
 }
 
-string Creation::GetNextName()
+string Creation::GetNextName(Galaxy *galaxy)
 {
 	string name;
 	do {
@@ -220,7 +220,7 @@ string Creation::GetNextName()
 		name = *mNamePos++;
 		if (mNameCount > 1)
 			name += " #" + Long2String(mNameCount);
-	} while (TheGalaxy->GetPlanet(name.c_str()) != NULL);
+	} while (galaxy->GetPlanet(name.c_str()) != NULL);
 
 	return name;
 }

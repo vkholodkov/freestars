@@ -386,7 +386,7 @@ void Galaxy::Build(Creation * c)
 		// create a planet
 		Planet * p = NULL;
 		p = TheGame->ObjectFactory(p);
-		c->SetLocation(p);
+		c->SetLocation(p, this);
 		p->CreateRandom(c);
 		mPlanets.push_back(p);
 		TheGame->AddAlsoHere(p);
@@ -396,8 +396,8 @@ void Galaxy::Build(Creation * c)
 	if (TheGame->GetRandomEvents() | RE_WORMHOLE) {
 		i = Random(TheGame->MinWormholes(), TheGame->MaxWormholes());
 		for ( ; i > 0; --i) {
-			Wormhole * wh1 = new Wormhole();
-			Wormhole * wh2 = new Wormhole();
+			Wormhole * wh1 = new Wormhole(this);
+			Wormhole * wh2 = new Wormhole(this);
 			wh1->Shift();
 			wh2->Shift();
 			wh1->SetAttached(wh2);

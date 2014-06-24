@@ -33,6 +33,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #define FreeStars_Message_h
 
 #include <string>
+#include "Galaxy.h"
+
 using namespace std;
 
 namespace FreeStars {
@@ -49,7 +51,7 @@ public:
 	virtual void WriteNode(TiXmlNode * node) const = 0;
 	virtual string ToString() const = 0;
 	void AddDesc(TiXmlElement * node) const;
-	static MessItem * ParseNode(const TiXmlNode * node);
+	static MessItem * ParseNode(const TiXmlNode * node, Galaxy*);
 
 	string mDesc;
 
@@ -67,7 +69,7 @@ public:
 	virtual ~MessLoc();
 	virtual void WriteNode(TiXmlNode * node) const;
 	virtual string ToString() const;
-	static MessLoc * ParseNode(const TiXmlNode * node);
+	static MessLoc * ParseNode(const TiXmlNode * node, Galaxy*);
 	bool StoreMessageLocation(const Location * loc);
 
 	const Location * mLoc;
@@ -184,7 +186,7 @@ public:
 
 	bool IsType(const char * t)			{ return mType.find(t) >= 0; }
 	void WriteNode(TiXmlNode * node) const;
-	bool ParseNode(const TiXmlNode * node);
+	bool ParseNode(const TiXmlNode * node, Galaxy*);
 	string ToString() const;
 
     void ApplyVisitor(MessageVisitor&) const;

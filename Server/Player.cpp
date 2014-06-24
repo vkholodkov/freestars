@@ -39,7 +39,9 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Player::Player(int id) : mID(id)
+Player::Player(Galaxy *_galaxy, int id)
+    : galaxy(_galaxy)
+    , mID(id)
 {
 	mTechLevel.insert(mTechLevel.begin(), Rules::MaxTechType, -1);
 	mTempTechLevel.insert(mTempTechLevel.begin(), Rules::MaxTechType, 0);
@@ -210,11 +212,11 @@ long Player::GainTech(long TechGain, TechType tech)
 			if (resources < cost) {
 				more = false;
 				mTechProgress[mResearchField] += resources;
-				TheGalaxy->TechSpent(resources, tech);
+				galaxy->TechSpent(resources, tech);
 			} else {
 				more = true;
 				mTechProgress[mResearchField] += cost;
-				TheGalaxy->TechSpent(cost, tech);
+				galaxy->TechSpent(cost, tech);
 				resources -= cost;
 				if (GainTechLevel(mResearchField)) {
 					more = false;
@@ -611,7 +613,7 @@ void Player::ParseMessages(const TiXmlNode * node)
 	Message * mess;
 	for (child = node->FirstChild("Message"); child != NULL; child = child->NextSibling("Message")) {
 		mess = new Message();
-		if (mess->ParseNode(child))
+		if (mess->ParseNode(child, galaxy))
 			mMessages.push_back(mess);
 		else
 			delete mess;
@@ -757,7 +759,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			if (stricmp(ptr, "Default") == 0) {
 				SetProduction(ProdOrder::ParseNode(node, NULL, this));
 			} else {
-				pto = TheGalaxy->GetPlanet(ptr);
+				pto = galaxy->GetPlanet(ptr);
 				if (pto != NULL && pto->GetOwner() == this)
 					pto->ParseProduction(node);
 				else {
@@ -769,7 +771,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			}
 		} else if (stricmp(node->Value(), "SetPayTax") == 0) {
 			ptr = GetString(node->FirstChild("Planet"));
-			pto = TheGalaxy->GetPlanet(ptr);
+			pto = galaxy->GetPlanet(ptr);
 			if (pto != NULL && pto->GetOwner() == this)
 				pto->SetPayTax(GetBool(node->FirstChild("PayTax")));
 			else {
@@ -789,7 +791,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 		} else if (stricmp(node->Value(), "ResearchNext") == 0) {
 			SetResearchNext(ParseResearchField(node));
 		} else if (stricmp(node->Value(), "SetPacketSpeed") == 0) {
-			pfrom = TheGalaxy->GetPlanet(GetString(node->FirstChild("Planet")));
+			pfrom = galaxy->GetPlanet(GetString(node->FirstChild("Planet")));
 			if (!pfrom || pfrom->GetOwner() != this) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("Planet")));
@@ -799,7 +801,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 
 			pfrom->SetPacketSpeed(GetLong(node->FirstChild("PacketSpeed")));
 		} else if (stricmp(node->Value(), "SetPacketDestination") == 0) {
-			pfrom = TheGalaxy->GetPlanet(GetString(node->FirstChild("Planet")));
+			pfrom = galaxy->GetPlanet(GetString(node->FirstChild("Planet")));
 			if (!pfrom || pfrom->GetOwner() != this) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("Planet")));
@@ -807,7 +809,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 				continue;
 			}
 
-			pto = TheGalaxy->GetPlanet(GetString(node->FirstChild("PacketDestination")));
+			pto = galaxy->GetPlanet(GetString(node->FirstChild("PacketDestination")));
 			if (!pto) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("PacketDestination")));
@@ -816,7 +818,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			}
 			pfrom->SetPacketDest(pto);
 		} else if (stricmp(node->Value(), "SetRouteDestination") == 0) {
-			pfrom = TheGalaxy->GetPlanet(GetString(node->FirstChild("From")));
+			pfrom = galaxy->GetPlanet(GetString(node->FirstChild("From")));
 			if (!pfrom || pfrom->GetOwner() != this) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("From")));
@@ -824,7 +826,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 				continue;
 			}
 
-			pto = TheGalaxy->GetPlanet(GetString(node->FirstChild("RouteDestination")));
+			pto = galaxy->GetPlanet(GetString(node->FirstChild("RouteDestination")));
 			if (!pto) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("RouteDestination")));
@@ -936,7 +938,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			if (mWriteXFile) {
 				WayOrderList wol;
 				wol.SetFleet(GetLong(node->FirstChild("Fleet")));
-				wol.ParseNode(node, this);
+				wol.ParseNode(node, this, galaxy);
 
 				Fleet * f = NCGetFleet(GetLong(node->FirstChild("Fleet")));
 				if (f == NULL)
@@ -977,14 +979,14 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 
 	child = node->FirstChild("Planet");
 	if (child != NULL) {
-		ch = TheGalaxy->GetPlanet(GetString(child));
+		ch = galaxy->GetPlanet(GetString(child));
 		if (owned == NULL) {
 			if (this == ch->GetOwner())
 				return ch;
 		} else if (this == ch->GetOwner())
 			return ch;
 		else
-			return TheGalaxy->GetJettison(owned, ch);
+			return galaxy->GetJettison(owned, ch);
 
 		Message * mess = AddMessage("Error: Not owner", ch);
 		mess->AddItem("Where", "cargo transfer");
@@ -1003,7 +1005,7 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 				return NULL;
 			}
 
-			ch = TheGalaxy->GetJettison(owned, p->NCGetFleet(f));
+			ch = galaxy->GetJettison(owned, p->NCGetFleet(f));
 		} else
 			ch = NCGetFleet(f);
 
@@ -1013,7 +1015,7 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 	if (owned != NULL) {
 		child = node->FirstChild("Space");
 		if (child != NULL) {
-			return TheGalaxy->GetJettison(owned, NULL);
+			return galaxy->GetJettison(owned, NULL);
 		}
 
 		child = node->FirstChild("Packet");
@@ -1149,7 +1151,7 @@ void Player::DoBattles()
 			Battle bat(*mFleets[i]);
 //			bat.AddFleet(mFleets[i]); Do not do this, it makes the next function have to check to see if the fleet has already been added
 			Planet * planet;
-			planet = TheGalaxy->GetPlanet(mFleets[i]);
+			planet = galaxy->GetPlanet(mFleets[i]);
 			bat.SetPlanet(planet);
 			bat.AddFleets();
 			bat.Resolve();
@@ -1807,7 +1809,7 @@ void Player::ParseWaypoints(const TiXmlNode * node)
 {
 	WayOrderList wol;
 	wol.SetFleet(GetLong(node->FirstChild("Fleet")));
-	wol.ParseNode(node, this);
+	wol.ParseNode(node, this, galaxy);
 
 	NCGetFleet(wol.GetFleet())->ChangeWaypoints(wol);
 }
@@ -1816,7 +1818,7 @@ double Player::GetPossibleMines(deque<MineField *> *pm, const Fleet * f, double 
 {
 	// OPTIMIZE This gets every mine field in range, regardless of the direction of travel
 
-	double Result = TheGalaxy->MaxX() + TheGalaxy->MaxY();
+	double Result = galaxy->MaxX() + galaxy->MaxY();
 	if (GetRelations(f->GetOwner()) >= PR_FRIEND)
 		return Result;
 
@@ -1933,7 +1935,7 @@ SpaceObject * Player::GetPatrolTarget(const Fleet * persuer, double * range) con
 
 Fleet * Player::FleetFactory()
 {
-	return new Fleet();
+	return new Fleet(galaxy);
 }
 
 BattlePlan * Player::BattlePlanFactory()
@@ -1943,7 +1945,7 @@ BattlePlan * Player::BattlePlanFactory()
 
 MineField * Player::MineFieldFactory()
 {
-	return new MineField(this);
+	return new MineField(galaxy, this);
 }
 
 }

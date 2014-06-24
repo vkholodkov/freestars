@@ -58,7 +58,7 @@ class MultipleOrder;
  */
 class Player : public Race {
 public:
-	Player(int id);
+	Player(Galaxy*, int id);
 	virtual ~Player();
 
 	void Remove()	{ delete this; }
@@ -201,6 +201,7 @@ public:
 	virtual MineField * MineFieldFactory();
 
 private:
+	Galaxy *galaxy;
 	double mResearchTax;
 	long mResearchField;
 	long mResearchNext;

@@ -47,7 +47,7 @@ class Player;
  */
 class TempFleet : public CargoHolder, public Chaser {
 public:
-	TempFleet(int fleetID, Player * owner);
+	TempFleet(Galaxy*, int fleetID, Player * owner);
 	TempFleet(const CargoHolder * ch, CargoHolder * ch2) : CargoHolder(*ch), mCargoHolder(ch2) { assert(ch2 == NULL || ch->IsWith(*ch2)); }
 	virtual ~TempFleet();
 

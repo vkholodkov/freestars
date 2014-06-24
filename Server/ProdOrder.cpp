@@ -825,7 +825,7 @@ void POPlanetary::Built(Planet * planet, long number)
 			p->AdjustAmounts(Type - POP_MIXEDPACKET - 1, planet->GetOwner()->PacketSizeOneMin() * number);
 		}
 
-		TheGalaxy->AddPacket(p, planet);
+		planet->GetGalaxy()->AddPacket(p, planet);
 	} else if (Type == POP_FACTS) {
 		planet->BuildFactories(number);
 	} else if (Type == POP_MINES) {

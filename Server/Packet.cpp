@@ -41,7 +41,7 @@ Packet::Packet(const CargoHolder &source, long speed, long driverSpeed, Planet *
 	mDestination(destination),
 	mFirstYear(true)
 {
-	mID = TheGalaxy->GetPacketID();
+	mID = mGalaxy->GetPacketID();
 }
 
 Packet::~Packet()
@@ -61,7 +61,7 @@ bool Packet::ParseNode(const TiXmlNode * node)
 		return false;
 	}
 
-	mDestination = TheGalaxy->GetPlanet(GetString(node->FirstChild("Destination")));
+	mDestination = mGalaxy->GetPlanet(GetString(node->FirstChild("Destination")));
 	if (mDestination == NULL) {
 		Message * mess = NCGetOwner()->AddMessage("Error: Invalid packet destination");
 		mess->AddItem("Destination", GetString(node->FirstChild("Destination")));

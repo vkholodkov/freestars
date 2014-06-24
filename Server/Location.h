@@ -32,6 +32,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #if !defined(FreeStars_Location_h)
 #define FreeStars_Location_h
 
+#include "Galaxy.h"
+
 namespace FreeStars {
 
 /**
@@ -44,7 +46,7 @@ public:
 	Location() : posX(0), posY(0) {}
 
 	virtual ~Location();
-	virtual bool ParseNode(const TiXmlNode * node);  ///< Load.
+	virtual bool ParseNode(const TiXmlNode * node, Galaxy*);  ///< Load.
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const	{ return WriteLocation(node); } ///< Save.
 	TiXmlNode * WriteLocation(TiXmlNode * node) const; ///< Save this location.
 

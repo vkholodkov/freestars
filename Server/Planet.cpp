@@ -34,8 +34,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Planet::Planet()
-    : CargoHolder()
+Planet::Planet(Galaxy *_galaxy)
+    : CargoHolder(_galaxy)
     , mProductionQ()
 {
 	Init();
@@ -88,13 +88,13 @@ bool Planet::ParseNode(const TiXmlNode * node)
 	if (ptr != NULL)
 		mName = ptr;
 	if (mName.empty() && TheGame->GetCreation())
-		mName = TheGame->GetCreation()->GetNextName();
+		mName = TheGame->GetCreation()->GetNextName(mGalaxy);
 	if (mName.empty()) {
 		Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
 		mess->AddItem("", "Missing Name");
 		return false;
 	}
-	if (TheGame->GetCreation() && TheGalaxy->GetPlanet(mName.c_str()) != NULL) {
+	if (TheGame->GetCreation() && mGalaxy->GetPlanet(mName.c_str()) != NULL) {
 		Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
 		mess->AddItem("Duplicate Name", mName);
 		return false;
@@ -224,7 +224,7 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		Planet * pdest;
 		child1 = node->FirstChild("PacketDestination");
 		if (child1) {
-			pdest = TheGalaxy->GetPlanet(GetString(child1));
+			pdest = mGalaxy->GetPlanet(GetString(child1));
 			if (!pdest) {
 				Message * mess = NCGetOwner()->AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(child1));
@@ -235,7 +235,7 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		}
 		child1 = node->FirstChild("PacketDestination");
 		if (child1) {
-			pdest = TheGalaxy->GetPlanet(GetString(child1));
+			pdest = mGalaxy->GetPlanet(GetString(child1));
 			if (!pdest) {
 				Message * mess = NCGetOwner()->AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(child1));
@@ -374,9 +374,9 @@ long Planet::GetDisplayPop() const
 
 void Planet::SetDestinations()
 {
-	mRouteTo = TheGalaxy->GetPlanet(mRouteName.c_str());
+	mRouteTo = mGalaxy->GetPlanet(mRouteName.c_str());
 	mRouteName.erase();
-	mPacketDest = TheGalaxy->GetPlanet(mPacketName.c_str());
+	mPacketDest = mGalaxy->GetPlanet(mPacketName.c_str());
 	mPacketName.erase();
 }
 
@@ -391,7 +391,7 @@ void Planet::Invade(Player * invader, long amount)
 	}
 
 	mInvasions.push_back(Invasion(invader, amount));
-	TheGalaxy->AddInvasion(this);
+	mGalaxy->AddInvasion(this);
 }
 
 double Planet::GetDefenseValue() const
@@ -1035,7 +1035,7 @@ void Planet::CreateRandom(Creation * c)
 {
 	long i;
 
-	mID = TheGalaxy->GetNextPlanetID();
+	mID = mGalaxy->GetNextPlanetID();
 	for (i = 0; i < Rules::MaxMinType; ++i)
 		mMinConc[i] = Random(Rules::MinMC(i), Rules::MaxMC(i));
 
@@ -1049,7 +1049,7 @@ void Planet::CreateRandom(Creation * c)
 		mArtifactType = Random(Rules::MaxTechType);
 	}
 
-	mName = c->GetNextName();
+	mName = c->GetNextName(mGalaxy);
 }
 
 void Planet::CreateHW(const Player * player)

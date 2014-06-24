@@ -62,7 +62,7 @@ public:
 	void SetDamage(int d)			{ mDamage = d; }
 
 	long DamageAllShips(long damage);
-	bool KillShips(long count, bool salvage);
+	bool KillShips(long count, bool salvage, Galaxy*);
 //	long ApplyDamage(long damage, int type);	// returns number of ships destroyed
 	void AddFromFleet(long fleet, long ships, long damaged);
 	const Fleet * GetFleetIn() const	{ return mFleetIn; }

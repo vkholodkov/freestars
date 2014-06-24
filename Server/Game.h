@@ -74,6 +74,9 @@ public:
 	bool ProcessWaypoints(long pnumber);
 	bool AssignWaypoints();
 
+	const Galaxy *GetGalaxy() const { return galaxy; }
+	Galaxy *GetGalaxy() { return galaxy; }
+
 	Player * GetCurrentPlayer()		{ return NCGetPlayer(mCurrentPlayer); }
 	Player * NCGetPlayer(unsigned int n);
 	const Player * GetPlayer(unsigned int n) const	{ return const_cast<Game *>(this)->NCGetPlayer(n); }	// Same thing just const
@@ -164,6 +167,7 @@ protected:
 	deque<deque<SpaceObject *> *> mTopObjects;
 	unsigned long * mSeed;
 
+	Galaxy *galaxy;
 	Creation * mCreation;
     VictoryConditions *VC;
 };

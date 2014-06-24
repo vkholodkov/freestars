@@ -43,7 +43,7 @@ GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
     , currentMessage(0)
     , currentSelection(0)
 {
-    mapView = new MapView(TheGalaxy, TheGame, _player);
+    mapView = new MapView(TheGame->GetGalaxy(), TheGame, _player);
     mapScroller = new QScrollArea;
     mapScroller->setWidget(mapView);
 //    mapScroller->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
@@ -82,10 +82,10 @@ GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
 
     setupMessages();
 
-    unsigned num_planets = TheGalaxy->GetPlanetCount();
+    unsigned num_planets = TheGame->GetGalaxy()->GetPlanetCount();
 
     for(unsigned n = 1 ; n <= num_planets ; n++) {
-        Planet *p = TheGalaxy->GetPlanet(n);
+        Planet *p = TheGame->GetGalaxy()->GetPlanet(n);
 
         if(p->GetOwner() == player) {
             selectObject(p);

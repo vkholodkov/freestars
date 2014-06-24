@@ -5,4 +5,3 @@
 #include "Galaxy.h"
 
 FreeStars::Game *TheGame;
-FreeStars::Galaxy *TheGalaxy;

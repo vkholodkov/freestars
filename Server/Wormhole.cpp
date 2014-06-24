@@ -33,13 +33,15 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Wormhole::Wormhole()
+Wormhole::Wormhole(Galaxy *galaxy)
+    : SpaceObject(galaxy)
 {
 	Init();
-	TheGalaxy->GetWormholeID();
+	mGalaxy->GetWormholeID();
 }
 
 Wormhole::Wormhole(const Wormhole &hole)
+    : SpaceObject(hole)
 {
 	Init();
 	mID = hole.mID;
@@ -118,7 +120,7 @@ const Wormhole * Wormhole::GetAttached() const
 		return NULL;
 
 	if (mAttached == NULL)
-		const_cast<Wormhole *>(this)->mAttached = TheGalaxy->GetWormhole(mAttachedID);
+		const_cast<Wormhole *>(this)->mAttached = mGalaxy->GetWormhole(mAttachedID);
 
 	return mAttached;
 }
@@ -149,12 +151,12 @@ void Wormhole::Jiggle()
 void Wormhole::Shift()
 {
 	// reset the wormhole
-	mID = TheGalaxy->GetWormholeID();
+	mID = mGalaxy->GetWormholeID();
 	mSeenBy.erase(mSeenBy.begin(), mSeenBy.end());
 	mSeenBy.insert(mSeenBy.begin(), TheGame->NumberPlayers(), 0L);
 
 	///@todo figure out how to hide the newly moved wormhole. new ID is probably best
-//	mID = TheGalaxy->GetWormholeID();
+//	mID = mGalaxy->GetWormholeID();
 //	GetAttached()->SetOtherEnd(this);
 
 	mStability = mMaxStability;
@@ -162,10 +164,10 @@ void Wormhole::Shift()
 	long dist = 0;
 	long count = 0;
 	while (count++ < 1000 || dist == 0) {	// hard coded max to planet placement for safety
-		SetPosX(Random(TheGalaxy->MinX(), TheGalaxy->MaxX()));
-		SetPosY(Random(TheGalaxy->MinY(), TheGalaxy->MaxY()));
+		SetPosX(Random(mGalaxy->MinX(), mGalaxy->MaxX()));
+		SetPosY(Random(mGalaxy->MinY(), mGalaxy->MaxY()));
 
-		dist = long(Distance(TheGalaxy->ClosestPlanet(this)));
+		dist = long(Distance(mGalaxy->ClosestPlanet(this)));
 		if (dist >= TheGame->GetWHMinDistance())
 			break;	// far enough apart, go with it
 	}

@@ -16,10 +16,10 @@ ResearchDialog::ResearchDialog(Player *_player, QWidget *parent)
 {
     long researchField = _player->GetResearchField();
 
-    unsigned num_planets = TheGalaxy->GetPlanetCount();
+    unsigned num_planets = TheGame->GetGalaxy()->GetPlanetCount();
 
     for(unsigned n = 1 ; n <= num_planets ; n++) {
-        Planet *p = TheGalaxy->GetPlanet(n);
+        Planet *p = TheGame->GetGalaxy()->GetPlanet(n);
 
         if(p->GetOwner() == player && p->GetPayTax()) {
             totalResources += p->GetResources();

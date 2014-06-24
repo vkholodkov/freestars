@@ -57,7 +57,7 @@ bool SpaceObject::ParseNode(const TiXmlNode * node)
 
 bool SpaceObject::ParseNode(const TiXmlNode * node, Player * player)
 {
-	if (!Location::ParseNode(node->FirstChild("Location")))
+	if (!Location::ParseNode(node->FirstChild("Location"), mGalaxy))
 		return false;
 
 	mOwner = player;

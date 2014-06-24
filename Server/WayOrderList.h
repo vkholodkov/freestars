@@ -48,7 +48,7 @@ public:
 	WayOrderList() : nPlayer(0), nFleet(0), mNoDelete(false) {}
 	~WayOrderList();
 
-	bool ParseNode(const TiXmlNode * node, Player * player);
+	bool ParseNode(const TiXmlNode * node, Player * player, Galaxy*);
 	const deque<WayOrder *> & GetOrders() const	{ return orders; }
 	void SetFleet(long fleet)		{ nFleet = fleet; }
 	long GetPlayer() const			{ return nPlayer; }

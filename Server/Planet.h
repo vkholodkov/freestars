@@ -56,7 +56,7 @@ class ProdOrder;
  */
 class Planet : public CargoHolder {
 public:
-	Planet();
+	Planet(Galaxy*);
 //	Planet(int x, int y);
 	virtual ~Planet();
 	static const char* ELEMENT_NAME()	{return "Planet";}; ///< Name of XML element associated with class.
@@ -65,6 +65,7 @@ public:
 	/// planets are not technically 'in orbit', but return ourselves if some one asks
 	virtual Planet * InOrbit()				{ return this; }
 	virtual const Planet * InOrbit() const	{ return this; }
+	Galaxy *GetGalaxy() const { return mGalaxy; }
 
 	void Init();
 	void SetDestinations();

@@ -33,6 +33,15 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
+class TestPlanet {
+public:
+	long GetHabValue(HabType ht) const		{ return mHabTerra[ht]; }
+	void SetHabValue(HabType ht, long v)	{ mHabTerra[ht] = v; }
+
+private:
+	deque<long> mHabTerra;
+};
+
 Race::Race()
 {
 	ResetDefaults();
@@ -63,6 +72,44 @@ double Race::RadDamage(HabType ht) const
 }
 
 long Race::HabFactor(const Planet * p) const	// gives how habitable this planet is
+{
+	long planetValuePoints = 0,redValue = 0,ideality = 10000;
+	long value, poorPlanetMod, fromIdeal;
+
+	HabType ht;
+	for (ht = 0; ht < Rules::MaxHabType; ++ht) {
+		if (HabCenter(ht) < 0)
+			planetValuePoints += 10000;
+		else {
+			fromIdeal = abs(HabCenter(ht) - p->GetHabValue(ht));
+
+			if (fromIdeal > HabWidth(ht))
+				redValue += min(fromIdeal - HabWidth(ht), 15L);
+			else {
+				/* green planet */
+				value = 100 - fromIdeal * 100 / HabWidth(ht);
+				planetValuePoints += value * value;
+
+				poorPlanetMod = fromIdeal * 2 - HabWidth(ht);
+				if (poorPlanetMod > 0)
+				{
+					ideality *= HabWidth(ht) * 2 - poorPlanetMod;
+					ideality /= HabWidth(ht) * 2;
+				}
+			}
+		}
+	}
+
+	if (redValue != 0)
+		return -redValue;
+
+	planetValuePoints = long(sqrt((double)planetValuePoints / Rules::MaxHabType) + 0.9);
+	planetValuePoints = planetValuePoints * ideality / 10000;
+
+	return planetValuePoints;
+}
+
+long Race::HabFactor(const TestPlanet * p) const	// gives how habitable this test planet is
 {
 	long planetValuePoints = 0,redValue = 0,ideality = 10000;
 	long value, poorPlanetMod, fromIdeal;
@@ -340,7 +387,7 @@ long Race::GetHabPoints() const
 {
 	double advantagePoints;
 	int tmpHab, TTCorrFactor, h, i;
-	Planet testPlanet;
+	TestPlanet testPlanet;
 
 	deque<long> testHabWidth;
 	testHabWidth.insert(testHabWidth.begin(), Rules::MaxHabType, 50);
@@ -398,7 +445,7 @@ long Race::GetHabPoints() const
 	return long(advantagePoints / 10.0 + 0.5);
 }
 
-double Race::HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> &testHabWidth, deque<long> &testHabStart, deque<long> &iterNum, deque<long> &TFDone, Planet * testPlanet) const
+double Race::HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> &testHabWidth, deque<long> &testHabStart, deque<long> &iterNum, deque<long> &TFDone, TestPlanet * testPlanet) const
 {
 	double sumOverHab;
 	if (depth < Rules::MaxHabType) {

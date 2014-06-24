@@ -53,7 +53,8 @@ MineField::~MineField(void)
 {
 }
 
-MineField::MineField(Player * owner)
+MineField::MineField(Galaxy *galaxy, Player * owner)
+    : SpaceObject(galaxy)
 {
 	mOwner = owner;
 }
@@ -112,7 +113,7 @@ void MineField::Decay()
 {
 	int numPlanets;
 
-	numPlanets = TheGalaxy->GetPlanetsWithin(this, GetRadius());
+	numPlanets = mGalaxy->GetPlanetsWithin(this, GetRadius());
 
 	double d;
 	d = Rules::GetFloat("MineFieldBaseDecayRate");

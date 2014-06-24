@@ -48,7 +48,7 @@ class Player;
  */
 class CargoHolder : public SpaceObject {
 public:
-	CargoHolder() : SpaceObject() { Init(); }
+	CargoHolder(Galaxy *galaxy) : SpaceObject(galaxy) { Init(); }
 	CargoHolder(const CargoHolder &source) : SpaceObject(source) { Init(); }
 //	CargoHolder(int x, int y, Player * owner) : Location(x, y) { Init(); }
 	virtual ~CargoHolder();
