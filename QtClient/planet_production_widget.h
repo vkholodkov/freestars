@@ -7,6 +7,8 @@
 
 #include <QWidget>
 
+#include "production_queue_model.h"
+
 #include "folding_widget.h"
 
 #include "FSServer.h"
@@ -18,6 +20,7 @@ class PlanetProductionWidget : public FoldingWidget {
 
 public:
     PlanetProductionWidget(const Planet*, const Player*, QWidget *parent = 0);
+    ~PlanetProductionWidget();
 
 public slots:
     void changeButtonClicked(bool);
@@ -29,6 +32,7 @@ signals:
 
 private:
     const Planet *planet;
+    ProductionQueueModel *productionQueueModel;
 };
 
 };

@@ -64,6 +64,37 @@ private:
     static const HullProperty interestingHullProperties[];
 };
 
+class ComponentDescriber : public QObject {
+    Q_OBJECT
+
+    typedef struct {
+        QString name;
+        QString (ComponentDescriber::*handler)(const Component*) const;
+        bool left;
+    } ComponentProperty;
+
+public:
+    ComponentDescriber(const Player *_player, QObject *parent = 0)
+        : QObject(parent)
+        , player(_player)
+    {
+    }
+
+    void describe(const Component*, QFormLayout*, QFormLayout*) const;
+
+private:
+    QString ironiumHandler(const Component*) const;
+    QString boraniumHandler(const Component*) const;
+    QString germaniumHandler(const Component*) const;
+    QString resourcesHandler(const Component*) const;
+    QString massHandler(const Component*) const;
+
+    static const ComponentProperty interestingComponentProperties[];
+
+private:
+    const Player *player;
+};
+
 };
 
 #endif

@@ -48,6 +48,7 @@ private slots:
     void setComponentCategory(QComboBox*, QListWidget*, int);
     void setComponentCategory1(int);
     void setComponentCategory2(int);
+    void setComponent1(int);
     void setShipDesign(int);
     void setHull(int);
     void copyDesign();

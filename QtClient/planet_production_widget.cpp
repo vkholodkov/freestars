@@ -19,7 +19,7 @@ PlanetProductionWidget::PlanetProductionWidget(const Planet *_planet, const Play
     Ui_PlanetProductionWidget ui_PlanetProductionWidget;
     ui_PlanetProductionWidget.setupUi(widget);
 
-    ProductionQueueModel *productionQueueModel = new ProductionQueueModel(_planet->GetProduction());
+    productionQueueModel = new ProductionQueueModel(_planet->GetProduction());
     QItemSelectionModel *m = ui_PlanetProductionWidget.productionQueueView->selectionModel();
     ui_PlanetProductionWidget.productionQueueView->setModel(productionQueueModel);
     delete m;
@@ -35,6 +35,11 @@ PlanetProductionWidget::PlanetProductionWidget(const Planet *_planet, const Play
     connect(ui_PlanetProductionWidget.clearButton, SIGNAL(clicked(bool)), this, SLOT(clearButtonClicked(bool)));
 
     this->addWidget(widget);
+}
+
+PlanetProductionWidget::~PlanetProductionWidget()
+{
+    delete productionQueueModel;
 }
 
 void PlanetProductionWidget::changeButtonClicked(bool)

@@ -155,6 +155,7 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
     if (oldViewMode == SDDVM_COMPONENTS) {
         chooseComponentBox1->clear();
         chooseComponentBox1->disconnect();
+        componentListWidget1->disconnect();
 
         if (newViewMode != SDDVM_COMPONENTS) {
             copyDesignButton->setEnabled(true);
@@ -184,6 +185,8 @@ void ShipDesignDialog::switchMode(int oldDesignMode, int newDesignMode, int oldV
         }
 
         connect(chooseComponentBox1, SIGNAL(activated(int)), this, SLOT(setComponentCategory1(int)));
+        connect(componentListWidget1, SIGNAL(currentRowChanged(int)), this, SLOT(setComponent1(int)));
+
         setComponentCategory1(0);
 
         if (oldViewMode != SDDVM_COMPONENTS) {
@@ -225,12 +228,12 @@ void ShipDesignDialog::setComponentCategory(QComboBox *chooseComponentBox, QList
         if ((*i)->IsBuildable(player) && ((*i)->GetType() & mask)) {
             const QIcon *icon = graphicsArray->GetComponentIcon((*i)->GetName());
 
-            if(icon != NULL) {
-                componentListWidget->addItem(new QListWidgetItem(*icon, QString((*i)->GetName().c_str())));
-            }
-            else {
-                componentListWidget->addItem(new QListWidgetItem((*i)->GetName().c_str()));
-            }
+            QListWidgetItem *item = (icon != NULL) ? new QListWidgetItem(*icon, QString((*i)->GetName().c_str()))
+                : new QListWidgetItem((*i)->GetName().c_str());
+
+            item->setData(Qt::UserRole, QVariant(reinterpret_cast<qlonglong>(*i)));
+
+            componentListWidget->addItem(item);
         }
     }
 }
@@ -238,11 +241,35 @@ void ShipDesignDialog::setComponentCategory(QComboBox *chooseComponentBox, QList
 void ShipDesignDialog::setComponentCategory1(int index)
 {
     setComponentCategory(chooseComponentBox1, componentListWidget1, index);
+    clearProperties();
 }
 
 void ShipDesignDialog::setComponentCategory2(int index)
 {
     setComponentCategory(chooseComponentBox2, componentListWidget2, index);
+}
+
+void ShipDesignDialog::setComponent1(int index)
+{
+    clearProperties();
+
+    if(index < 0) {
+        return;
+    }
+
+    QListWidgetItem *item = componentListWidget1->item(index);
+
+    QVariant userData = item->data(Qt::UserRole);
+
+    Component *component = reinterpret_cast<Component*>(userData.toULongLong());
+
+    if(component != NULL) {
+        costTitleLabel3->setText(tr("Cost of one %0").arg(component->GetName().c_str()));
+
+        ComponentDescriber componentDescriber(player, this);
+        componentDescriber.describe(component, dynamic_cast<QFormLayout*>(propertiesWidget31->layout()),
+            dynamic_cast<QFormLayout*>(propertiesWidget32->layout()));
+    }
 }
 
 void ShipDesignDialog::populateExistingDesigns(int designMode, bool initial)
@@ -305,6 +332,11 @@ void ShipDesignDialog::clearProperties()
         delete w;
     while (QWidget* w = propertiesWidget2->findChild<QWidget*>())
         delete w;
+    while (QWidget* w = propertiesWidget31->findChild<QWidget*>())
+        delete w;
+    while (QWidget* w = propertiesWidget32->findChild<QWidget*>())
+        delete w;
+    costTitleLabel3->setText("");
 }
 
 void ShipDesignDialog::enterEditMode(bool addNew)
@@ -566,7 +598,9 @@ void ShipDesignDialog::collectFloatingWidgetBoundaries(QRect &boundaries)
     for(std::vector<QWidget*>::const_iterator i = slotWidgets.begin() ;
         i != slotWidgets.end() ; i++)
     {
-        boundaries = boundaries.united((*i)->geometry());
+        if(*i != NULL) {
+            boundaries = boundaries.united((*i)->geometry());
+        }
     }
 }
 

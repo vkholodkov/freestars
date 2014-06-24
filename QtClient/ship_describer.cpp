@@ -101,4 +101,58 @@ void HullDescriber::describe(const Hull *hull, QFormLayout *left, QFormLayout *r
     }
 }
 
+QString ComponentDescriber::ironiumHandler(const Component *component) const {
+    Cost cost(component->GetCost(player));
+    return tr("%0kt").arg(cost[0]);
+}
+
+QString ComponentDescriber::boraniumHandler(const Component *component) const {
+    Cost cost(component->GetCost(player));
+    return tr("%0kt").arg(cost[1]);
+}
+
+QString ComponentDescriber::germaniumHandler(const Component *component) const {
+    Cost cost(component->GetCost(player));
+    return tr("%0kt").arg(cost[2]);
+}
+
+QString ComponentDescriber::resourcesHandler(const Component *component) const {
+    Cost cost(component->GetCost(player));
+    return QString::number(cost.GetResources());
+}
+
+QString ComponentDescriber::massHandler(const Component *component) const {
+    return component->GetMass() != 0 ? tr("%0kt").arg(component->GetMass()) : "";
+}
+
+const ComponentDescriber::ComponentProperty ComponentDescriber::interestingComponentProperties[] = {
+    { tr("Ironium"), &ComponentDescriber::ironiumHandler, true },
+    { tr("Boranium"), &ComponentDescriber::boraniumHandler, true },
+    { tr("Germanium"), &ComponentDescriber::germaniumHandler, true },
+    { tr("Resources"), &ComponentDescriber::resourcesHandler, true },
+    { tr("Mass"), &ComponentDescriber::massHandler, true },
+    { NULL, NULL },
+};
+
+void ComponentDescriber::describe(const Component *component, QFormLayout *left, QFormLayout *right) const
+{
+    const ComponentDescriber::ComponentProperty *property = interestingComponentProperties;
+
+    while(property->name != NULL) {
+        if((property->left && left) || (!property->left && right)) {
+            QString value((this->*property->handler)(component));
+
+            if(!value.isEmpty()) {
+                QLabel *label = new QLabel(property->name + ":");
+                label->setStyleSheet("QLabel { font-weight: bold; }");
+                QLabel *text = new QLabel(value);
+                text->setAlignment(Qt::AlignRight);
+                (property->left ? left : right)->addRow(label, text);
+            }
+        }
+
+        property++;
+    }
+}
+
 };
