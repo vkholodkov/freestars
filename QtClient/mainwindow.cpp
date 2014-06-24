@@ -81,20 +81,21 @@ void MainWindow::open()
 
 bool MainWindow::save()
 {
-    if (curFile.isEmpty()) {
-        return saveAs();
-    } else {
-        return saveFile(curFile);
+    if(TheGame != NULL) {
+#ifndef QT_NO_CURSOR
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
+        Player *player = TheGame->GetCurrentPlayer();
+        player->SaveXFile();
+
+#ifndef QT_NO_CURSOR
+        QApplication::restoreOverrideCursor();
+#endif
+
+        statusBar()->showMessage(tr("File saved"), 2000);
     }
-}
-
-bool MainWindow::saveAs()
-{
-    QString fileName = QFileDialog::getSaveFileName(this);
-    if (fileName.isEmpty())
-        return false;
-
-    return saveFile(fileName);
+    return true;
 }
 
 void MainWindow::openRecentFile()
@@ -169,11 +170,6 @@ void MainWindow::createActions()
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the document to disk"));
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
-
-    saveAsAct = new QAction(tr("Save &As..."), this);
-    saveAsAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsAct->setStatusTip(tr("Save the document under a new name"));
-    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
     for (int i = 0; i < MaxRecentFiles; ++i) {
         recentFileActs[i] = new QAction(this);
@@ -286,7 +282,6 @@ void MainWindow::createMenus()
     fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
-    fileMenu->addAction(saveAsAct);
     separatorAct = fileMenu->addSeparator();
     for (int i = 0; i < MaxRecentFiles; ++i)
         fileMenu->addAction(recentFileActs[i]);
@@ -417,31 +412,6 @@ void MainWindow::loadPlayerFile(const QString &fileName)
     openGameView();
 
     statusBar()->showMessage(tr("File loaded"), 2000);
-}
-
-bool MainWindow::saveFile(const QString &fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return false;
-    }
-
-    QTextStream out(&file);
-#ifndef QT_NO_CURSOR
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-    //out << textEdit->toPlainText();
-#ifndef QT_NO_CURSOR
-    QApplication::restoreOverrideCursor();
-#endif
-
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File saved"), 2000);
-    return true;
 }
 
 void MainWindow::setCurrentFile(const QString &fileName)

@@ -35,7 +35,6 @@ private slots:
     void newFile();
     void open();
     bool save();
-    bool saveAs();
     void openRecentFile();
     void about();
     void documentWasModified();
@@ -77,7 +76,6 @@ private:
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;
-    QAction *saveAsAct;
     QAction *exitAct;
 
     QAction *viewRaceAction;
