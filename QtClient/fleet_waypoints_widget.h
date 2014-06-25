@@ -40,6 +40,7 @@ private:
     QListWidget *waypointListBox;
     Fleet *fleet;
     const Player *player;
+    WayOrderList orderList;
 };
 
 };

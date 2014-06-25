@@ -50,6 +50,7 @@ public:
 
 	bool ParseNode(const TiXmlNode * node, Player * player, Galaxy*);
 	const deque<WayOrder *> & GetOrders() const	{ return orders; }
+	deque<WayOrder *> & GetOrders() { return orders; }
 	void SetFleet(long fleet)		{ nFleet = fleet; }
 	long GetPlayer() const			{ return nPlayer; }
 	long GetFleet() const			{ return nFleet; }

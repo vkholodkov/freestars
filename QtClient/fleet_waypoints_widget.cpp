@@ -16,7 +16,10 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
     : FoldingWidget(tr("Fleet Waypoints"))
     , fleet(_fleet)
     , player(_player)
+    , orderList()
 {
+    orderList.SetFleet(_fleet->GetID());
+
     QWidget *widget = new QWidget;
 
     Ui_FleetWaypointsWidget ui_FleetWaypointsWidget;
@@ -24,10 +27,11 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
 
     waypointListBox = ui_FleetWaypointsWidget.waypointListBox;
 
-    const std::deque<WayOrder *> &orders = _fleet->GetOrders();
+    const std::deque<WayOrder *> &orders = fleet->GetOrders();
 
     for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
         waypointListBox->addItem(getLocationName((*o)->GetLocation()));
+        orderList.GetOrders().push_back(*o);
     }
 
     waypointListBox->setCurrentRow(0);
@@ -64,9 +68,9 @@ void FleetWaypointsWidget::setRepeatOrders(int state)
 
 void FleetWaypointsWidget::wayorderAdded(const Location *location)
 {
-    std::deque<WayOrder *> &orders = fleet->GetOrders();
-
     int row = waypointListBox->currentRow();
+
+    std::deque<WayOrder *> &orders = orderList.GetOrders();
     
     if(row >= 0 && row < orders.size()) {
         std::auto_ptr<WayOrder> order(new WayOrder(const_cast<Location*>(location), false));
@@ -75,12 +79,14 @@ void FleetWaypointsWidget::wayorderAdded(const Location *location)
         order.release();
 
         waypointListBox->setCurrentRow(row + 1);
+
+        fleet->ChangeWaypoints(orderList);
     }
 }
 
 void FleetWaypointsWidget::wayorderSelected(int row)
 {
-    const std::deque<WayOrder *> &orders = fleet->GetOrders();
+    std::deque<WayOrder *> &orders = orderList.GetOrders();
 
     if(row >= 0 && row < orders.size()) {
         emit selectWaypoint(orders[row]->GetLocation());
@@ -90,11 +96,13 @@ void FleetWaypointsWidget::wayorderSelected(int row)
 void FleetWaypointsWidget::wayorderDeleted()
 {
     int row = waypointListBox->currentRow();
-    std::deque<WayOrder *> &orders = fleet->GetOrders();
+
+    std::deque<WayOrder *> &orders = orderList.GetOrders();
 
     if(row > 0 && row < orders.size()) {
         orders.erase(orders.begin() + row);
         delete waypointListBox->takeItem(row);
+        fleet->ChangeWaypoints(orderList);
     }
 }
 
