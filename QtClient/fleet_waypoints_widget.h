@@ -20,6 +20,7 @@ class FleetWaypointsWidget : public FoldingWidget {
 
 public:
     FleetWaypointsWidget(Fleet*, const Player*, QWidget *parent = 0);
+    ~FleetWaypointsWidget();
 
 signals:
     void selectWaypoint(const Location*);
@@ -35,12 +36,13 @@ protected:
 
 private:
     QString getLocationName(const Location*) const;
+    void changeWayorderList();
 
 private:
     QListWidget *waypointListBox;
     Fleet *fleet;
     const Player *player;
-    WayOrderList orderList;
+    std::deque<WayOrder *> orders;
 };
 
 };

@@ -96,7 +96,7 @@ TiXmlNode * ProductionOrder::WriteNode(TiXmlNode * node) const
 {
 	TiXmlNode * wo = TypedListOrder<ProdOrder>::WriteNode(node);
 	if (wo != NULL)
-		AddString(wo, "Planet", mQName);
+		AddString(wo, "Planet", mQName.c_str());
 
 	return wo;
 }

@@ -47,9 +47,17 @@ public:
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const = 0;
 	virtual bool DoUndo() = 0;
 
+	/*
+	 * Returns true if if new order replaces current one (e.g. a new order for the same fleet)
+	 */
+	virtual bool Replaces(const Order*) = 0;
+	bool IsReplaced() const { return mReplaced; }
+	void SetReplaced() { mReplaced = true; }
+
 protected:
-	Order() : mUndone(false) {}
+	Order() : mUndone(false), mReplaced(false) {}
 	bool mUndone;
+	bool mReplaced;
 };
 
 /**
@@ -91,6 +99,7 @@ public:
 		} else
 			return NULL;
 	}
+	virtual bool Replaces(const Order*) { return false; }
 
 protected:
 	Type * m_pValue;
@@ -150,6 +159,10 @@ public:
 		: TypedListOrder<WayOrder>(ords, "Waypoints"), mFleet(f) {}
 
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order *_new) {
+		const WaypointOrder *o = dynamic_cast<const WaypointOrder*>(_new);
+		return o != NULL && this->mFleet == o->mFleet;
+	}
 
 private:
 	long mFleet;
@@ -166,6 +179,7 @@ public:
 	virtual ~BattlePlanOrder();
 
 	virtual bool DoUndo();
+	virtual bool Replaces(const Order*) { return false;  }
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
 	BattlePlan * GetBattlePlan(BattlePlan * old)
@@ -189,6 +203,7 @@ public:
 
 	virtual bool DoUndo()	{ deque<long> t = mPrior; mPrior = *m_pValue; *m_pValue = t; return true; }
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order*) { return false;  }
 
 private:
 	deque<long> mPrior;
@@ -201,13 +216,17 @@ private:
  */
 class ProductionOrder : public TypedListOrder<ProdOrder> {
 public:
-	ProductionOrder(const char * name, deque<ProdOrder *> * ords)
+	ProductionOrder(const string &name, deque<ProdOrder *> * ords)
 		: TypedListOrder<ProdOrder>(ords, "ProductionQueue"), mQName(name) {}
 
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order *_new) {
+		const ProductionOrder *o = dynamic_cast<const ProductionOrder*>(_new);
+		return o != NULL && this->mQName == o->mQName;
+	}
 
 private:
-	const char * mQName;
+	string mQName;
 };
 
 /**
@@ -220,6 +239,7 @@ public:
 	virtual ~MultipleOrder();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 	virtual bool DoUndo();
+	virtual bool Replaces(const Order*) { return false;  }
 
 	void AddOrder(Order * o);
 
@@ -238,6 +258,11 @@ public:
 
 	virtual bool DoUndo();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order *_new) {
+		const TransportOrder *o = dynamic_cast<const TransportOrder*>(_new);
+		return o != NULL && this->mPlayer == o->mPlayer
+			&& this->mOwned == o->mOwned && this->mOther == o->mOther;
+	}
 
 private:
 	Player * mPlayer;

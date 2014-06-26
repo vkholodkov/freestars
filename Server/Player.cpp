@@ -1560,8 +1560,11 @@ bool Player::SaveXFile()
 	AddLong(&node, "GameID", TheGame->GetGameID());
 	AddLong(&node, "Turn", TheGame->GetTurn());
 	AddLong(&node, "PlayerNo", GetID());
-	for (int i = 0; i < mOrders.size(); ++i)
-		mOrders[i]->WriteNode(&node);
+	for (int i = 0; i < mOrders.size(); ++i) {
+		if(!mOrders[i]->IsReplaced()) {
+			mOrders[i]->WriteNode(&node);
+		}
+	}
 
 	doc.InsertEndChild(node);
 
@@ -1662,7 +1665,16 @@ void Player::AddOrder(Order * o)
 				break;
 		}
 
-		mOrders.push_back(o);
+		for (i = 0 ; i != mOrders.size(); i++) {
+			if(!o->IsReplaced() && o->Replaces(mOrders[i])) {
+				mOrders[i]->SetReplaced();
+			}
+		}
+
+		if(i == mOrders.size()) {
+			mOrders.push_back(o);
+		}
+
 		mUnsavedChanges++;
 	} else
 		mMO->AddOrder(o);

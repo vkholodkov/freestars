@@ -16,10 +16,8 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
     : FoldingWidget(tr("Fleet Waypoints"))
     , fleet(_fleet)
     , player(_player)
-    , orderList()
+    , orders()
 {
-    orderList.SetFleet(_fleet->GetID());
-
     QWidget *widget = new QWidget;
 
     Ui_FleetWaypointsWidget ui_FleetWaypointsWidget;
@@ -31,7 +29,7 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
 
     for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
         waypointListBox->addItem(getLocationName((*o)->GetLocation()));
-        orderList.GetOrders().push_back(*o);
+        this->orders.push_back(new WayOrder(**o));
     }
 
     waypointListBox->setCurrentRow(0);
@@ -45,6 +43,13 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
         this, SLOT(wayorderSelected(int)));
 
     this->addWidget(widget);
+}
+
+FleetWaypointsWidget::~FleetWaypointsWidget()
+{
+    for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
+        delete *o;
+    }
 }
 
 bool FleetWaypointsWidget::eventFilter(QObject *obj, QEvent *event)
@@ -70,24 +75,22 @@ void FleetWaypointsWidget::wayorderAdded(const Location *location)
 {
     int row = waypointListBox->currentRow();
 
-    std::deque<WayOrder *> &orders = orderList.GetOrders();
-    
     if(row >= 0 && row < orders.size()) {
+        waypointListBox->insertItem(row + 1, getLocationName(location));
+        waypointListBox->setCurrentRow(row + 1);
+
         std::auto_ptr<WayOrder> order(new WayOrder(const_cast<Location*>(location), false));
-        waypointListBox->insertItem(row + 1, getLocationName(order->GetLocation()));
         orders.insert(orders.begin() + row + 1, order.get());
         order.release();
 
-        waypointListBox->setCurrentRow(row + 1);
+        changeWayorderList();
 
-        fleet->ChangeWaypoints(orderList);
+        wayorderSelected(row + 1);
     }
 }
 
 void FleetWaypointsWidget::wayorderSelected(int row)
 {
-    std::deque<WayOrder *> &orders = orderList.GetOrders();
-
     if(row >= 0 && row < orders.size()) {
         emit selectWaypoint(orders[row]->GetLocation());
     }
@@ -97,13 +100,25 @@ void FleetWaypointsWidget::wayorderDeleted()
 {
     int row = waypointListBox->currentRow();
 
-    std::deque<WayOrder *> &orders = orderList.GetOrders();
-
     if(row > 0 && row < orders.size()) {
+        delete orders[row];
         orders.erase(orders.begin() + row);
         delete waypointListBox->takeItem(row);
-        fleet->ChangeWaypoints(orderList);
+
+        changeWayorderList();
     }
+}
+
+void FleetWaypointsWidget::changeWayorderList()
+{
+    WayOrderList orderList;
+    orderList.SetFleet(fleet->GetID());
+
+    for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
+        orderList.GetOrders().push_back(new WayOrder(**o));
+    }
+
+    fleet->ChangeWaypoints(orderList);
 }
 
 QString FleetWaypointsWidget::getLocationName(const Location *loc) const
