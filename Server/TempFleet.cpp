@@ -33,8 +33,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-TempFleet::TempFleet(Galaxy *galaxy, int fleetID, Player * owner)
-    : CargoHolder(galaxy)
+TempFleet::TempFleet(Game *game, int fleetID, Player * owner)
+    : CargoHolder(game)
 {
 	mID = fleetID;
 	mOwner = owner;

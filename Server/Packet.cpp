@@ -41,7 +41,7 @@ Packet::Packet(const CargoHolder &source, long speed, long driverSpeed, Planet *
 	mDestination(destination),
 	mFirstYear(true)
 {
-	mID = mGalaxy->GetPacketID();
+	mID = mGame->GetGalaxy()->GetPacketID();
 }
 
 Packet::~Packet()
@@ -61,14 +61,14 @@ bool Packet::ParseNode(const TiXmlNode * node)
 		return false;
 	}
 
-	mDestination = mGalaxy->GetPlanet(GetString(node->FirstChild("Destination")));
+	mDestination = mGame->GetGalaxy()->GetPlanet(GetString(node->FirstChild("Destination")));
 	if (mDestination == NULL) {
 		Message * mess = NCGetOwner()->AddMessage("Error: Invalid packet destination");
 		mess->AddItem("Destination", GetString(node->FirstChild("Destination")));
 		return false;
 	}
 
-	TheGame->AddAlsoHere(this);
+	mGame->AddAlsoHere(this);
 	return true;
 }
 
@@ -233,9 +233,9 @@ bool Packet::Move(bool FirstYear)
 
 	if (mFirstYear) {
 		mFirstYear = false;
-		TheGame->AddAlsoHere(this);
+		mGame->AddAlsoHere(this);
 	} else
-		TheGame->MoveAlsoHere(this);
+		mGame->MoveAlsoHere(this);
 
 	return false;
 }

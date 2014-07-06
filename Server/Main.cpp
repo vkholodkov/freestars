@@ -23,6 +23,8 @@ Contact:
 Email Elliott at 9jm0tjj02@sneakemail.com
 */
 
+#include <memory>
+
 #include "FSServer.h"
 
 #include "Battle.h"
@@ -56,50 +58,50 @@ int main (int argc, char * argv[])
 	string HostFile = argv[1];
 	string FileType = HostFile.substr(HostFile.find_last_of('.'));
 
-	TheGame = new Game();
+	std::auto_ptr<Game> game(new Game());
 
 	if (stricmp(FileType.c_str(), ".def") == 0) {
 		cout << "Loading Defination File" << endl;
-		if (!TheGame->LoadDefFile(argv[1]))
+		if (!game->LoadDefFile(argv[1]))
 			error = true;
 
-		TheGame->InitialSeen();
+		game->InitialSeen();
 
 		if (!error) {
 			cout << "Writing XY File" << endl;
-			TheGame->WriteXYFile();
+			game->WriteXYFile();
 		}
 	} else if (stricmp(FileType.c_str(), ".hst") == 0) {
 		cout << "Loading Host File" << endl;
-		if (!TheGame->LoadHostFile(argv[1]))
+		if (!game->LoadHostFile(argv[1]))
 			error = true;
 
 		cout << "Loading Turns" << endl;
-		if (!error && !TheGame->LoadTurns())
+		if (!error && !game->LoadTurns())
 			error = true;
 		
 		cout << "Processing Turns" << endl;
-		if (!error && !TheGame->ProcessTurn())
+		if (!error && !game->ProcessTurn())
 			error = true;
 	} else if (FileType[1] == 'm') {
 		cout << "Loading player file and orders (.x file)" << endl;
-		if (!TheGame->LoadPlayerFile(argv[1]))
+		if (!game->LoadPlayerFile(argv[1]))
 			error = true;
 
 		cout << "Writing player orders (.x file)" << endl;
-		if (!error && !TheGame->GetCurrentPlayer()->SaveXFile())
+		if (!error && !game->GetCurrentPlayer()->SaveXFile())
 			error = true;
 
 		if (!error)
-			TheGame->GetCurrentPlayer()->TestUndoRedo();
+			game->GetCurrentPlayer()->TestUndoRedo();
 
 		error = true;	// always set to true to prevent host file being written when .m file is read
 	} else if (FileType[1] == 'r') {
 		cout << "Loading race file" << endl;
-		TheGame->LoadRules(argv[1], "RaceDefinition");
+		game->LoadRules(argv[1], "RaceDefinition");
 		Player * p = NULL;
-//		TheGame->SetFileLocation(argv[1]);
-		p = TheGame->ObjectFactory(p, 1);
+//		game->SetFileLocation(argv[1]);
+		p = game->ObjectFactory(p, 1);
 		error = p->CreateFromFile(argv[1]) == -1;
 		if (!error) {
 			cout << "Race " << p->GetSingleName() << " has ";
@@ -116,26 +118,26 @@ int main (int argc, char * argv[])
 
 	if (!error) {
 		cout << "Writing Host File" << endl;
-		error = !TheGame->WriteHostFile();
+		error = !game->WriteHostFile();
 	}
 
 	if (!error) {
 		cout << "Writing Players Files" << endl;
-		error = !TheGame->WritePlayerFiles();
+		error = !game->WritePlayerFiles();
 		error = true;
 	}
 	
 	// For debugging
-	for (unsigned int i = 0; i < TheGame->GetMessages().size(); ++i)
+	for (unsigned int i = 0; i < game->GetMessages().size(); ++i)
 	{
-		string message = TheGame->GetMessages()[i]->ToString();
+		string message = game->GetMessages()[i]->ToString();
 		/*if(message.find("Error") != -1 || message.find("Warn") != -1)*/
 			cout << message << endl;
 	}
 
-	for (unsigned int j = 1; j <= TheGame->NumberPlayers(); ++j)
+	for (unsigned int j = 1; j <= game->NumberPlayers(); ++j)
 	{
-		const Player* p = TheGame->GetPlayer(j);
+		const Player* p = game->GetPlayer(j);
 		if (p != NULL) {
 			for (unsigned int i = 0; i < p->GetMessages().size(); ++i)
 			{
@@ -153,7 +155,6 @@ int main (int argc, char * argv[])
 	Component::Cleanup();
 	Battle::Cleanup();
 	Ship::Cleanup();
-	delete TheGame;
 	}
 
 	if(error)

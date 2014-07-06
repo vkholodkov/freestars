@@ -161,8 +161,10 @@ void Cost::SetCost(CargoType ct, long c)
 }
 */
 
-void Cost::ReadCosts(const TiXmlNode * node)
+void Cost::ReadCosts(const TiXmlNode * node, MessageSink &messageSink)
 {
+    ArrayParser arrayParser(messageSink);
+
 	if (node == NULL) {
 		mResources = 0;
 		mCrew = 0;
@@ -172,7 +174,7 @@ void Cost::ReadCosts(const TiXmlNode * node)
 	} else {
 		mResources = GetLong(node->FirstChild("Resources"));
 		mCrew = GetLong(node->FirstChild("Crew"));
-		Rules::ParseArray(node, mMinerals, MINERALS);
+		Rules::ParseArray(node, mMinerals, MINERALS, messageSink);
 	}
 }
 

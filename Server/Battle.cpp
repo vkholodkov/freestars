@@ -36,14 +36,15 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 namespace FreeStars {
 long** Battle::StartX = NULL;
 long** Battle::StartY = NULL;
+long Battle::NumberOfPlayers;
 deque<TiXmlElement *> Battle::sReports;
 
 
-Battle::Battle(const Location & loc)
-:	Location(loc), mBaseFight(false)
+Battle::Battle(Game *_game, const Location & loc)
+:	game(_game), Location(loc), mBaseFight(false)
 {
 	if (StartX == NULL) {
-		SetStartPos();
+		SetStartPos(game);
 	}
 }
 
@@ -54,9 +55,9 @@ Battle::~Battle()
 void Battle::Cleanup()
 {
 	if (StartX != NULL) {
-		for (unsigned int i = 0; i < TheGame->NumberPlayers() - 1; ++i) {
-			delete StartX[i];
-			delete StartY[i];
+		for (unsigned int i = 0; i < NumberOfPlayers - 1; ++i) {
+			delete [] StartX[i];
+			delete [] StartY[i];
 		}
 
 		delete [] StartX;
@@ -68,14 +69,16 @@ void Battle::Cleanup()
 	for (int j = 0; j < sReports.size(); ++j)
 		delete sReports[j];
 
-	sReports.empty();
+	sReports.clear();
 }
 
-void Battle::SetStartPos()
+void Battle::SetStartPos(const Game *game)
 {
-	StartX = new long*[TheGame->NumberPlayers() - 1];
-	StartY = new long*[TheGame->NumberPlayers() - 1];
-	for (unsigned int i = 0; i < TheGame->NumberPlayers() - 1; ++i) {
+    NumberOfPlayers = game->NumberPlayers();
+
+	StartX = new long*[game->NumberPlayers() - 1];
+	StartY = new long*[game->NumberPlayers() - 1];
+	for (unsigned int i = 0; i < game->NumberPlayers() - 1; ++i) {
 		StartX[i] = new long[i+2];
 		StartY[i] = new long[i+2];
 		for (unsigned int j = 0; j < i+2; ++j) {
@@ -97,8 +100,8 @@ void Battle::AddFleet(Fleet * fleet)
 void Battle::AddFleets()
 {
 	Player * player;
-	for (int i = 1; i <= TheGame->NumberPlayers(); ++i) {
-		player = TheGame->NCGetPlayer(i);
+	for (int i = 1; i <= game->NumberPlayers(); ++i) {
+		player = game->NCGetPlayer(i);
 		player->AddBattleFleets(this);
 	}
 }
@@ -109,8 +112,8 @@ void Battle::Resolve()
 	// First, see who is fighting
 	deque<Fleet *>::iterator if1, if2;
 	unsigned long i, j;
-	for (i = 1; i <= TheGame->NumberPlayers(); ++i)
-		TheGame->NCGetPlayer(i)->ClearBattleEnemies();
+	for (i = 1; i <= game->NumberPlayers(); ++i)
+		game->NCGetPlayer(i)->ClearBattleEnemies();
 
 	for (if1 = mThere.begin(); if1 != mThere.end(); ++if1) {
 		if ((*if1)->CanShoot() && (*if1)->GetBattlePlan()->GetEnemy() != BPE_NONE) {
@@ -147,8 +150,8 @@ void Battle::Resolve()
 	sReports.push_back(bReport);
 
 	long Races = 0;	// number of races in this battle
-	for (i = 1; i <= TheGame->NumberPlayers(); ++i) {
-		if (TheGame->GetPlayer(i)->InThisBattle())
+	for (i = 1; i <= game->NumberPlayers(); ++i) {
+		if (game->GetPlayer(i)->InThisBattle())
 			Races++;
 	}
 
@@ -218,8 +221,8 @@ void Battle::Resolve()
 	bReport->InsertEndChild(Stacks);
 
 	// everyone in the battle gets to see all designs
-	for (i = 1; i <= TheGame->NumberPlayers(); ++i) {
-		p1 = TheGame->NCGetPlayer(i);
+	for (i = 1; i <= game->NumberPlayers(); ++i) {
+		p1 = game->NCGetPlayer(i);
 		if (p1->InThisBattle()) {
 			for (j = 0; j < mFighting.size(); ++j) {
 				Player * o = mFighting[j]->GetFleetIn()->NCGetOwner();
@@ -250,8 +253,8 @@ void Battle::Resolve()
 
 
 	// finally, send a message to all players at the location
-	for (i = 1; i <= TheGame->NumberPlayers(); ++i) {
-		p1 = TheGame->NCGetPlayer(i);
+	for (i = 1; i <= game->NumberPlayers(); ++i) {
+		p1 = game->NCGetPlayer(i);
 		if (p1->InThisBattle()) {
 			Message * mess = p1->AddMessage("Battle");
 			if (mBPlanet != NULL)

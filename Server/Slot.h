@@ -48,7 +48,7 @@ class Slot {
 public:
 	Slot(const Component * comp, long amount, long Pos, const Slot & hull) : Allowed(0), component(comp), count(amount), mPosition(Pos), mSlotLeft(hull.mSlotLeft), mSlotTop(hull.mSlotTop) {}
 //	Slot(long allowed, long maximum, long Pos) : Allowed(allowed), component(NULL), count(maximum), mPosition(Pos) {}
-	Slot(const TiXmlNode * node, long Pos);
+	Slot(const TiXmlNode * node, long Pos, MessageSink&);
 	Slot(const Slot & other) : Allowed(other.Allowed), component(other.component), count(other.count), mPosition(other.mPosition), mSlotLeft(other.mSlotLeft), mSlotTop(other.mSlotTop) {}
 
 	const Component * GetComp() const	{ return component; }

@@ -176,7 +176,7 @@ public:
 	long GetStartFactories() const			{ return mLeftoverBuys == LOPB_FACTORIES ? mLeftoverPoints : 0; }
 	long GetStartDefenses() const			{ return mLeftoverBuys == LOPB_DEFENSES ? mLeftoverPoints : 0; }
 
-	long GetAdvantagePoints() const;
+	long GetAdvantagePoints(MessageSink &messageSink = NullMessageSink::Instance()) const;
 	long GetHabPoints() const;
 	void SetLeftoverPoints(long lop)		{ mLeftoverPoints = lop; }
 

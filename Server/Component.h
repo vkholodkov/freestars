@@ -156,9 +156,9 @@ public:
 	bool CanSmartBomb() const {return BombType == BT_SMART;}
 	bool CanTerraBomb() const {return BombType == BT_TERRA;}
 
-	static bool LoadComponents(const TiXmlNode * comps, deque<Component *> &CompList);
-	static HullType ParseHullType(const char * ptr);
-	static ComponentType ParseCompType(const char * ptr);
+	static bool LoadComponents(const TiXmlNode * comps, deque<Component *> &CompList, MessageSink&);
+	static HullType ParseHullType(const char * ptr, MessageSink&);
+	static ComponentType ParseCompType(const char * ptr, MessageSink&);
 	static long GetScore(const Component * check, long ValueType);
 	static const Cost * DefenseCost()	{ return mDefenseCost; }
 	static const Cost * ScannerCost()	{ return mScannerCost; }

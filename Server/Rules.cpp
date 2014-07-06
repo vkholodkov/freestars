@@ -69,6 +69,168 @@ deque<long> Rules::mHWSetupSM;
 deque<MineFieldType *> Rules::mMineFieldTypes;
 deque<long> Rules::mTurnOrder;
 
+bool ArrayParser::ParseArrayBool(const TiXmlNode * node, const char * name, const char * Attrib, deque<bool> & arr, const deque<string> * desc /*= NULL*/)
+{
+	if (!node)
+		return false;
+
+	bool IsOK = true;
+	const TiXmlNode * child;
+	for (child = node->FirstChild(name); child; child = child->NextSibling(name)) {
+		const TiXmlElement * el = child->ToElement();
+		if (el == NULL) {
+			Message * mess = messageSink.AddMessage("Error: Invalid element in ParseArrayBool");
+			mess->AddItem("", name);
+			IsOK = false;
+			continue;
+		}
+
+		unsigned int index;
+		if (desc == NULL) {
+			el->Attribute(Attrib, (int*)(&index));
+		} else {
+			const char * type;
+			type = el->Attribute(Attrib);
+			if (type == NULL) {
+				Message * mess = messageSink.AddMessage("Error: Invalid attribute in ParseArrayBool");
+				mess->AddItem(name, Attrib);
+				IsOK = false;
+				continue;
+			}
+
+			deque<string>::const_iterator in;
+			in = find(desc->begin(), desc->end(), type);
+			if (in == desc->end()) {
+				Message * mess = messageSink.AddMessage("Error: Invalid attribute in ParseArrayBool");
+				mess->AddItem(name, Attrib);
+				IsOK = false;
+				continue;
+			}
+
+			index = in - desc->begin() + 1;
+		}
+
+		if (index < 1 || index > arr.size()) {
+			Message * mess = messageSink.AddMessage("Error: Invalid index in ParseArrayBool");
+			mess->AddLong(name, index);
+			IsOK = false;
+			continue;
+		}
+
+		arr[index-1] = GetBool(child);
+	}
+
+	return IsOK;
+}
+
+bool ArrayParser::ParseArray(const TiXmlNode * node, const char * name, const char * Attrib, deque<long> & arr, const deque<string> * desc /*= NULL*/)
+{
+	if (!node)
+		return false;
+
+	bool IsOK = true;
+	const TiXmlNode * child;
+	for (child = node->FirstChild(name); child; child = child->NextSibling(name)) {
+		const TiXmlElement * el = child->ToElement();
+		if (el == NULL) {
+			Message * mess = messageSink.AddMessage("Error: Invalid element in ParseArray");
+			mess->AddItem("", name);
+			IsOK = false;
+			continue;
+		}
+
+		unsigned int index;
+		if (desc == NULL) {
+			el->Attribute(Attrib, (int*)(&index));
+		} else {
+			const char * type;
+			type = el->Attribute(Attrib);
+			if (type == NULL) {
+				Message * mess = messageSink.AddMessage("Error: Invalid attribute in ParseArray");
+				mess->AddItem(name, Attrib);
+				IsOK = false;
+				continue;
+			}
+
+			deque<string>::const_iterator in;
+			in = find(desc->begin(), desc->end(), type);
+			if (in == desc->end()) {
+				Message * mess = messageSink.AddMessage("Error: Invalid attribute in ParseArray");
+				mess->AddItem(name, Attrib);
+				IsOK = false;
+				continue;
+			}
+
+			index = in - desc->begin() + 1;
+		}
+
+		if (index < 1 || index > arr.size()) {
+			Message * mess = messageSink.AddMessage("Error: Invalid index in ParseArray");
+			mess->AddLong(name, index);
+			IsOK = false;
+			continue;
+		}
+
+		arr[index-1] = GetLong(child);
+	}
+
+	return IsOK;
+}
+
+bool ArrayParser::ParseArrayFloat(const TiXmlNode * node, const char * name, const char * Attrib, deque<double> & arr, const deque<string> * desc /*= NULL*/)
+{
+	if (!node)
+		return false;
+
+	bool IsOK = true;
+	const TiXmlNode * child;
+	for (child = node->FirstChild(name); child; child = child->NextSibling(name)) {
+		const TiXmlElement * el = child->ToElement();
+		if (el == NULL) {
+			Message * mess = messageSink.AddMessage("Error: Invalid element in ParseArray");
+			mess->AddItem("", name);
+			IsOK = false;
+			continue;
+		}
+
+		unsigned int index;
+		if (desc == NULL) {
+			el->Attribute(Attrib, (int*)(&index));
+		} else {
+			const char * type;
+			type = el->Attribute(Attrib);
+			if (type == NULL) {
+				Message * mess = messageSink.AddMessage("Error: Invalid attribute in ParseArray");
+				mess->AddItem(name, Attrib);
+				IsOK = false;
+				continue;
+			}
+
+			deque<string>::const_iterator in;
+			in = find(desc->begin(), desc->end(), type);
+			if (in == desc->end()) {
+				Message * mess = messageSink.AddMessage("Error: Invalid attribute in ParseArray");
+				mess->AddItem(name, Attrib);
+				IsOK = false;
+				continue;
+			}
+
+			index = in - desc->begin() + 1;
+		}
+
+		if (index < 1 || index > arr.size()) {
+			Message * mess = messageSink.AddMessage("Error: Invalid index in ParseArray");
+			mess->AddLong(name, index);
+			IsOK = false;
+			continue;
+		}
+
+		arr[index-1] = GetDouble(child);
+	}
+
+	return IsOK;
+}
+
 void Rules::Init()
 {
 	MaxTechType = 0;
@@ -282,7 +444,7 @@ void Rules::WriteRulesFile(TiXmlNode * node)
 	node->InsertEndChild(rulefile);
 }
 
-bool Rules::LoadRules(const TiXmlNode * node, const char * file, const char * verify, double version)
+bool Rules::LoadRules(const TiXmlNode * node, const char * file, const char * verify, double version, MessageSink &messageSink)
 {
 	if (!node)
 		return false;
@@ -300,6 +462,8 @@ bool Rules::LoadRules(const TiXmlNode * node, const char * file, const char * ve
 //	string ptr;
 	long val;
 	double dval;
+    ArrayParser arrayParser(messageSink);
+
 	for (child1 = node->FirstChild(); child1; child1 = child1->NextSibling()) {
 		if (child1->Type() == TiXmlNode::COMMENT)
 			continue;
@@ -374,7 +538,7 @@ bool Rules::LoadRules(const TiXmlNode * node, const char * file, const char * ve
 			HabName.push_back(GetString(child1->FirstChild("Name")));
 			deque<long> * hoa;
 			hoa = Rules::GetHabOddArray(MaxHabType, true);
-			ParseArray(child1->FirstChild("Array"), "TickOdds", "TickNumber", *hoa);
+			arrayParser.ParseArray(child1->FirstChild("Array"), "TickOdds", "TickNumber", *hoa);
 			long sum = 0;
 			for (long i = 0; i < hoa->size(); ++i) {
 				sum += (*hoa)[i];
@@ -395,7 +559,7 @@ bool Rules::LoadRules(const TiXmlNode * node, const char * file, const char * ve
 				delete mft;
 		} else if (stricmp(child1->Value(), "PacketTerraformMinerals") == 0) {
 			deque<long> array;
-			if (ParsePacketMapping(child1, array)) {
+			if (ParsePacketMapping(child1, array, messageSink)) {
 				Array<long> * arr = new Array<long>(0);
 				for (int index = 0; index < MaxMinType; ++index)
 					arr->AddItem(array[index]);
@@ -509,7 +673,7 @@ void Rules::ReadTurnOrder(const TiXmlNode * node)
 	// mTurnOrder
 }
 
-bool Rules::ParsePacketMapping(const TiXmlNode * node, deque<long> & array)
+bool Rules::ParsePacketMapping(const TiXmlNode * node, deque<long> & array, MessageSink &messageSink)
 {
 	assert(MaxMinType > 0 && MaxHabType > 0);
 	const TiXmlNode * child2;
@@ -519,19 +683,19 @@ bool Rules::ParsePacketMapping(const TiXmlNode * node, deque<long> & array)
 	for (child2 = node->FirstChild("Mineral"); child2; child2 = child2->NextSibling("Mineral")) {
 		txe = child2->ToElement();
 		if (txe == NULL) {
-			TheGame->AddMessage("Missing mineral name in PacketTerraformMinerals");
+			messageSink.AddMessage("Missing mineral name in PacketTerraformMinerals");
 			continue;
 		}
 
 		index = MineralID(txe->Attribute("Name"));
 		if (index < 0) {
-			TheGame->AddMessage("Bad or missing mineral name in PacketTerraformMinerals");
+			messageSink.AddMessage("Bad or missing mineral name in PacketTerraformMinerals");
 			continue;
 		}
 
 		array[index] = HabID(GetString(child2));
 		if (array[index] < 0) {
-			Message * mess = TheGame->AddMessage("Bad or missing hab name in PacketTerraformMinerals");
+			Message * mess = messageSink.AddMessage("Bad or missing hab name in PacketTerraformMinerals");
 			mess->AddItem("For mineral", GetCargoName(index));
 			continue;
 		}
@@ -549,7 +713,7 @@ bool Rules::ParsePacketMapping(const TiXmlNode * node, deque<long> & array)
 	for (index = 0; index < MaxHabType; ++index) {
 		if (!map[index]) {
 			OK = false;
-			Message * mess = TheGame->AddMessage("Missing hab type in PacketTerraformMinerals");
+			Message * mess = messageSink.AddMessage("Missing hab type in PacketTerraformMinerals");
 			mess->AddItem("Missing hab", GetHabName(index));
 		}
 	}
@@ -683,7 +847,7 @@ const MineFieldType * Rules::GetMineFieldType(int type)
 	return mMineFieldTypes[type];
 }
 
-void Rules::ReadCargo(const TiXmlNode * node, deque<long> & q, long * pop)
+void Rules::ReadCargo(const TiXmlNode * node, deque<long> & q, long * pop, MessageSink &messageSink)
 {
 	deque<long>::iterator li;
 	if (node == NULL) {
@@ -692,7 +856,7 @@ void Rules::ReadCargo(const TiXmlNode * node, deque<long> & q, long * pop)
 			*li = 0;
 	} else {
 		if (pop)	*pop = GetLong(node->FirstChild("Population"));
-		ParseArray(node, q, MINERALS);
+		ParseArray(node, q, MINERALS, messageSink);
 	}
 }
 
@@ -725,8 +889,7 @@ long Rules::GetCargoType(const char * name)
 	else {
 		long result = MineralID(name);
 		if (result < 0) {
-			Message * mess = TheGame->AddMessage("Error: Bad cargo type");
-			mess->AddItem("", name);
+            return UNKNOWN_CARGO;
 		}
 
 		return result;
@@ -773,6 +936,34 @@ TiXmlElement * Rules::WriteArrayFloat(const char * node, const deque<double> & q
 		assert(false);
 		return NULL;
 	}
+}
+
+bool Rules::ParseArray(const TiXmlNode * node, deque<long> & q, long Type, MessageSink &messageSink)
+{
+    ArrayParser arrayParser(messageSink);
+
+	if (Type == MINERALS)
+		return arrayParser.ParseArray(node, "Mineral", "Name", q, &Rules::MineralName);
+	else if (Type == TECHS)
+		return arrayParser.ParseArray(node, "Tech", "Name", q, &TechName);
+	else if (Type == HABS)
+		return arrayParser.ParseArray(node, "Hab", "Name", q, &HabName);
+	else
+		return false;
+}
+
+bool Rules::ParseArrayFloat(const TiXmlNode * node, deque<double> & q, long Type, MessageSink &messageSink)
+{
+    ArrayParser arrayParser(messageSink);
+
+	if (Type == MINERALS)
+		return arrayParser.ParseArrayFloat(node, "Mineral", "Name", q, &MineralName);
+	else if (Type == TECHS)
+		return arrayParser.ParseArrayFloat(node, "Tech", "Name", q, &TechName);
+	else if (Type == HABS)
+		return arrayParser.ParseArrayFloat(node, "Hab", "Name", q, &HabName);
+	else
+		return false;
 }
 
 TiXmlElement * Rules::WriteArrayBool(const char * node, const char * name, const char * Attrib, const deque<bool> & arr, const deque<string> * desc /*= NULL*/)
@@ -829,192 +1020,6 @@ TiXmlElement * Rules::WriteArrayFloat(const char * node, const char * name, cons
 	return result;
 }
 
-bool Rules::ParseArray(const TiXmlNode * node, deque<long> & q, long Type)
-{
-	if (Type == MINERALS)
-		return ParseArray(node, "Mineral", "Name", q, &MineralName);
-	else if (Type == TECHS)
-		return ParseArray(node, "Tech", "Name", q, &TechName);
-	else if (Type == HABS)
-		return ParseArray(node, "Hab", "Name", q, &HabName);
-	else
-		return false;
-}
-
-bool Rules::ParseArrayFloat(const TiXmlNode * node, deque<double> & q, long Type)
-{
-	if (Type == MINERALS)
-		return ParseArrayFloat(node, "Mineral", "Name", q, &MineralName);
-	else if (Type == TECHS)
-		return ParseArrayFloat(node, "Tech", "Name", q, &TechName);
-	else if (Type == HABS)
-		return ParseArrayFloat(node, "Hab", "Name", q, &HabName);
-	else
-		return false;
-}
-
-bool Rules::ParseArrayBool(const TiXmlNode * node, const char * name, const char * Attrib, deque<bool> & arr, const deque<string> * desc /*= NULL*/)
-{
-	if (!node)
-		return false;
-
-	bool IsOK = true;
-	const TiXmlNode * child;
-	for (child = node->FirstChild(name); child; child = child->NextSibling(name)) {
-		const TiXmlElement * el = child->ToElement();
-		if (el == NULL) {
-			Message * mess = TheGame->AddMessage("Error: Invalid element in ParseArrayBool");
-			mess->AddItem("", name);
-			IsOK = false;
-			continue;
-		}
-
-		unsigned int index;
-		if (desc == NULL) {
-			el->Attribute(Attrib, (int*)(&index));
-		} else {
-			const char * type;
-			type = el->Attribute(Attrib);
-			if (type == NULL) {
-				Message * mess = TheGame->AddMessage("Error: Invalid attribute in ParseArrayBool");
-				mess->AddItem(name, Attrib);
-				IsOK = false;
-				continue;
-			}
-
-			deque<string>::const_iterator in;
-			in = find(desc->begin(), desc->end(), type);
-			if (in == desc->end()) {
-				Message * mess = TheGame->AddMessage("Error: Invalid attribute in ParseArrayBool");
-				mess->AddItem(name, Attrib);
-				IsOK = false;
-				continue;
-			}
-
-			index = in - desc->begin() + 1;
-		}
-
-		if (index < 1 || index > arr.size()) {
-			Message * mess = TheGame->AddMessage("Error: Invalid index in ParseArrayBool");
-			mess->AddLong(name, index);
-			IsOK = false;
-			continue;
-		}
-
-		arr[index-1] = GetBool(child);
-	}
-
-	return IsOK;
-}
-
-bool Rules::ParseArray(const TiXmlNode * node, const char * name, const char * Attrib, deque<long> & arr, const deque<string> * desc /*= NULL*/)
-{
-	if (!node)
-		return false;
-
-	bool IsOK = true;
-	const TiXmlNode * child;
-	for (child = node->FirstChild(name); child; child = child->NextSibling(name)) {
-		const TiXmlElement * el = child->ToElement();
-		if (el == NULL) {
-			Message * mess = TheGame->AddMessage("Error: Invalid element in ParseArray");
-			mess->AddItem("", name);
-			IsOK = false;
-			continue;
-		}
-
-		unsigned int index;
-		if (desc == NULL) {
-			el->Attribute(Attrib, (int*)(&index));
-		} else {
-			const char * type;
-			type = el->Attribute(Attrib);
-			if (type == NULL) {
-				Message * mess = TheGame->AddMessage("Error: Invalid attribute in ParseArray");
-				mess->AddItem(name, Attrib);
-				IsOK = false;
-				continue;
-			}
-
-			deque<string>::const_iterator in;
-			in = find(desc->begin(), desc->end(), type);
-			if (in == desc->end()) {
-				Message * mess = TheGame->AddMessage("Error: Invalid attribute in ParseArray");
-				mess->AddItem(name, Attrib);
-				IsOK = false;
-				continue;
-			}
-
-			index = in - desc->begin() + 1;
-		}
-
-		if (index < 1 || index > arr.size()) {
-			Message * mess = TheGame->AddMessage("Error: Invalid index in ParseArray");
-			mess->AddLong(name, index);
-			IsOK = false;
-			continue;
-		}
-
-		arr[index-1] = GetLong(child);
-	}
-
-	return IsOK;
-}
-
-bool Rules::ParseArrayFloat(const TiXmlNode * node, const char * name, const char * Attrib, deque<double> & arr, const deque<string> * desc /*= NULL*/)
-{
-	if (!node)
-		return false;
-
-	bool IsOK = true;
-	const TiXmlNode * child;
-	for (child = node->FirstChild(name); child; child = child->NextSibling(name)) {
-		const TiXmlElement * el = child->ToElement();
-		if (el == NULL) {
-			Message * mess = TheGame->AddMessage("Error: Invalid element in ParseArray");
-			mess->AddItem("", name);
-			IsOK = false;
-			continue;
-		}
-
-		unsigned int index;
-		if (desc == NULL) {
-			el->Attribute(Attrib, (int*)(&index));
-		} else {
-			const char * type;
-			type = el->Attribute(Attrib);
-			if (type == NULL) {
-				Message * mess = TheGame->AddMessage("Error: Invalid attribute in ParseArray");
-				mess->AddItem(name, Attrib);
-				IsOK = false;
-				continue;
-			}
-
-			deque<string>::const_iterator in;
-			in = find(desc->begin(), desc->end(), type);
-			if (in == desc->end()) {
-				Message * mess = TheGame->AddMessage("Error: Invalid attribute in ParseArray");
-				mess->AddItem(name, Attrib);
-				IsOK = false;
-				continue;
-			}
-
-			index = in - desc->begin() + 1;
-		}
-
-		if (index < 1 || index > arr.size()) {
-			Message * mess = TheGame->AddMessage("Error: Invalid index in ParseArray");
-			mess->AddLong(name, index);
-			IsOK = false;
-			continue;
-		}
-
-		arr[index-1] = GetDouble(child);
-	}
-
-	return IsOK;
-}
-
 long Rules::RandomHab(HabType ht)
 {
 	deque<long> * hoa = GetHabOddArray(ht, false);
@@ -1063,7 +1068,7 @@ long Rules::GetSecondHab(HabType ht, const Player * owner)
 	return Result;
 }
 
-bool Rules::ParseMinSettings(const TiXmlNode * node)
+bool Rules::ParseMinSettings(const TiXmlNode * node, MessageSink &messageSink)
 {
 	const TiXmlNode * child;
 	mMinMC.insert(mMinMC.begin(), Rules::MaxMinType, 1);
@@ -1074,31 +1079,31 @@ bool Rules::ParseMinSettings(const TiXmlNode * node)
 
 	child = node->FirstChild("AllWorlds");
 	if (!child) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = messageSink.AddMessage("Error: Missing section");
 		mess->AddItem("Section", "Mineral settings - AllWorlds");
 		return false;
 	}
 
-	if (!ParseArray(child->FirstChild("Minimum"), mMinMC, MINERALS))
+	if (!ParseArray(child->FirstChild("Minimum"), mMinMC, MINERALS, messageSink))
 		return false;
 
-	if (!ParseArray(child->FirstChild("Maximum"), mMaxMC, MINERALS))
+	if (!ParseArray(child->FirstChild("Maximum"), mMaxMC, MINERALS, messageSink))
 		return false;
 
 	child = node->FirstChild("HomeWorlds");
 	if (!child) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = messageSink.AddMessage("Error: Missing section");
 		mess->AddItem("Section", "Mineral settings - HomeWorlds");
 		return false;
 	}
 
-	if (!ParseArray(child->FirstChild("Minimum"), mHWMinMC, MINERALS))
+	if (!ParseArray(child->FirstChild("Minimum"), mHWMinMC, MINERALS, messageSink))
 		return false;
 
-	if (!ParseArray(child->FirstChild("Maximum"), mHWMaxMC, MINERALS))
+	if (!ParseArray(child->FirstChild("Maximum"), mHWMaxMC, MINERALS, messageSink))
 		return false;
 
-	if (!ParseArray(child->FirstChild("HWFloor"), mHWFloorMC, MINERALS))
+	if (!ParseArray(child->FirstChild("HWFloor"), mHWFloorMC, MINERALS, messageSink))
 		return false;
 
 	return true;
@@ -1192,11 +1197,11 @@ long Rules::GetHWMC(long mintype)
 	return mHWSetupMC[mintype];
 }
 
-long Rules::GetHWStartMinerals(long mintype)
+long Rules::GetHWStartMinerals(long mintype, const Creation *creation)
 {
 	long lMax;
 	long lMin = 165;
-	if (TheGame->GetCreation() && mHWSetupSM.size() == 0) {
+	if (creation != NULL && mHWSetupSM.size() == 0) {
 		mHWSetupSM.insert(mHWSetupSM.begin(), Rules::MaxMinType, 1);
 		for (int i = 0; i < Rules::MaxMinType; ++i) {
 			lMax = Rules::GetHWMC(i) * 11;
@@ -1213,10 +1218,10 @@ long Rules::GetHWStartMinerals(long mintype)
 	return mHWSetupSM[mintype];
 }
 
-long Rules::GetSWStartMinerals(long /*mintype*/)
+long Rules::GetSWStartMinerals(long /*mintype*/, const Creation *creation)
 {
-	if (TheGame->GetCreation())
-		return Random(TheGame->GetCreation()->mSWMinMin, TheGame->GetCreation()->mSWMaxMin);
+	if (creation != NULL)
+		return Random(creation->mSWMinMin, creation->mSWMaxMin);
 	else
 		return 0;
 }

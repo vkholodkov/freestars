@@ -38,6 +38,7 @@ namespace FreeStars {
 class Player;
 class WayOrder;
 class Fleet;
+class Game;
 
 /**
  * List of Waypoint Orders.
@@ -48,7 +49,7 @@ public:
 	WayOrderList() : nPlayer(0), nFleet(0), mNoDelete(false) {}
 	~WayOrderList();
 
-	bool ParseNode(const TiXmlNode * node, Player * player, Galaxy*);
+	bool ParseNode(const TiXmlNode * node, Player * player, Game*);
 	const deque<WayOrder *> & GetOrders() const	{ return orders; }
 	deque<WayOrder *> & GetOrders() { return orders; }
 	void SetFleet(long fleet)		{ nFleet = fleet; }

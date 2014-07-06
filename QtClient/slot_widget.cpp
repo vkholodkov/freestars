@@ -144,7 +144,7 @@ Component *EditableSlotWidget::extractComponent(QDropEvent *e)
         return NULL;
     }
 
-    const std::deque<Component*> &components = TheGame->GetComponents();
+    const std::deque<Component*> &components = game->GetComponents();
 
     for (std::deque<Component*>::const_iterator i = components.begin() ; i != components.end() ; i++) {
         if(componentNames.at(0) == QString((*i)->GetName().c_str())) {

@@ -134,14 +134,14 @@ string MessItem::ToString() const
 	return m;
 }
 
-MessItem * MessItem::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
+MessItem * MessItem::ParseNode(const TiXmlNode * node, Game *game)
 {
 	if (node == NULL)
 		return NULL;
 
 	MessItem * mi;
 	if (stricmp(node->Value(), "Player") == 0)
-		mi = MessPlayer::ParseNode(node);
+		mi = MessPlayer::ParseNode(node, game);
 	else if (stricmp(node->Value(), "Number") == 0)
 		mi = MessNumber::ParseNode(node);
 	else if (stricmp(node->Value(), "Float") == 0)
@@ -149,7 +149,7 @@ MessItem * MessItem::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 	else if (stricmp(node->Value(), "String") == 0)
 		mi = MessString::ParseNode(node);
 	else
-		mi = MessLoc::ParseNode(node, galaxy);
+		mi = MessLoc::ParseNode(node, game);
 
 	if (mi != NULL) {
 		const TiXmlElement * tie = node->ToElement();
@@ -227,7 +227,7 @@ void MessLoc::WriteNode(TiXmlNode * node) const
 	AddDesc(lNode->ToElement());
 }
 
-MessLoc * MessLoc::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
+MessLoc * MessLoc::ParseNode(const TiXmlNode * node, Game *game)
 {
 	MessLoc * mi = NULL;
 	const TiXmlElement * tie;
@@ -236,12 +236,12 @@ MessLoc * MessLoc::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 		if (tie != NULL) {
 			int pnum;
 			tie->Attribute("IDNumber", &pnum);
-			const Planet * p = galaxy->GetPlanet(pnum);
+			const Planet * p = game->GetGalaxy()->GetPlanet(pnum);
 			if (p != NULL)
 				mi = new MessLoc("", p);
 		}
 	} else if (stricmp(node->Value(), "Fleet") == 0) {
-		const Player * p = TheGame->GetPlayer(GetLong(node->FirstChild("Owner")));
+		const Player * p = game->GetPlayer(GetLong(node->FirstChild("Owner")));
 		if (p != NULL) {
 			int fNum;
 			tie = node->ToElement();
@@ -257,7 +257,7 @@ MessLoc * MessLoc::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 	} else if (stricmp(node->Value(), "Salvage") == 0) {
 	} else if (stricmp(node->Value(), "Location") == 0) {
 		Location * loc = new Location();
-		loc->ParseNode(node, galaxy);
+		loc->ParseNode(node, game);
 		mi = new MessLoc("", loc, true);
 	}
 
@@ -338,9 +338,9 @@ void MessPlayer::WriteNode(TiXmlNode * node) const
 	AddDesc(AddLong(node, "Player", mPlayer->GetID()));
 }
 
-MessPlayer * MessPlayer::ParseNode(const TiXmlNode * node)
+MessPlayer * MessPlayer::ParseNode(const TiXmlNode * node, Game *game)
 {
-	const Player * p = TheGame->GetPlayer(GetLong(node));
+	const Player * p = game->GetPlayer(GetLong(node));
 	if (p != NULL)
 		return new MessPlayer("", p);
 	else
@@ -459,7 +459,7 @@ void Message::WriteNode(TiXmlNode * node) const
 	node->LinkEndChild(mNode);
 }
 
-bool Message::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
+bool Message::ParseNode(const TiXmlNode * node, Game *game)
 {
 	if (node == NULL)
 		return false;
@@ -475,7 +475,7 @@ bool Message::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 	const TiXmlNode * child;
 	MessItem * mi;
 	for (child = node->FirstChild(); child != NULL; child = child->NextSibling()) {
-		mi = MessItem::ParseNode(child, galaxy);
+		mi = MessItem::ParseNode(child, game);
 		if (mi != NULL)
 			AddItem(mi);
 	}

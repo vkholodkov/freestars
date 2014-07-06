@@ -216,7 +216,7 @@ void ProdOrder::CheckPartials(Planet * planet, const TiXmlNode * node, bool Trus
 	if (node == NULL || planet == NULL)
 		return;
 
-	Partial.ReadCosts(node->FirstChild("Partial"));
+	Partial.ReadCosts(node->FirstChild("Partial"), *planet->GetGame());
 	if (TrustPartials)
 		return;
 
@@ -470,14 +470,8 @@ POAuto::~POAuto()
 
 TiXmlNode * POAuto::WriteNode(TiXmlNode * node) const
 {
-	string str;
-	str = TypeToString();
-
-	if (str.empty())
-		TheGame->AddMessage("Error: Invalid auto procution order");
-	else
-		AddLong(node, str.c_str(), Amount);
-
+	string str(TypeToString());
+	AddLong(node, str.c_str(), Amount);
 	return node;
 }
 
@@ -498,8 +492,6 @@ string POAuto::TypeToString() const
 		str = "AutoMinTerra";
 	else if (Type == POP_MAXTERRA)
 		str = "AutoMaxTerra";
-	else
-		TheGame->AddMessage("Error: Invalid auto production order");
 
 	return str;
 }
@@ -722,7 +714,6 @@ string POPlanetary::TypeToString() const
 		str = "Scanner";
 		break;
 	default:
-		TheGame->AddMessage("Error: Invalid planetary procution order");
 		break;
 	}
 
@@ -825,7 +816,7 @@ void POPlanetary::Built(Planet * planet, long number)
 			p->AdjustAmounts(Type - POP_MIXEDPACKET - 1, planet->GetOwner()->PacketSizeOneMin() * number);
 		}
 
-		planet->GetGalaxy()->AddPacket(p, planet);
+		planet->GetGame()->GetGalaxy()->AddPacket(p, planet);
 	} else if (Type == POP_FACTS) {
 		planet->BuildFactories(number);
 	} else if (Type == POP_MINES) {
@@ -953,15 +944,16 @@ bool POTerraform::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 
 		c.Zero();
 		owner->ResetTerraLimits();
-		for (unsigned long i = 0; i < TheGame->GetComponents().size(); ++i) {
+		for (unsigned long i = 0; i < planet->GetGame()->GetComponents().size(); ++i) {
 			// Is it terraforming? can we build it? Will it help? Is it cheaper?
-			if (TheGame->GetComponents()[i]->GetType() == CT_TERRAFORM &&
-				TheGame->GetComponents()[i]->IsBuildable(owner) &&
-				planet->CanTerraform(TheGame->GetComponents()[i]) &&
-				(mResCost == 0 || mResCost >= TheGame->GetComponents()[i]->GetCost().GetResources()))
+			if (planet->GetGame()->GetComponents()[i]->GetType() == CT_TERRAFORM &&
+				planet->GetGame()->GetComponents()[i]->IsBuildable(owner) &&
+				planet->CanTerraform(planet->GetGame()->GetComponents()[i]) &&
+				(mResCost == 0 || mResCost >= planet->GetGame()->GetComponents()[i]->GetCost().GetResources()))
 			{
-				owner->SetTerraLimit(TheGame->GetComponents()[i]->GetTerraType(), TheGame->GetComponents()[i]->GetTerraLimit());
-				c = TheGame->GetComponents()[i]->GetCost();
+				owner->SetTerraLimit(planet->GetGame()->GetComponents()[i]->GetTerraType(),
+					planet->GetGame()->GetComponents()[i]->GetTerraLimit());
+				c = planet->GetGame()->GetComponents()[i]->GetCost();
 			}
 		}
 

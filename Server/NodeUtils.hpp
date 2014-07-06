@@ -30,12 +30,12 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 namespace FreeStars {
 
 template <class T>
-bool ParseGroup(const TiXmlNode * node, deque<T*> & deck)
+bool ParseGroup(Game *game, const TiXmlNode * node, deque<T*> & deck)
 {
 	const TiXmlNode * w;
 	for(w = node->FirstChildElement(T::ELEMENT_NAME()); w; w = w->NextSiblingElement(T::ELEMENT_NAME())) {
 		T* obj = NULL;
-		obj = TheGame->ObjectFactory(obj);
+		obj = game->ObjectFactory(obj);
 
 		if(!obj->ParseNode(w)){
 			delete obj;

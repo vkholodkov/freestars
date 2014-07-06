@@ -86,6 +86,7 @@ private:
 private:
     QImage plateImage;
     const GraphicsArray *graphicsArray;
+    Game *game;
     Player *player;
     int currentDesignMode, currentViewMode;
     std::auto_ptr<Ship> shipBeingEdited;

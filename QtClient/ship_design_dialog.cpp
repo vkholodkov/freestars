@@ -56,6 +56,7 @@ void (ShipDesignDialog::*ShipDesignDialog::propertyFiller[])(QFormLayout*) = {
 ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphicsArray, QWidget *parent)
     : QDialog(parent)
     , graphicsArray(_graphicsArray)
+    , game(_player->GetGame())
     , player(_player)
     , currentDesignMode(SDDDM_SHIPS)
     , currentViewMode(SDDVM_EXISTING)
@@ -222,7 +223,7 @@ void ShipDesignDialog::setComponentCategory(QComboBox *chooseComponentBox, QList
 
     componentListWidget->clear();
 
-    const std::deque<Component*> &components = TheGame->GetComponents();
+    const std::deque<Component*> &components = game->GetComponents();
 
     for (std::deque<Component*>::const_iterator i = components.begin() ; i != components.end() ; i++) {
         if ((*i)->IsBuildable(player) && ((*i)->GetType() & mask)) {
@@ -296,7 +297,7 @@ void ShipDesignDialog::populateExistingDesigns(int designMode, bool initial)
 
 void ShipDesignDialog::populateAvailableHullTypes(int designMode)
 {
-    const std::deque<Component*> &components = TheGame->GetComponents();
+    const std::deque<Component*> &components = game->GetComponents();
 
     for (std::deque<Component*>::const_iterator i = components.begin(); i != components.end(); i++) {
         if ((*i)->IsBuildable(player) && ((*i)->IsType(designMode == SDDDM_SHIPS ? CT_HULL : CT_BASE))) {
@@ -474,20 +475,20 @@ void ShipDesignDialog::updateDesignProperties()
 
 void ShipDesignDialog::copyDesign(const Hull *hull)
 {
-    shipBeingEdited.reset(new Ship(hull));
+    shipBeingEdited.reset(new Ship(player->GetGame(), hull));
     enterEditMode(true);
 }
 
 void ShipDesignDialog::copyDesign(const Ship *ship)
 {
-    shipBeingEdited.reset(new Ship);
+    shipBeingEdited.reset(new Ship(player->GetGame()));
     shipBeingEdited->CopyDesign(ship, false);
     enterEditMode(true);
 }
 
 void ShipDesignDialog::editDesign(const Ship *ship)
 {
-    shipBeingEdited.reset(new Ship);
+    shipBeingEdited.reset(new Ship(player->GetGame()));
     shipBeingEdited->CopyDesign(ship, false);
     enterEditMode(false);
 }
@@ -679,7 +680,7 @@ void ShipDesignDialog::createShipWidgets(Ship *ship, bool readOnly)
         const Slot &hullSlot = hull->GetSlot(i);
         dimensions[i].translate(origin);
         drawOrder[i] = slotWidgets[i] = readOnly ? new SlotWidget(graphicsArray, shipSlot, hullSlot)
-            : new EditableSlotWidget(graphicsArray, shipSlot, hullSlot);
+            : new EditableSlotWidget(game, graphicsArray, shipSlot, hullSlot);
         slotWidgets[i]->setGeometry(dimensions[i]);
     }
 

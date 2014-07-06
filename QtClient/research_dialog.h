@@ -26,6 +26,7 @@ private slots:
     void accept();
 
 private:
+    Game *game;
     Player *player;
     QButtonGroup *researchFieldGroup;
     long totalResources;

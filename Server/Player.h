@@ -51,6 +51,7 @@ class BattlePlanOrder;
 class RelationsOrder;
 class ProductionOrder;
 class MultipleOrder;
+class Game;
 
 /**
  * Player.
@@ -58,10 +59,13 @@ class MultipleOrder;
  */
 class Player : public Race {
 public:
-	Player(Galaxy*, int id);
+	Player(Game*, int id);
 	virtual ~Player();
 
 	void Remove()	{ delete this; }
+
+	const Game *GetGame() const { return game; }
+	Game *GetGame() { return game; }
 
 	bool ParseNode(const TiXmlNode * node, bool other);
 	bool ParseCommon(const TiXmlNode * node);
@@ -201,7 +205,7 @@ public:
 	virtual MineField * MineFieldFactory();
 
 private:
-	Galaxy *galaxy;
+	Game *game;
 	double mResearchTax;
 	long mResearchField;
 	long mResearchNext;

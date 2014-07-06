@@ -180,7 +180,7 @@ long Race::PacketTerraform(CargoType ct) const
 	return Result;
 }
 
-long Race::GetAdvantagePoints() const
+long Race::GetAdvantagePoints(MessageSink &messageSink) const
 {
 	int points = Rules::GetConstant("StartingPoints", 1650);
 	int hab;
@@ -374,7 +374,7 @@ long Race::GetAdvantagePoints() const
 		points -= 180;
 
 	if (mLeftoverPoints > points / 3) {
-		Message * mess = TheGame->AddMessage("Warning: Invalid racial setting");
+		Message * mess = messageSink.AddMessage("Warning: Invalid racial setting");
 		mess->AddItem("Race", mSingularName);
 		mess->AddLong("Leftover points claimed", mLeftoverPoints);
 		mess->AddLong("Leftover points max", points/3);
@@ -507,6 +507,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 	const TiXmlNode * child2;
 	long i;
 	const char * ptr;
+    ArrayParser arrayParser(messageSink);
 
 	for (child1 = node->FirstChild(); child1; child1 = child1->NextSibling()) {
 		if (child1->Type() == TiXmlNode::COMMENT)
@@ -548,7 +549,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 
 				mHabCenter[i] = GetLong(child2->FirstChild("Center"));
 				if (mHabCenter[i] != -1 && (mHabCenter[i] < 10 || mHabCenter[i] > 90)) {
-					Message * mess = TheGame->AddMessage("Error: Invalid racial setting");
+					Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 					mess->AddItem("Race", mSingularName);
 					mess->AddLong("Hab center", mHabCenter[i]);
 					return false;
@@ -589,7 +590,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 				return false;
 			}
 		} else if (stricmp(child1->Value(), "FactoryCost") == 0) {
-			mFactoryCost.ReadCosts(child1);
+			mFactoryCost.ReadCosts(child1, messageSink);
 			// magic number
 			if (mFactoryCost.GetResources() < 5 || mFactoryCost.GetResources() > 25
 				|| mFactoryCost[0] != 0
@@ -619,7 +620,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 				return false;
 			}
 		} else if (stricmp(child1->Value(), "MineCost") == 0) {
-			mMineCost.ReadCosts(child1);
+			mMineCost.ReadCosts(child1, messageSink);
 			// magic number
 			if (mMineCost.GetResources() < 2 || mMineCost.GetResources() > 15
 				|| mMineCost[0] != 0
@@ -640,7 +641,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 				return false;
 			}
 		} else if (stricmp(child1->Value(), "TechFactor") == 0) {
-			Rules::ParseArrayFloat(child1, mTechCostFactor, TECHS);
+			Rules::ParseArrayFloat(child1, mTechCostFactor, TECHS, messageSink);
 		} else if (stricmp(child1->Value(), "StartAt") == 0) {
 			ptr = GetString(child1);
 			if (ptr && stricmp(ptr, "true") == 0)
@@ -724,7 +725,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 			// but won't bother since it won't cause problems if they can't
 
 			deque<long> array;
-			if (Rules::ParsePacketMapping(child1, array))
+			if (Rules::ParsePacketMapping(child1, array, messageSink))
 				mPacketMap.insert(mPacketMap.begin(), array.begin(), array.end());
 		} else if (stricmp(child1->Value(), "InitialSettings") == 0) {
 			// skip it here

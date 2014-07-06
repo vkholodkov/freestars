@@ -112,7 +112,7 @@ void Stack::WriteNode(TiXmlNode * node) const
 	AddLong(node, "Speed", bSpeed);
 	AddLong(node, "XPos", bx);
 	AddLong(node, "YPos", by);
-	mFleetIn->GetBattlePlan()->WriteNodeBattle(node);
+	mFleetIn->GetBattlePlan()->WriteNodeBattle(node, *mFleetIn->GetGame());
 }
 
 void Stack::SetupBase(const Planet * planet)

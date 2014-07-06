@@ -39,8 +39,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Player::Player(Galaxy *_galaxy, int id)
-    : galaxy(_galaxy)
+Player::Player(Game *_game, int id)
+    : game(_game)
     , mID(id)
 {
 	mTechLevel.insert(mTechLevel.begin(), Rules::MaxTechType, -1);
@@ -128,7 +128,7 @@ double Player::Miniturize(const Component * comp) const
 	}
 
 	if (TechDif == Rules::MaxTechLevel) {
-		Message * mess = TheGame->AddMessage("Item with no required tech");
+		Message * mess = game->AddMessage("Item with no required tech");
 		mess->AddItem("Component name", comp->GetName());
 	}
 
@@ -139,9 +139,9 @@ bool Player::GainTechLevel(TechType tech)
 {
 	bool Result = false;
 	mTechProgress[tech] -= TechCost(tech);
-	mLastTechGainPhase = TheGame->GetTurnPhase();
+	mLastTechGainPhase = game->GetTurnPhase();
 
-	if (Rules::GetTurnEvent(TheGame->GetTurnPhase()) == TP_PRODUCTION)
+	if (Rules::GetTurnEvent(game->GetTurnPhase()) == TP_PRODUCTION)
 		mTempTechLevel[tech]++;
 	else
 		mTechLevel[tech]++;
@@ -200,7 +200,7 @@ long Player::GainTech(long TechGain, TechType tech)
 		return TechGain;
 
 	long Result = 0;
-	if (Rules::GetTurnEvent(TheGame->GetTurnPhase()) == TP_PRODUCTION) {
+	if (Rules::GetTurnEvent(game->GetTurnPhase()) == TP_PRODUCTION) {
 		if (mResearchField == RESEARCH_ALCHEMY)
 			return TechGain;
 
@@ -212,11 +212,11 @@ long Player::GainTech(long TechGain, TechType tech)
 			if (resources < cost) {
 				more = false;
 				mTechProgress[mResearchField] += resources;
-				galaxy->TechSpent(resources, tech);
+				game->GetGalaxy()->TechSpent(resources, tech);
 			} else {
 				more = true;
 				mTechProgress[mResearchField] += cost;
-				galaxy->TechSpent(cost, tech);
+				game->GetGalaxy()->TechSpent(cost, tech);
 				resources -= cost;
 				if (GainTechLevel(mResearchField)) {
 					more = false;
@@ -273,7 +273,7 @@ long Player::TechCost(TechType tech) const
 	}
 
 	TotalCost = long(TotalCost * mTechCostFactor[tech] + .5);
-	TotalCost = long(TotalCost * TheGame->GetTechFactor() + .5);	// 1.0 for normal games, 2.0 for slow tech games
+	TotalCost = long(TotalCost * game->GetTechFactor() + .5);	// 1.0 for normal games, 2.0 for slow tech games
 
 	return TotalCost;
 }
@@ -338,8 +338,8 @@ void Player::DeleteFleet(Fleet * gone)
 		return;	// serious error;
 	}
 
-	TheGame->RemoveAlsoHere(gone);
-	TheGame->StoreMessageLocation(gone);	// make any messages referring to this fleet point to it's last location
+	game->RemoveAlsoHere(gone);
+	game->StoreMessageLocation(gone);	// make any messages referring to this fleet point to it's last location
 	mFleets[gone->GetID()-1] = NULL;
 	delete gone;
 }
@@ -363,7 +363,7 @@ bool Player::TransferFleet(const Fleet * from)
 	}
 
 	int count = 0;
-	Ship ship;
+	Ship ship(game);
 	Ship * design;
 	for (i = 0; i < from->GetStacks(); ++i) {
 		ship.CopyDesign(from->GetStack(i)->GetDesign(), true);
@@ -393,7 +393,7 @@ bool Player::TransferFleet(const Fleet * from)
 			for (j = 0; j < mShipDesigns.size(); ++j) {
 				if (mShipDesigns[j] == NULL) {
 					Ship * newShip = NULL;
-					newShip = TheGame->ObjectFactory(newShip);
+					newShip = game->ObjectFactory(newShip);
 					newShip->CopyDesign(stack->GetDesign(), true);
 					mShipDesigns[j] = newShip;
 					design = newShip;
@@ -431,17 +431,19 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 	if (stricmp(node->Value(), "Player") != 0)
 		return false;
 
+	ArrayParser arrayParser(*GetGame());
+
 	mID = GetLong(node->FirstChild("PlayerNumber"));
-	if (mID < 1 || mID > TheGame->NumberPlayers()) {
-		Message * mess = TheGame->AddMessage("Error: Invalid player number");
+	if (mID < 1 || mID > game->NumberPlayers()) {
+		Message * mess = game->AddMessage("Error: Invalid player number");
 		mess->AddLong("", mID);
 		return false;
 	}
 
 	// setup relations
 	mRelations.erase(mRelations.begin(), mRelations.end());
-	mRelations.insert(mRelations.begin(), TheGame->NumberPlayers(), PR_NEUTRAL);
-	Rules::ParseArray(node->FirstChild("Relations"), "Race", "IDNumber", mRelations);
+	mRelations.insert(mRelations.begin(), game->NumberPlayers(), PR_NEUTRAL);
+	arrayParser.ParseArray(node->FirstChild("Relations"), "Race", "IDNumber", mRelations);
 	if (!ParseCommon(node))
 		return false;
 
@@ -460,19 +462,19 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child->Value(), "ResearchField") == 0) {
 		} else if (stricmp(child->Value(), "ResearchNext") == 0) {
 		} else if (stricmp(child->Value(), "TechLevels") == 0) {
-			if (!Rules::ParseArray(child, mTechLevel, TECHS))
+			if (!Rules::ParseArray(child, mTechLevel, TECHS, *GetGame()))
 				return false;
 		} else if (!other && stricmp(child->Value(), "TechProgress") == 0) {
-			if (!Rules::ParseArray(child, mTechProgress, TECHS))
+			if (!Rules::ParseArray(child, mTechProgress, TECHS, *GetGame()))
 				return false;
 		} else if (!other && stricmp(child->Value(), "BattlePlan") == 0) {
 		} else if (!other && stricmp(child->Value(), "ProductionQueue") == 0) {
 		} else if (!other && stricmp(child->Value(), "DefaultPayTax") == 0) {
 		} else if (!other && stricmp(child->Value(), "Relations") == 0) {
-			if (!Rules::ParseArray(child, mTechLevel, TECHS))
+			if (!Rules::ParseArray(child, mTechLevel, TECHS, *GetGame()))
 				return false;
 		} else if (!other && stricmp(child->Value(), "TechProgress") == 0) {
-			if (!Rules::ParseArray(child, mTechProgress, TECHS))
+			if (!Rules::ParseArray(child, mTechProgress, TECHS, *GetGame()))
 				return false;
 		} else if (stricmp(child->Value(), "PlanetarySpaceScan") == 0) {
 			mScanSpace = GetLong(child);
@@ -481,19 +483,19 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child->Value(), "DefenseValue") == 0) {
 			mDefenseValue = GetDouble(child);
 		} else if (stricmp(child->Value(), "TerraformLimit") == 0) {
-			if (!Rules::ParseArray(child, mTerraLimit, HABS))
+			if (!Rules::ParseArray(child, mTerraLimit, HABS, *GetGame()))
 				return false;
 		} else if (stricmp(child->Value(), "ShipDesign") == 0) {
 			const TiXmlElement * tie = child->ToElement();
 			int num;
 			tie->Attribute("IDNumber", &num);
 			if (num <= 0 || num > Rules::GetConstant("MaxShipDesigns")) {
-				Message * mess = TheGame->AddMessage("Error: Invalid ship slot number");
+				Message * mess = game->AddMessage("Error: Invalid ship slot number");
 				mess->AddLong("", num);
 			} else {
 				num--;
 				if (mShipDesigns[num] == NULL)
-					mShipDesigns[num] = TheGame->ObjectFactory(mShipDesigns[num]);
+					mShipDesigns[num] = game->ObjectFactory(mShipDesigns[num]);
 				if (!mShipDesigns[num]->ParseNode(child, this, other)) {
 					delete mShipDesigns[num];
 					mShipDesigns[num] = NULL;
@@ -504,12 +506,12 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 			int num;
 			tie->Attribute("IDNumber", &num);
 			if (num <= 0 || num > Rules::GetConstant("MaxBaseDesigns")) {
-				Message * mess = TheGame->AddMessage("Error: Invalid base slot number");
+				Message * mess = game->AddMessage("Error: Invalid base slot number");
 				mess->AddLong("", num);
 			} else {
 				num--;
 				if (mBaseDesigns[num] == NULL)
-					mBaseDesigns[num] = TheGame->ObjectFactory(mBaseDesigns[num]);
+					mBaseDesigns[num] = game->ObjectFactory(mBaseDesigns[num]);
 				if (!mBaseDesigns[num]->ParseNode(child, this, other)) {
 					delete mBaseDesigns[num];
 					mBaseDesigns[num] = NULL;
@@ -518,11 +520,11 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 		} else if (stricmp(child->Value(), "Minefield") == 0) {
 //			if (!(*mMineFields.insert(mMineFields.begin()))->ParseNode(child, this))
 //				return false;
-//			TheGame->AddAlsoHere();
+//			game->AddAlsoHere();
 		} else if (stricmp(child->Value(), "Fleet") == 0) {
 			ParseFleet(child, other);
 		} else {
-			Message * mess = TheGame->AddMessage("Warning: Unknown section");
+			Message * mess = game->AddMessage("Warning: Unknown section");
 			mess->AddItem("Section name", child->Value());
 			mess->AddItem("Player", this);
 		}
@@ -533,10 +535,12 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 
 bool Player::ParseCommon(const TiXmlNode * node)
 {
+	ArrayParser arrayParser(*GetGame());
+
 	// setup relations
 	mRelations.erase(mRelations.begin(), mRelations.end());
-	mRelations.insert(mRelations.begin(), TheGame->NumberPlayers(), PR_NEUTRAL);
-	Rules::ParseArray(node->FirstChild("Relations"), "Race", "IDNumber", mRelations);
+	mRelations.insert(mRelations.begin(), game->NumberPlayers(), PR_NEUTRAL);
+	arrayParser.ParseArray(node->FirstChild("Relations"), "Race", "IDNumber", mRelations);
 
 	const TiXmlNode * child;
 	for (child = node->FirstChild(); child; child = child->NextSibling()) {
@@ -555,7 +559,7 @@ bool Player::ParseCommon(const TiXmlNode * node)
 			int num;
 			child->ToElement()->Attribute("IDNumber", &num);
 			if (num < 0 || num >= Rules::GetConstant("MaxBattlePlans")) {
-				Message * mess = TheGame->AddMessage("Error: Invalid battle plan number");
+				Message * mess = game->AddMessage("Error: Invalid battle plan number");
 				mess->AddLong("", num);
 			} else {
 				if (mBattlePlans[num] == NULL)
@@ -581,12 +585,12 @@ void Player::ParseResearchTax(const TiXmlNode * node)
 
 	tax = GetDouble(node);
 	if (tax < 0.0) {
-		Message * mess = TheGame->AddMessage("Error: Invalid tech tax");
+		Message * mess = game->AddMessage("Error: Invalid tech tax");
 		mess->AddFloat("tax", tax);
 		tax = 0.0;
 	}
 	if (tax > 1.0) {
-		Message * mess = TheGame->AddMessage("Error: Invalid tech tax");
+		Message * mess = game->AddMessage("Error: Invalid tech tax");
 		mess->AddFloat("tax", tax);
 		tax = 1.0;
 	}
@@ -597,7 +601,7 @@ long Player::ParseResearchField(const TiXmlNode * node)
 {
 	long field = Rules::TechID(GetString(node));
 	if (field == TECH_NONE) {
-		Message * mess = TheGame->AddMessage("Error: Invalid tech type");
+		Message * mess = game->AddMessage("Error: Invalid tech type");
 		mess->AddItem("Research field", GetString(node));
 	}
 
@@ -613,7 +617,7 @@ void Player::ParseMessages(const TiXmlNode * node)
 	Message * mess;
 	for (child = node->FirstChild("Message"); child != NULL; child = child->NextSibling("Message")) {
 		mess = new Message();
-		if (mess->ParseNode(child, galaxy))
+		if (mess->ParseNode(child, game))
 			mMessages.push_back(mess);
 		else
 			delete mess;
@@ -714,7 +718,7 @@ void Player::ParseFleet(const TiXmlNode * node, bool other)
 	tie->Attribute("IDNumber", &num);
 
 	if (num < 1 || num >= Rules::MaxFleets) {
-		Message * mess = TheGame->AddMessage("Error: Invalid fleet number");
+		Message * mess = game->AddMessage("Error: Invalid fleet number");
 		mess->AddLong("", num);
 	} else {
 		--num;
@@ -724,7 +728,7 @@ void Player::ParseFleet(const TiXmlNode * node, bool other)
 			delete mFleets[num];
 			mFleets[num] = NULL;
 		} else
-			TheGame->AddAlsoHere(mFleets[num]);
+			game->AddAlsoHere(mFleets[num]);
 	}
 }
 
@@ -733,6 +737,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 	const TiXmlNode * node;
 	const TiXmlNode * child;
 	const char * ptr;
+	ArrayParser arrayParser(*GetGame());
 
 	Planet * pfrom;
 	Planet * pto;
@@ -759,7 +764,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			if (stricmp(ptr, "Default") == 0) {
 				SetProduction(ProdOrder::ParseNode(node, NULL, this));
 			} else {
-				pto = galaxy->GetPlanet(ptr);
+				pto = game->GetGalaxy()->GetPlanet(ptr);
 				if (pto != NULL && pto->GetOwner() == this)
 					pto->ParseProduction(node);
 				else {
@@ -771,7 +776,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			}
 		} else if (stricmp(node->Value(), "SetPayTax") == 0) {
 			ptr = GetString(node->FirstChild("Planet"));
-			pto = galaxy->GetPlanet(ptr);
+			pto = game->GetGalaxy()->GetPlanet(ptr);
 			if (pto != NULL && pto->GetOwner() == this)
 				pto->SetPayTax(GetBool(node->FirstChild("PayTax")));
 			else {
@@ -791,7 +796,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 		} else if (stricmp(node->Value(), "ResearchNext") == 0) {
 			SetResearchNext(ParseResearchField(node));
 		} else if (stricmp(node->Value(), "SetPacketSpeed") == 0) {
-			pfrom = galaxy->GetPlanet(GetString(node->FirstChild("Planet")));
+			pfrom = game->GetGalaxy()->GetPlanet(GetString(node->FirstChild("Planet")));
 			if (!pfrom || pfrom->GetOwner() != this) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("Planet")));
@@ -801,7 +806,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 
 			pfrom->SetPacketSpeed(GetLong(node->FirstChild("PacketSpeed")));
 		} else if (stricmp(node->Value(), "SetPacketDestination") == 0) {
-			pfrom = galaxy->GetPlanet(GetString(node->FirstChild("Planet")));
+			pfrom = game->GetGalaxy()->GetPlanet(GetString(node->FirstChild("Planet")));
 			if (!pfrom || pfrom->GetOwner() != this) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("Planet")));
@@ -809,7 +814,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 				continue;
 			}
 
-			pto = galaxy->GetPlanet(GetString(node->FirstChild("PacketDestination")));
+			pto = game->GetGalaxy()->GetPlanet(GetString(node->FirstChild("PacketDestination")));
 			if (!pto) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("PacketDestination")));
@@ -818,7 +823,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			}
 			pfrom->SetPacketDest(pto);
 		} else if (stricmp(node->Value(), "SetRouteDestination") == 0) {
-			pfrom = galaxy->GetPlanet(GetString(node->FirstChild("From")));
+			pfrom = game->GetGalaxy()->GetPlanet(GetString(node->FirstChild("From")));
 			if (!pfrom || pfrom->GetOwner() != this) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("From")));
@@ -826,7 +831,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 				continue;
 			}
 
-			pto = galaxy->GetPlanet(GetString(node->FirstChild("RouteDestination")));
+			pto = game->GetGalaxy()->GetPlanet(GetString(node->FirstChild("RouteDestination")));
 			if (!pto) {
 				Message * mess = AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(node->FirstChild("RouteDestination")));
@@ -909,7 +914,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			cargo.insert(cargo.begin(), Rules::MaxMinType, 0);
 			long pop;
 			long fuel;
-			Rules::ReadCargo(child, cargo, &pop);
+			Rules::ReadCargo(child, cargo, &pop, *GetGame());
 			fuel = GetLong(child->FirstChild("Fuel"));
 			TransferCargo(owned, other, pop, fuel, cargo);
 		} else if (stricmp(node->Value(), "BattlePlan") == 0) {
@@ -926,8 +931,8 @@ void Player::ParseOrders(const TiXmlNode * orders)
 		} else if (stricmp(node->Value(), "Relations") == 0) {
 			// setup relations
 			deque<long> rel;
-			rel.insert(rel.begin(), TheGame->NumberPlayers(), PR_NEUTRAL);
-			Rules::ParseArray(node, "Race", "IDNumber", rel);
+			rel.insert(rel.begin(), game->NumberPlayers(), PR_NEUTRAL);
+			arrayParser.ParseArray(node, "Race", "IDNumber", rel);
 			SetRelations(rel);
 		} else if (stricmp(node->Value(), "SetRepeat") == 0) {
 			ffrom = NCGetFleet(GetLong(node->FirstChild("Fleet")));
@@ -938,7 +943,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			if (mWriteXFile) {
 				WayOrderList wol;
 				wol.SetFleet(GetLong(node->FirstChild("Fleet")));
-				wol.ParseNode(node, this, galaxy);
+				wol.ParseNode(node, this, game);
 
 				Fleet * f = NCGetFleet(GetLong(node->FirstChild("Fleet")));
 				if (f == NULL)
@@ -979,14 +984,14 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 
 	child = node->FirstChild("Planet");
 	if (child != NULL) {
-		ch = galaxy->GetPlanet(GetString(child));
+		ch = game->GetGalaxy()->GetPlanet(GetString(child));
 		if (owned == NULL) {
 			if (this == ch->GetOwner())
 				return ch;
 		} else if (this == ch->GetOwner())
 			return ch;
 		else
-			return galaxy->GetJettison(owned, ch);
+			return game->GetGalaxy()->GetJettison(owned, ch);
 
 		Message * mess = AddMessage("Error: Not owner", ch);
 		mess->AddItem("Where", "cargo transfer");
@@ -997,7 +1002,7 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 	if (child != NULL) {
 		long f = GetLong(child);
 		if (owned != NULL) {
-			Player * p = TheGame->NCGetPlayer(GetLong(node->FirstChild("Owner")));
+			Player * p = game->NCGetPlayer(GetLong(node->FirstChild("Owner")));
 			if (!p) {
 				Message * mess = AddMessage("Error: Invalid player number");
 				mess->AddLong("", GetLong(child));
@@ -1005,7 +1010,7 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 				return NULL;
 			}
 
-			ch = galaxy->GetJettison(owned, p->NCGetFleet(f));
+			ch = game->GetGalaxy()->GetJettison(owned, p->NCGetFleet(f));
 		} else
 			ch = NCGetFleet(f);
 
@@ -1015,7 +1020,7 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 	if (owned != NULL) {
 		child = node->FirstChild("Space");
 		if (child != NULL) {
-			return galaxy->GetJettison(owned, NULL);
+			return game->GetGalaxy()->GetJettison(owned, NULL);
 		}
 
 		child = node->FirstChild("Packet");
@@ -1099,7 +1104,7 @@ void Player::BuildShips(Planet * planet, long Type, long number)
 
 	if (newfleet) {
 		mFleets[f]->SetStartOrders(planet);
-		TheGame->AddAlsoHere(mFleets[f]);
+		game->AddAlsoHere(mFleets[f]);
 	}
 
 	mess->AddItem("Ship name", GetShipDesign(Type)->GetName());
@@ -1138,7 +1143,7 @@ void Player::ResetSeen()
 	}
 
 	mSeenHab.empty();
-	mSeenHab.insert(mSeenHab.begin(), TheGame->NumberPlayers(), false);
+	mSeenHab.insert(mSeenHab.begin(), game->NumberPlayers(), false);
 }
 
 void Player::DoBattles()
@@ -1148,10 +1153,10 @@ void Player::DoBattles()
 	unsigned int i;
 	for (i = 0; i < Rules::MaxFleets; ++i) {
 		if (mFleets[i] != NULL && !mFleets[i]->AlreadyFought()) {
-			Battle bat(*mFleets[i]);
+			Battle bat(game, *mFleets[i]);
 //			bat.AddFleet(mFleets[i]); Do not do this, it makes the next function have to check to see if the fleet has already been added
 			Planet * planet;
-			planet = galaxy->GetPlanet(mFleets[i]);
+			planet = game->GetGalaxy()->GetPlanet(mFleets[i]);
 			bat.SetPlanet(planet);
 			bat.AddFleets();
 			bat.Resolve();
@@ -1205,7 +1210,7 @@ bool Player::AddBombingFleets(Bombing * bom, const Player* owner, const long bom
 void Player::ClearBattleEnemies()
 {
 	mBattleEnemy.clear();
-	mBattleEnemy.insert(mBattleEnemy.begin(), TheGame->NumberPlayers(), false);
+	mBattleEnemy.insert(mBattleEnemy.begin(), game->NumberPlayers(), false);
 	mInBattle = false;
 }
 
@@ -1277,7 +1282,7 @@ long Player::CreateFromFile(const char * file)
 	TiXmlDocument doc(file);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = game->AddMessage("Error: Cannot open file");
 		mess->AddItem("", file);
 		return -1;
 	}
@@ -1286,24 +1291,24 @@ long Player::CreateFromFile(const char * file)
 
 	node = doc.FirstChild("RaceDefinition");
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = game->AddMessage("Error: Missing section");
 		mess->AddItem("File name", file);
 		mess->AddItem("Section", "RaceDefinition");
 		return -1;
 	}
 
-	if (!Game::CheckMetaInfo(node, file, RACEFILEVERSION))
+	if (!game->CheckMetaInfo(node, file, RACEFILEVERSION))
 		return -1;
 
 //	child = node->FirstChild("Rules");
 //	if (!child) {
-//		Message * mess = TheGame->AddMessage("Error: Missing section");
+//		Message * mess = game->AddMessage("Error: Missing section");
 //		mess->AddItem("File name", file);
 //		mess->AddItem("Section", "Rules");
 //		return false;
 //	}
 
-//	if (!TheGame->LoadRules(GetString(child->FirstChild("File")),
+//	if (!game->LoadRules(GetString(child->FirstChild("File")),
 //							GetString(child->FirstChild("Verification")),
 //							GetDouble(child->FirstChild("Version")), true))
 //	{
@@ -1317,7 +1322,7 @@ long Player::CreateFromFile(const char * file)
 		return -1;
 
 	if (GetBattlePlan(0) == NULL) {
-		Message * mess = TheGame->AddMessage("Error: No default battle plan");
+		Message * mess = game->AddMessage("Error: No default battle plan");
 		mess->AddItem("File name", file);
 		return -1;
 	}
@@ -1347,14 +1352,14 @@ long Player::CreateFromFile(const char * file)
 
 	// tech and LRT dependant
 	const Component * comp;
-	comp = TheGame->GetBestComp(this, "PlanetScanSpace", false, HC_ALL);
+	comp = game->GetBestComp(this, "PlanetScanSpace", false, HC_ALL);
 	mScanSpace = comp == NULL ? 0 : comp->GetScanSpace();
-	comp = TheGame->GetBestComp(this, "PlanetScanPen", false, HC_ALL);
+	comp = game->GetBestComp(this, "PlanetScanPen", false, HC_ALL);
 	mScanPenetrating = comp == NULL ? 0 : comp->GetScanPenetrating();
-	comp = TheGame->GetBestComp(this, "DefensePower", false, HC_ALL);
+	comp = game->GetBestComp(this, "DefensePower", false, HC_ALL);
 	mDefenseValue = comp == NULL ? 0 : comp->GetDefensePower();
 	for (i = 0; i < Rules::MaxHabType; ++i)
-		mTerraLimit[i] = TheGame->GetTerraLimit(this, i);
+		mTerraLimit[i] = game->GetTerraLimit(this, i);
 
 	return GetLong(node->FirstChild("Randomize"), 1200) % 10000;
 }
@@ -1362,7 +1367,7 @@ long Player::CreateFromFile(const char * file)
 void Player::SetupRelations()
 {
 	mRelations.erase(mRelations.begin(), mRelations.end());
-	mRelations.insert(mRelations.begin(), TheGame->NumberPlayers(), PR_NEUTRAL);
+	mRelations.insert(mRelations.begin(), game->NumberPlayers(), PR_NEUTRAL);
 }
 
 void Player::AddStartShips(Planet * planet, bool HomeWorld)
@@ -1390,7 +1395,7 @@ void Player::AddStartShips(const RacialTrait * rt, int i, Planet * planet, bool 
 
 	const Ship * basicDesign = rt->GetStartDesign(i);
 	if ((basicDesign->GetCannotBuild() == NULL || !basicDesign->GetCannotBuild()->IsBuildable(this)) && basicDesign->IsValidDesign(this)) {
-		Ship * upgrade = new Ship();
+		Ship * upgrade = new Ship(game);
 		upgrade->CopyDesign(rt->GetStartDesign(i), false);
 		if (!(upgrade->GetHull()->GetHullType() & HC_BASE))
 			upgrade->Upgrade(this);
@@ -1483,7 +1488,7 @@ void Player::PlaceHW(Planet * planet)
 	}
 
 	if (planet->GetOwner() == NULL) {
-		planet->CreateHW(this);
+		planet->CreateHW(this, game->GetCreation());
 	} else if (planet->GetOwner() != this) {
 		// error
 		return;
@@ -1491,7 +1496,7 @@ void Player::PlaceHW(Planet * planet)
 
 	mHasHW = true;
 	// adjust based on player settings
-	planet->AdjustHW(this);
+	planet->AdjustHW(this, game->GetCreation());
 	AddMessage("Homeworld is", planet);
 	AddStartShips(planet, true);
 }
@@ -1504,7 +1509,7 @@ void Player::PlaceSW(Planet * second, Planet * homeworld)
 	}
 
 	if (second->GetOwner() == NULL) {
-		second->CreateSecondWorld(homeworld);
+		second->CreateSecondWorld(homeworld, game->GetCreation());
 	} else if (second->GetOwner() != this) {
 		// error
 		return;
@@ -1520,7 +1525,7 @@ void Player::LoadFleets()
 	int i;
 	for (i = 0; i < mFleets.size(); ++i) {
 		if (mFleets[i] != NULL)
-			TheGame->AddAlsoHere(mFleets[i]);
+			game->AddAlsoHere(mFleets[i]);
 	}
 }
 
@@ -1528,14 +1533,14 @@ void Player::LoadMinefields()
 {
 	int i;
 	for (i = 0; i < mMineFields.size(); ++i)
-		TheGame->AddAlsoHere(mMineFields[i]);
+		game->AddAlsoHere(mMineFields[i]);
 }
 
 bool Player::OpenOrdersFile()
 {
 	string File;
-	File = TheGame->GetFileLoc();
-	File += TheGame->GetFileName();
+	File = game->GetFileLoc();
+	File += game->GetFileName();
 	File += ".x" + Long2String(GetID() + 1);
 
 	return OpenOrdersFile(File.c_str());
@@ -1557,8 +1562,8 @@ bool Player::SaveXFile()
 	AddDouble(&MetaInfo, "FileVersion", ORDERSFILEVERSION);
 	node.InsertEndChild(MetaInfo);
 
-	AddLong(&node, "GameID", TheGame->GetGameID());
-	AddLong(&node, "Turn", TheGame->GetTurn());
+	AddLong(&node, "GameID", game->GetGameID());
+	AddLong(&node, "Turn", game->GetTurn());
 	AddLong(&node, "PlayerNo", GetID());
 	for (int i = 0; i < mOrders.size(); ++i) {
 		if(!mOrders[i]->IsReplaced()) {
@@ -1570,9 +1575,9 @@ bool Player::SaveXFile()
 
 	char buf[1024];
 #ifdef _DEBUG
-	sprintf(buf, "%snew/%s.x%ld", TheGame->GetFileLoc().c_str(), TheGame->GetFileName().c_str(), GetID());
+	sprintf(buf, "%snew/%s.x%ld", game->GetFileLoc().c_str(), game->GetFileName().c_str(), GetID());
 #else
-	sprintf(buf, "%s%s.x%ld", TheGame->GetFileLoc().c_str(), TheGame->GetFileName().c_str(), GetID());
+	sprintf(buf, "%s%s.x%ld", game->GetFileLoc().c_str(), game->GetFileName().c_str(), GetID());
 #endif // _DEBUG
 	bool saved = doc.SaveFile(buf);
 	if (saved)
@@ -1598,14 +1603,14 @@ bool Player::OpenOrdersFile(const char * file)
 	}
 
 	long id = GetLong(orders->FirstChild("GameID"));
-	if (id != TheGame->GetGameID()) {
+	if (id != game->GetGameID()) {
 		Message * mess = AddMessage("Error: Missmatched Game IDs");
-		mess->AddLong("Host file GameID", TheGame->GetGameID());
+		mess->AddLong("Host file GameID", game->GetGameID());
 		mess->AddLong("Orders file GameID", id);
 		return false;
 	}
 
-	if (!Game::CheckMetaInfo(orders, file, ORDERSFILEVERSION))
+	if (!game->CheckMetaInfo(orders, file, ORDERSFILEVERSION))
 		return false;
 
 	const TiXmlNode * child;
@@ -1618,10 +1623,10 @@ bool Player::OpenOrdersFile(const char * file)
 	}
 
 	child = orders->FirstChild("Turn");
-	if (GetLong(child) != TheGame->GetTurn()) {
+	if (GetLong(child) != game->GetTurn()) {
 		Message * mess = AddMessage("Error: Wrong year number in turn file");
 		mess->AddLong("Turn specified", GetLong(child));
-		mess->AddLong("Actual turn", TheGame->GetTurn());
+		mess->AddLong("Actual turn", game->GetTurn());
 		return false;
 	}
 
@@ -1781,7 +1786,7 @@ TiXmlNode * Player::WriteBattlePlan(TiXmlNode * node, int num) const
 	if (mBattlePlans[num] != NULL) {
 		TiXmlElement * BPO = new TiXmlElement("BattlePlan");
 		BPO->SetAttribute("IDNumber", num);
-		mBattlePlans[num]->WriteNode(BPO);
+		mBattlePlans[num]->WriteNode(BPO, *game);
 		node->LinkEndChild(BPO);
 		return BPO;
 	} else
@@ -1821,7 +1826,7 @@ void Player::ParseWaypoints(const TiXmlNode * node)
 {
 	WayOrderList wol;
 	wol.SetFleet(GetLong(node->FirstChild("Fleet")));
-	wol.ParseNode(node, this, galaxy);
+	wol.ParseNode(node, this, game);
 
 	NCGetFleet(wol.GetFleet())->ChangeWaypoints(wol);
 }
@@ -1830,7 +1835,7 @@ double Player::GetPossibleMines(deque<MineField *> *pm, const Fleet * f, double 
 {
 	// OPTIMIZE This gets every mine field in range, regardless of the direction of travel
 
-	double Result = galaxy->MaxX() + galaxy->MaxY();
+	double Result = game->GetGalaxy()->MaxX() + game->GetGalaxy()->MaxY();
 	if (GetRelations(f->GetOwner()) >= PR_FRIEND)
 		return Result;
 
@@ -1913,7 +1918,7 @@ void Player::DetonateMineFields()
 			continue;
 
 		assert(mMineFields[i]->GetType()->CanDetonate());
-		TheGame->DetonateMineField(mMineFields[i]);
+		game->DetonateMineField(mMineFields[i]);
 	}
 }
 
@@ -1947,7 +1952,7 @@ SpaceObject * Player::GetPatrolTarget(const Fleet * persuer, double * range) con
 
 Fleet * Player::FleetFactory()
 {
-	return new Fleet(galaxy);
+	return new Fleet(game);
 }
 
 BattlePlan * Player::BattlePlanFactory()
@@ -1957,7 +1962,7 @@ BattlePlan * Player::BattlePlanFactory()
 
 MineField * Player::MineFieldFactory()
 {
-	return new MineField(galaxy, this);
+	return new MineField(game, this);
 }
 
 }

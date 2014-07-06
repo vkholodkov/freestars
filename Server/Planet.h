@@ -56,16 +56,16 @@ class ProdOrder;
  */
 class Planet : public CargoHolder {
 public:
-	Planet(Galaxy*);
+	Planet(Game*);
 //	Planet(int x, int y);
 	virtual ~Planet();
 	static const char* ELEMENT_NAME()	{return "Planet";}; ///< Name of XML element associated with class.
-	virtual bool ParseNode(const TiXmlNode * node);
+	virtual bool ParseNode(const TiXmlNode * node, Creation*);
 	virtual TiXmlNode * WriteNode(TiXmlNode * node, const Player * viewer) const;
 	/// planets are not technically 'in orbit', but return ourselves if some one asks
 	virtual Planet * InOrbit()				{ return this; }
 	virtual const Planet * InOrbit() const	{ return this; }
-	Galaxy *GetGalaxy() const { return mGalaxy; }
+	Game *GetGame() const { return mGame; }
 
 	void Init();
 	void SetDestinations();
@@ -169,10 +169,10 @@ public:
 	virtual void ResetSeen();
 
 	void CreateRandom(Creation * c);
-	void CreateHW(const Player * player);
-	void AdjustHW(Player * player);
+	void CreateHW(const Player * player, const Creation*);
+	void AdjustHW(Player * player, const Creation*);
     bool IsHW() const { return mHomeWorld; }
-	void CreateSecondWorld(const Planet * HW);
+	void CreateSecondWorld(const Planet*, const Creation*);
 	void AdjustSecondWorld(Player * player);
 	void ParseProduction(const TiXmlNode * node);
     const deque<ProdOrder *> GetProduction() const { return mProductionQ; }

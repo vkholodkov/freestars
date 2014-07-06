@@ -46,7 +46,7 @@ class Player;
  */
 class Salvage : public CargoHolder {
 public:
-	Salvage(Galaxy*);
+	Salvage(Game*);
 	Salvage(const CargoHolder &source);
 	virtual ~Salvage();
 	static const char* ELEMENT_NAME()	{return "Salvage";}; ///< Name of XML element associated with class.

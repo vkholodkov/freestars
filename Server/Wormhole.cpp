@@ -33,11 +33,11 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Wormhole::Wormhole(Galaxy *galaxy)
-    : SpaceObject(galaxy)
+Wormhole::Wormhole(Game *game)
+    : SpaceObject(game)
 {
 	Init();
-	mGalaxy->GetWormholeID();
+	game->GetGalaxy()->GetWormholeID();
 }
 
 Wormhole::Wormhole(const Wormhole &hole)
@@ -60,25 +60,27 @@ void Wormhole::Init()
 	mMaxStability = WORM_VERYSTABLE;
 	mMinStability = WORM_VERYUNSTABLE;
 	mID = 0;
-	mHadSeen.insert(mHadSeen.begin(), TheGame->NumberPlayers(), false);
-	mTraversed.insert(mTraversed.begin(), TheGame->NumberPlayers(), false);
+	mHadSeen.insert(mHadSeen.begin(), mGame->NumberPlayers(), false);
+	mTraversed.insert(mTraversed.begin(), mGame->NumberPlayers(), false);
 }
 
 bool Wormhole::ParseNode(const TiXmlNode * node)
 {
 	SpaceObject::ParseNode(node);
 
+    ArrayParser arrayParser(*mGame);
+
 	mStability = GetLong(node->FirstChild("Stability"));
 	mMaxStability = GetLong(node->FirstChild("MaxStability"));
 	mMinStability = GetLong(node->FirstChild("MinStability"));
 	mAttachedID = GetLong(node->FirstChild("Attached"));
-	Rules::ParseArrayBool(node->FirstChild("Traversed"), "Race", "Number", mTraversed);
-	for (int i = 0; i < TheGame->NumberPlayers(); ++i) {
+	arrayParser.ParseArrayBool(node->FirstChild("Traversed"), "Race", "Number", mTraversed);
+	for (int i = 0; i < mGame->NumberPlayers(); ++i) {
 		if (SeenBy(i))
 			mHadSeen[i] = true;
 	}
 
-	TheGame->AddAlsoHere(this);
+	mGame->AddAlsoHere(this);
 
 	if(mID == 0)
 		return false;
@@ -88,7 +90,7 @@ bool Wormhole::ParseNode(const TiXmlNode * node)
 
 void Wormhole::AdjustTraverse()
 {
-	for (int i = 0; i < TheGame->NumberPlayers(); ++i) {
+	for (int i = 0; i < mGame->NumberPlayers(); ++i) {
 		if (!SeenBy(i))
 			mTraversed[i] = false;
 		else if (GetAttached() && GetAttached()->SeenBy(i) == 0)
@@ -120,7 +122,7 @@ const Wormhole * Wormhole::GetAttached() const
 		return NULL;
 
 	if (mAttached == NULL)
-		const_cast<Wormhole *>(this)->mAttached = mGalaxy->GetWormhole(mAttachedID);
+		const_cast<Wormhole *>(this)->mAttached = mGame->GetGalaxy()->GetWormhole(mAttachedID);
 
 	return mAttached;
 }
@@ -151,9 +153,9 @@ void Wormhole::Jiggle()
 void Wormhole::Shift()
 {
 	// reset the wormhole
-	mID = mGalaxy->GetWormholeID();
+	mID = mGame->GetGalaxy()->GetWormholeID();
 	mSeenBy.erase(mSeenBy.begin(), mSeenBy.end());
-	mSeenBy.insert(mSeenBy.begin(), TheGame->NumberPlayers(), 0L);
+	mSeenBy.insert(mSeenBy.begin(), mGame->NumberPlayers(), 0L);
 
 	///@todo figure out how to hide the newly moved wormhole. new ID is probably best
 //	mID = mGalaxy->GetWormholeID();
@@ -164,11 +166,11 @@ void Wormhole::Shift()
 	long dist = 0;
 	long count = 0;
 	while (count++ < 1000 || dist == 0) {	// hard coded max to planet placement for safety
-		SetPosX(Random(mGalaxy->MinX(), mGalaxy->MaxX()));
-		SetPosY(Random(mGalaxy->MinY(), mGalaxy->MaxY()));
+		SetPosX(Random(mGame->GetGalaxy()->MinX(), mGame->GetGalaxy()->MaxX()));
+		SetPosY(Random(mGame->GetGalaxy()->MinY(), mGame->GetGalaxy()->MaxY()));
 
-		dist = long(Distance(mGalaxy->ClosestPlanet(this)));
-		if (dist >= TheGame->GetWHMinDistance())
+		dist = long(Distance(mGame->GetGalaxy()->ClosestPlanet(this)));
+		if (dist >= mGame->GetWHMinDistance())
 			break;	// far enough apart, go with it
 	}
 }

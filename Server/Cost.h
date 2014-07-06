@@ -45,7 +45,7 @@ public:
 	Cost();
 	Cost(const Cost & c);
 
-	void ReadCosts(const TiXmlNode * node);
+	void ReadCosts(const TiXmlNode * node, MessageSink &messageSink);
 	TiXmlNode * WriteCosts(TiXmlNode * node, const char * name) const;
 	long GetResources() const { return mResources; }
 	long GetCrew() const { return mCrew; }

@@ -47,10 +47,10 @@ Hull::~Hull()
 	Slots.clear();
 }
 
-bool Hull::LoadSlot(const TiXmlNode * node)
+bool Hull::LoadSlot(const TiXmlNode * node, MessageSink &messageSink)
 {
 	deque<Slot>::iterator iter;
-	iter = Slots.insert(Slots.end(), Slot(node, Slots.size()));
+	iter = Slots.insert(Slots.end(), Slot(node, Slots.size(), messageSink));
 	if (iter->IsAllowed(~CT_NONE) && iter->GetCount() > 0)
 		return true;
 	else {

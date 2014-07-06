@@ -46,7 +46,7 @@ public:
 	Location() : posX(0), posY(0) {}
 
 	virtual ~Location();
-	virtual bool ParseNode(const TiXmlNode * node, Galaxy*);  ///< Load.
+	virtual bool ParseNode(const TiXmlNode * node, Game*);  ///< Load.
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const	{ return WriteLocation(node); } ///< Save.
 	TiXmlNode * WriteLocation(TiXmlNode * node) const; ///< Save this location.
 

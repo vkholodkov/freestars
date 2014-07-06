@@ -64,8 +64,8 @@ const long SEEN_HOST			= 0xFFFFFFFF;	///< what the Host sees
  */
 class SpaceObject : public Location {
 public:
-	SpaceObject(Galaxy *galaxy) : Location(), mGalaxy(galaxy), mOwner(NULL), mAlsoHere(NULL) { Init(); }
-	SpaceObject(const SpaceObject &source) : Location(source), mGalaxy(source.mGalaxy), mOwner(source.mOwner), mAlsoHere(NULL) { Init(); }
+	SpaceObject(Game *game) : Location(), mGame(game), mOwner(NULL), mAlsoHere(NULL) { Init(); }
+	SpaceObject(const SpaceObject &source) : Location(source), mGame(source.mGame), mOwner(source.mOwner), mAlsoHere(NULL) { Init(); }
 //	SpaceObject(int x, int y, Player * owner) : Location(x, y), mOwner(owner) { Init(); }
 	virtual ~SpaceObject();
 	void Init();
@@ -73,6 +73,9 @@ public:
 	virtual bool ParseNode(const TiXmlNode * node);
 	virtual TiXmlNode * WriteNode(TiXmlNode * node, const Player * viewer) const; ///< Save.
 	TiXmlNode * WriteTransport(TiXmlNode * node) const; ///< Save transport.
+
+    const Game *GetGame() const { return mGame; }
+    Game *GetGame() { return mGame; }
 
 	long GetID() const		{ return mID; } ///< Get ID.
 	void SetID(long id)		{ mID = id; } ///< Set ID.
@@ -103,7 +106,7 @@ public:
 	virtual const Planet * InOrbit() const; ///< Get planet this object is in orbit of, or NULL if none.
 
 protected:
-    Galaxy *mGalaxy;
+    Game *mGame;
 	deque<long> mSeenBy;
 	deque<Chaser *> mChasers; ///< Chasers following this SpaceObject.
 	Player * mOwner; ///< Owner of this SpaceObject.

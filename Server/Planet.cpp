@@ -34,8 +34,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Planet::Planet(Galaxy *_galaxy)
-    : CargoHolder(_galaxy)
+Planet::Planet(Game *game)
+    : CargoHolder(game)
     , mProductionQ()
 {
 	Init();
@@ -46,7 +46,7 @@ void Planet::Init()
 	mMinConc.insert(mMinConc.begin(), Rules::MaxMinType, 1);
 	mMinMined.insert(mMinMined.begin(), Rules::MaxMinType, 0);
 	mCanLoadBy.clear();
-	mCanLoadBy.insert(mCanLoadBy.begin(), TheGame->NumberPlayers(), false);
+	mCanLoadBy.insert(mCanLoadBy.begin(), mGame->NumberPlayers(), false);
 	mHabTerra.insert(mHabTerra.begin(), Rules::MaxHabType, 50);
 	mHabStart.insert(mHabStart.begin(), Rules::MaxHabType, 50);
 	mHomeWorld = false;
@@ -75,7 +75,7 @@ Planet::~Planet()
 		delete *iter;
 }
 
-bool Planet::ParseNode(const TiXmlNode * node)
+bool Planet::ParseNode(const TiXmlNode * node, Creation *creation)
 {
 	if (!CargoHolder::ParseNode(node))
 		return false;
@@ -83,19 +83,20 @@ bool Planet::ParseNode(const TiXmlNode * node)
 	const TiXmlNode * child1;
 	const char * ptr;
 	int i;
+    ArrayParser arrayParser(*mGame);
 
 	ptr = GetString(node->FirstChild("Name"));
 	if (ptr != NULL)
 		mName = ptr;
-	if (mName.empty() && TheGame->GetCreation())
-		mName = TheGame->GetCreation()->GetNextName(mGalaxy);
+	if (mName.empty() && creation != NULL)
+		mName = creation->GetNextName(mGame->GetGalaxy());
 	if (mName.empty()) {
-		Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+		Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 		mess->AddItem("", "Missing Name");
 		return false;
 	}
-	if (TheGame->GetCreation() && mGalaxy->GetPlanet(mName.c_str()) != NULL) {
-		Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+	if (creation != NULL && mGame->GetGalaxy()->GetPlanet(mName.c_str()) != NULL) {
+		Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 		mess->AddItem("Duplicate Name", mName);
 		return false;
 	}
@@ -104,7 +105,7 @@ bool Planet::ParseNode(const TiXmlNode * node)
 
 	bool bSecond = GetBool(node->FirstChild("SecondWorld"));
 	if (bSecond && GetOwner() != NULL)
-		TheGame->GetCreation()->AddSecond(NCGetOwner(), this);
+		creation->AddSecond(NCGetOwner(), this);
 
 	if (mHomeWorld && bSecond) {
 		return false;
@@ -112,8 +113,8 @@ bool Planet::ParseNode(const TiXmlNode * node)
 
 	child1 = node->FirstChild("StartingHab");
 	if (child1 != NULL)
-		Rules::ParseArray(child1, mHabStart, HABS);
-	else if (TheGame->GetCreation()) {
+		Rules::ParseArray(child1, mHabStart, HABS, *mGame);
+	else if (creation != NULL) {
 		for (i = 0; i < Rules::MaxHabType; ++i) {
 			if (mHomeWorld && GetOwner() != NULL && GetOwner()->HabCenter(i) >= 0)	// leave immunes random
 				mHabStart[i] = GetOwner()->HabCenter(i);
@@ -124,16 +125,16 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		}
 	}
 
-	Rules::ParseArrayBool(node->FirstChild("CanLoadBy"), "Race", "Number", mCanLoadBy);
+	arrayParser.ParseArrayBool(node->FirstChild("CanLoadBy"), "Race", "Number", mCanLoadBy);
 
 	child1 = node->FirstChild("Concentrations");
 	if (child1 != NULL)
-		Rules::ParseArray(child1, mMinConc, MINERALS);
-	else if (TheGame->GetCreation()) {
+		Rules::ParseArray(child1, mMinConc, MINERALS, *mGame);
+	else if (creation != NULL) {
 		if (mHomeWorld) {
 			for (i = 0; i < Rules::MaxMinType; ++i) {
 				mMinConc[i] = Rules::GetHWMC(i);
-				mContains[i] = Rules::GetHWStartMinerals(i);
+				mContains[i] = Rules::GetHWStartMinerals(i, creation);
 			}
 		} else {
 			for (i = 0; i < Rules::MaxHabType; ++i)
@@ -141,36 +142,36 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		}
 	}
 
-	Rules::ParseArray(node->FirstChild("MineProgress"), mMinMined, MINERALS);
+	Rules::ParseArray(node->FirstChild("MineProgress"), mMinMined, MINERALS, *mGame);
 
 	child1 = node->FirstChild("Factories");
 	mFactories = GetLong(child1);
 	if (mFactories < 0) {
-		Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+		Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 		mess->AddItem("", this);
 		mess->AddLong("Factories", mFactories);
 		return false;
-	} else if (child1 == NULL && mHomeWorld && TheGame->GetCreation())
-		mFactories = TheGame->GetCreation()->mHWFactories;
-	else if (child1 == NULL && bSecond && TheGame->GetCreation())
-		mFactories = TheGame->GetCreation()->mSWFactories;
+	} else if (child1 == NULL && mHomeWorld && creation != NULL)
+		mFactories = creation->mHWFactories;
+	else if (child1 == NULL && bSecond && creation != NULL)
+		mFactories = creation->mSWFactories;
 
 	child1 = node->FirstChild("Mines");
 	mMines = GetLong(child1);
 	if (mMines < 0) {
-		Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+		Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 		mess->AddItem("", this);
 		mess->AddLong("Mines", mMines);
 		return false;
-	} else if (child1 == NULL && mHomeWorld && TheGame->GetCreation())
-		mMines = TheGame->GetCreation()->mHWMines;
-	else if (child1 == NULL && bSecond && TheGame->GetCreation())
-		mMines = TheGame->GetCreation()->mSWMines;
+	} else if (child1 == NULL && mHomeWorld && creation != NULL)
+		mMines = creation->mHWMines;
+	else if (child1 == NULL && bSecond && creation != NULL)
+		mMines = creation->mSWMines;
 
 	child1 = node->FirstChild("CurrentHab");
 	if (child1 != NULL)
-		Rules::ParseArray(child1, mHabTerra, HABS);
-	else if (TheGame->GetCreation()) {
+		Rules::ParseArray(child1, mHabTerra, HABS, *mGame);
+	else if (creation != NULL) {
 		for (i = 0; i < Rules::MaxMinType; ++i)
 			mHabTerra[i] = mHabStart[i];
 	}
@@ -180,12 +181,12 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		if (child1) {
 			mBaseDesign = GetLong(child1) - 1;
 			if (mBaseDesign < -1 || mBaseDesign > Rules::GetConstant("MaxBaseDesigns")) {
-				Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+				Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 				mess->AddItem("", this);
 				mess->AddLong("BaseDesign", mBaseDesign);
 				return false;
 			}
-		} else if ((mHomeWorld || bSecond) && TheGame->GetCreation()) {
+		} else if ((mHomeWorld || bSecond) && creation != NULL) {
 			mBaseDesign = -2;	// special value to allow placement later
 		} else
 			mBaseDesign = -1;
@@ -196,7 +197,7 @@ bool Planet::ParseNode(const TiXmlNode * node)
 				(mBaseDamage > 0 && mBaseDamage > GetBaseDesign()->GetArmor(GetOwner()))
 			)
 		{
-			Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+			Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 			mess->AddItem("", this);
 			mess->AddLong("BaseDamage", mBaseDamage);
 			return false;
@@ -205,17 +206,17 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		child1 = node->FirstChild("Scanner");
 		if (child1)
 			mScanner = GetBool(child1);
-		else if (TheGame->GetCreation() && (mHomeWorld || bSecond) && GetOwner())
+		else if (creation != NULL && (mHomeWorld || bSecond) && GetOwner())
 			mScanner = GetOwner()->GetScanSpace() > 0;
 
 		child1 = node->FirstChild("Defenses");
 		if (child1)
 			mDefenses = GetLong(node->FirstChild("Defenses"));
-		else if (mHomeWorld && TheGame->GetCreation())
-			mDefenses = TheGame->GetCreation()->mHWDefenses;
+		else if (mHomeWorld && creation != NULL)
+			mDefenses = creation->mHWDefenses;
 
 		if (mDefenses < 0 || mDefenses > Rules::GetConstant("MaxDefenses")) {
-			Message * mess = TheGame->AddMessage("Error: Invalid value on Planet");
+			Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 			mess->AddItem("", this);
 			mess->AddLong("Defenses", mDefenses);
 			return false;
@@ -224,7 +225,7 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		Planet * pdest;
 		child1 = node->FirstChild("PacketDestination");
 		if (child1) {
-			pdest = mGalaxy->GetPlanet(GetString(child1));
+			pdest = mGame->GetGalaxy()->GetPlanet(GetString(child1));
 			if (!pdest) {
 				Message * mess = NCGetOwner()->AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(child1));
@@ -235,7 +236,7 @@ bool Planet::ParseNode(const TiXmlNode * node)
 		}
 		child1 = node->FirstChild("PacketDestination");
 		if (child1) {
-			pdest = mGalaxy->GetPlanet(GetString(child1));
+			pdest = mGame->GetGalaxy()->GetPlanet(GetString(child1));
 			if (!pdest) {
 				Message * mess = NCGetOwner()->AddMessage("Error: Invalid planet");
 				mess->AddItem("", GetString(child1));
@@ -264,13 +265,13 @@ bool Planet::ParseNode(const TiXmlNode * node)
 	}
 
 	// if we are creating a game, and it has an owner, add starting ships
-	if (TheGame->GetCreation() && mHomeWorld) {
+	if (creation != NULL && mHomeWorld) {
 		if (GetOwner())
 			NCGetOwner()->PlaceHW(this);
 		else
-			TheGame->GetCreation()->AddHW(this);
+			creation->AddHW(this);
 	}
-	if (TheGame->GetCreation() && bSecond) {
+	if (creation != NULL && bSecond) {
 		if (GetOwner())
 			NCGetOwner()->PlaceSW(this, NULL);	// HW isn't used if owner is already set.
 	}
@@ -374,9 +375,9 @@ long Planet::GetDisplayPop() const
 
 void Planet::SetDestinations()
 {
-	mRouteTo = mGalaxy->GetPlanet(mRouteName.c_str());
+	mRouteTo = mGame->GetGalaxy()->GetPlanet(mRouteName.c_str());
 	mRouteName.erase();
-	mPacketDest = mGalaxy->GetPlanet(mPacketName.c_str());
+	mPacketDest = mGame->GetGalaxy()->GetPlanet(mPacketName.c_str());
 	mPacketName.erase();
 }
 
@@ -391,7 +392,7 @@ void Planet::Invade(Player * invader, long amount)
 	}
 
 	mInvasions.push_back(Invasion(invader, amount));
-	mGalaxy->AddInvasion(this);
+	mGame->GetGalaxy()->AddInvasion(this);
 }
 
 double Planet::GetDefenseValue() const
@@ -1028,42 +1029,42 @@ void Planet::ResetSeen()
 	CargoHolder::ResetSeen();
 
 	mCanLoadBy.clear();
-	mCanLoadBy.insert(mCanLoadBy.begin(), TheGame->NumberPlayers(), false);
+	mCanLoadBy.insert(mCanLoadBy.begin(), mGame->NumberPlayers(), false);
 }
 
 void Planet::CreateRandom(Creation * c)
 {
 	long i;
 
-	mID = mGalaxy->GetNextPlanetID();
+	mID = mGame->GetGalaxy()->GetNextPlanetID();
 	for (i = 0; i < Rules::MaxMinType; ++i)
 		mMinConc[i] = Random(Rules::MinMC(i), Rules::MaxMC(i));
 
-	mCanLoadBy.insert(mCanLoadBy.begin(), TheGame->NumberPlayers(), false);
+	mCanLoadBy.insert(mCanLoadBy.begin(), mGame->NumberPlayers(), false);
 	for (i = 0; i < Rules::MaxHabType; ++i)
 		mHabTerra[i] = mHabStart[i] = Rules::RandomHab(i);
 
 	// preplant artifacts
-	if (TheGame->GetRandomEvents() | RE_ARTIFACT && Randodd(Rules::GetFloat("ArtifactOdds"))) {
+	if (mGame->GetRandomEvents() | RE_ARTIFACT && Randodd(Rules::GetFloat("ArtifactOdds"))) {
 		mArtifactAmount = Random(Rules::GetConstant("ArtifactMin"), Rules::GetConstant("ArtifactMax"));
 		mArtifactType = Random(Rules::MaxTechType);
 	}
 
-	mName = c->GetNextName(mGalaxy);
+	mName = c->GetNextName(mGame->GetGalaxy());
 }
 
-void Planet::CreateHW(const Player * player)
+void Planet::CreateHW(const Player * player, const Creation *creation)
 {
-	mPopulation = TheGame->GetCreation()->mHWBasePop;
-	if (player->HasSecondPlanet() && TheGame->GetCreation()->mSecondaryWorlds)
-		mPopulation = long(mPopulation * TheGame->GetCreation()->mPopMultiplierFor2nd + .5);
+	mPopulation = creation->mHWBasePop;
+	if (player->HasSecondPlanet() && creation->mSecondaryWorlds)
+		mPopulation = long(mPopulation * creation->mPopMultiplierFor2nd + .5);
 
-	mDefenses = TheGame->GetCreation()->mHWDefenses;
-	mFactories = TheGame->GetCreation()->mHWFactories;
-	mMines = TheGame->GetCreation()->mHWMines;
+	mDefenses = creation->mHWDefenses;
+	mFactories = creation->mHWFactories;
+	mMines = creation->mHWMines;
 	for (int i = 0; i < Rules::MaxMinType; ++i) {
 		mMinConc[i] = Rules::GetHWMC(i);
-		mContains[i] = Rules::GetHWStartMinerals(i);
+		mContains[i] = Rules::GetHWStartMinerals(i, creation);
 	}
 
 	mBaseDesign = -2;	// allow this world to have a base
@@ -1072,13 +1073,13 @@ void Planet::CreateHW(const Player * player)
 	mHomeWorld = true;
 }
 
-void Planet::AdjustHW(Player * player)
+void Planet::AdjustHW(Player * player, const Creation *creation)
 {
 	mOwner = player;
 	long bonusPop;
-	bonusPop = long(TheGame->GetCreation()->mHWPopBonus * player->GrowthRate() + .5);
-	if (player->HasSecondPlanet() && TheGame->GetCreation()->mSecondaryWorlds)
-		bonusPop = long(bonusPop * TheGame->GetCreation()->mPopMultiplierFor2nd + .5);
+	bonusPop = long(creation->mHWPopBonus * player->GrowthRate() + .5);
+	if (player->HasSecondPlanet() && creation->mSecondaryWorlds)
+		bonusPop = long(bonusPop * creation->mPopMultiplierFor2nd + .5);
 
 	mPopulation = long((bonusPop + mPopulation) * player->StartingPopFactor());
 
@@ -1125,16 +1126,16 @@ void Planet::AdjustHW(Player * player)
 		mScanner = true;
 }
 
-void Planet::CreateSecondWorld(const Planet * HW)
+void Planet::CreateSecondWorld(const Planet *HW, const Creation *creation)
 {
-	mPopulation = long(HW->GetPopulation() * TheGame->GetCreation()->mSecondaryPop + .5);
+	mPopulation = long(HW->GetPopulation() * creation->mSecondaryPop + .5);
 
-	mDefenses = TheGame->GetCreation()->mSWDefenses;
-	mFactories = TheGame->GetCreation()->mSWFactories;
-	mMines = TheGame->GetCreation()->mSWMines;
+	mDefenses = creation->mSWDefenses;
+	mFactories = creation->mSWFactories;
+	mMines = creation->mSWMines;
 	int i;
 	for (i = 0; i < Rules::MaxMinType; ++i)
-		mContains[i] = Rules::GetSWStartMinerals(i);
+		mContains[i] = Rules::GetSWStartMinerals(i, creation);
 
 	for (i = 0; i < Rules::MaxHabType; ++i)
 		mHabStart[i] = Rules::GetSecondHab(i, HW->GetOwner());
@@ -1535,7 +1536,7 @@ void Planet::SweepMines()
 	if (sweep == 0)
 		return;
 
-	TheGame->SweepMines(this, sweep, mOwner->GetBattlePlan(0));
+	mGame->SweepMines(this, sweep, mOwner->GetBattlePlan(0));
 }
 
 }

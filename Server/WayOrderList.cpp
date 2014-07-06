@@ -81,7 +81,7 @@ WayOrderList::~WayOrderList()
 	</Waypoints>
 */
 
-bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *galaxy)
+bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Game *game)
 {
 	const TiXmlNode * child1;
 	const TiXmlNode * child2;
@@ -107,13 +107,13 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *ga
 		fmo = false;
 		speed = 0;
 		unsigned long pnum = GetLong(child1->FirstChild("Player"));
-		if (pnum < 0 || pnum > TheGame->NumberPlayers()) {
+		if (pnum < 0 || pnum > game->NumberPlayers()) {
 			Message * mess = player->AddMessage("Error: invalid player number");
 			mess->AddLong("", pnum);
 			mess->AddItem("Where", "Fleet destination");
 			continue;
 		}
-		player2 = TheGame->NCGetPlayer(pnum);
+		player2 = game->NCGetPlayer(pnum);
 
 		for (child2 = child1->FirstChild(); child2; child2 = child2->NextSibling()) {
 			if (child2->Type() == TiXmlNode::COMMENT)
@@ -124,7 +124,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *ga
 					continue;
 
 				Location * nl = new Location();
-				if (!nl->ParseNode(child2, galaxy)) {
+				if (!nl->ParseNode(child2, game)) {
 					delete nl;
 					continue;
 				}
@@ -134,7 +134,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *ga
 				if (loc != NULL)
 					continue;
 
-				Planet * planet = galaxy->GetPlanet(GetString(child2));
+				Planet * planet = game->GetGalaxy()->GetPlanet(GetString(child2));
 				if (!planet) {
 					Message * mess = player->AddMessage("Error: invalid planet");
 					mess->AddItem("", GetString(child2));
@@ -152,7 +152,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *ga
 					continue;
 
 				long l = GetLong(child2);
-				Salvage * salvage = galaxy->GetSalvage(l);
+				Salvage * salvage = game->GetGalaxy()->GetSalvage(l);
 				if (!salvage || !salvage->SeenBy(player)) {
 					Message * mess = player->AddMessage("Error: invalid salvage pile");
 					mess->AddLong("Waypoint order", l);
@@ -174,7 +174,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *ga
 					continue;
 
 				if (player2 == player) {
-					loc = new TempFleet(galaxy, GetLong(child2), player);
+					loc = new TempFleet(game, GetLong(child2), player);
 					fmo = true;
 				} else {
 					Fleet * f2 = player2->NCGetFleet(GetLong(child2));
@@ -241,7 +241,7 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Galaxy *ga
 					wo->mOrder = OT_LAYMINE;
 				} else if (strnicmp(child3->Value(), "Transfer", 8) == 0) {
 					unsigned long num = GetLong(child3);
-					if (num < 0 || num > TheGame->NumberPlayers()) {
+					if (num < 0 || num > game->NumberPlayers()) {
 						Message * mess = player->AddMessage("Error: invalid player number");
 						mess->AddLong("", num);
 						mess->AddItem("Where", "Waypoint order");

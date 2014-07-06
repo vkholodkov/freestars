@@ -33,7 +33,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Slot::Slot(const TiXmlNode * node, long Pos)
+Slot::Slot(const TiXmlNode * node, long Pos, MessageSink &messageSink)
 {
 	const TiXmlNode * child1;
 	const char * ptr;
@@ -78,7 +78,7 @@ Slot::Slot(const TiXmlNode * node, long Pos)
 			else if (stricmp(ptr, "General") == 0)
 				Allowed |= CT_GENERAL;
 			else {
-				Message * mess = TheGame->AddMessage("Warning: Unknown slot type");
+				Message * mess = messageSink.AddMessage("Warning: Unknown slot type");
 				mess->AddItem("", ptr);
 			}
 		} else if (stricmp(child1->Value(), "Number") == 0) {
@@ -92,7 +92,7 @@ Slot::Slot(const TiXmlNode * node, long Pos)
 		} else if (stricmp(child1->Value(), "SlotTop") == 0) {
 			mSlotTop = ::round(GetDouble(child1) * 64);
 		} else {
-			Message * mess = TheGame->AddMessage("Warning: Unknown section");
+			Message * mess = messageSink.AddMessage("Warning: Unknown section");
 			mess->AddItem("Slot", child1->Value());
 		}
 	}

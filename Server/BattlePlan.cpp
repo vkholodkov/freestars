@@ -155,7 +155,7 @@ bool BattlePlan::ParseNode(const TiXmlNode * node, Player * owner)
 		mEnemy = BPE_ALL;
 	else {
 		unsigned long num = atol(ptr);
-		if (num > TheGame->NumberPlayers()) {
+		if (num > owner->GetGame()->NumberPlayers()) {
 			Message * mess = owner->AddMessage("Error: Battle Plan has invalid enemy");
 			mess->AddLong("Battle Plan #", num);
 			mess->AddItem("Battle Plan enemy", ptr);
@@ -171,11 +171,11 @@ bool BattlePlan::ParseNode(const TiXmlNode * node, Player * owner)
 	return true;
 }
 
-void BattlePlan::WriteNode(TiXmlNode * node) const
+void BattlePlan::WriteNode(TiXmlNode * node, MessageSink &messageSink) const
 {
 	AddString(node, "Name", mName.c_str());
-	AddString(node, "PrimaryTarget", WriteTarget(mPrimary));
-	AddString(node, "SecondaryTarget", WriteTarget(mSecondary));
+	AddString(node, "PrimaryTarget", WriteTarget(mPrimary, messageSink));
+	AddString(node, "SecondaryTarget", WriteTarget(mSecondary, messageSink));
 	if (mTactic == BPT_DISENGAGE)
 		AddString(node, "Tactic", "Disengage");
 	else if (mTactic == BPT_DISIFHIT)
@@ -189,7 +189,7 @@ void BattlePlan::WriteNode(TiXmlNode * node) const
 	else if (mTactic == BPT_MAXDAM)
 		AddString(node, "Tactic", "MaximizeDamage");
 	else {
-		TheGame->AddMessage("Error: Battle Plan has invalid Primary target");
+		messageSink.AddMessage("Error: Battle Plan has invalid Primary target");
 		AddString(node, "Tactic", "");
 	}
 
@@ -208,10 +208,10 @@ void BattlePlan::WriteNode(TiXmlNode * node) const
 		AddString(node, "DumpCargo", "true");
 }
 
-void BattlePlan::WriteNodeBattle(TiXmlNode * node) const
+void BattlePlan::WriteNodeBattle(TiXmlNode * node, MessageSink &messageSink) const
 {
-	AddString(node, "PrimaryTarget", WriteTarget(mPrimary));
-	AddString(node, "SecondaryTarget", WriteTarget(mSecondary));
+	AddString(node, "PrimaryTarget", WriteTarget(mPrimary, messageSink));
+	AddString(node, "SecondaryTarget", WriteTarget(mSecondary, messageSink));
 	if (mTactic == BPT_DISENGAGE)
 		AddString(node, "Tactic", "Disengage");
 	else if (mTactic == BPT_DISIFHIT)
@@ -250,7 +250,7 @@ HullType BattlePlan::GetTarget(const char * ptr)
 		return HC_UNKNOWN;
 }
 
-const char * BattlePlan::WriteTarget(HullType target)
+const char * BattlePlan::WriteTarget(HullType target, MessageSink &messageSink)
 {
 	if (target == HC_NONE)
 		return "NoneDisengage";
@@ -269,7 +269,7 @@ const char * BattlePlan::WriteTarget(HullType target)
 	else if (target == HC_FREIGHTER)
 		return "Freighters";
 	else {
-		TheGame->AddMessage("Error: Battle Plan has invalid target");
+		messageSink.AddMessage("Error: Battle Plan has invalid target");
 		return "";
 	}
 }

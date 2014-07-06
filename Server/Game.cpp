@@ -44,6 +44,8 @@ namespace FreeStars {
 Game::Game()
 	: galaxy(new Galaxy())
 {
+	galaxy->SetGame(this);
+
 	mTurnPhase = 0;
 	mCreation = NULL;
     VC = NULL;
@@ -225,12 +227,12 @@ bool Game::LoadCreation(const TiXmlNode * options)
 
 	child1 = options->FirstChild("MineralSettings");
 	if (!child1) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("Section", "MineralSettings");
 		return false;
 	}
 
-	Rules::ParseMinSettings(child1);
+	Rules::ParseMinSettings(child1, *this);
 
 	return true;
 }
@@ -266,7 +268,7 @@ bool Game::LoadComponents(const TiXmlNode * node)
 	if (!node)
 		return false;
 
-	if (!Component::LoadComponents(node, mComponents))
+	if (!Component::LoadComponents(node, mComponents, *this))
 		return false;
 
 #ifdef _DEBUG
@@ -306,7 +308,7 @@ bool Game::LoadHostFile(const char * hostfile)
 	TiXmlDocument doc(hostfile);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("File name", hostfile);
 		mess->AddItem("TinyXML error description", doc.ErrorDesc());
 		mess->AddLong("TinyXML error row", doc.ErrorRow());
@@ -319,7 +321,7 @@ bool Game::LoadHostFile(const char * hostfile)
 
 	hf = doc.FirstChild("HostFile");
 	if (!hf) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", hostfile);
 		mess->AddItem("Section", "HostFile");
 		return false;
@@ -330,7 +332,7 @@ bool Game::LoadHostFile(const char * hostfile)
 
 	mGameID = GetLong(hf->FirstChild("GameID"));
 	if (mGameID == 0) {
-		Message * mess = TheGame->AddMessage("Error: Invalid Game ID");
+		Message * mess = this->AddMessage("Error: Invalid Game ID");
 		mess->AddLong("Game ID", mGameID);
 		return false;
 	}
@@ -338,7 +340,7 @@ bool Game::LoadHostFile(const char * hostfile)
 	node = hf->FirstChild("Turn");
 	Turn = GetLong(node);
 	if (Turn < 1) {
-		Message * mess = TheGame->AddMessage("Error: Turn too low");
+		Message * mess = this->AddMessage("Error: Turn too low");
 		mess->AddLong("Turn", Turn);
 		return false;
 	}
@@ -377,14 +379,14 @@ bool Game::LoadHostFile(const char * hostfile)
 		const TiXmlNode * child2 = node->FirstChild("PlayerNumber");
 		unsigned int p = GetLong(child2);
 		if (p < 1 || p > NumberPlayers() || p != mPlayers.size()+1) {
-			Message * mess = TheGame->AddMessage("Error: Invalid player number");
+			Message * mess = this->AddMessage("Error: Invalid player number");
 			mess->AddLong("", p);
 			return false;
 		}
 
 		Player * dummy = NULL;
 		deque<Player *>::iterator pi;
-		pi = mPlayers.insert(mPlayers.end(), TheGame->ObjectFactory(dummy, p));
+		pi = mPlayers.insert(mPlayers.end(), this->ObjectFactory(dummy, p));
 		if (!(*pi)->ParseNode(node, false))
 			return false;
 	}
@@ -392,7 +394,7 @@ bool Game::LoadHostFile(const char * hostfile)
 	// Load after loading players, will cause problems with planet owners otherwise
 	node = hf->FirstChild("Galaxy");
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", hostfile);
 		mess->AddItem("Section", "Galaxy");
 		return false;
@@ -417,7 +419,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 	TiXmlDocument doc(playerfile);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("File name", playerfile);
 		mess->AddItem("TinyXML error description", doc.ErrorDesc());
 		mess->AddLong("TinyXML error row", doc.ErrorRow());
@@ -430,7 +432,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 
 	ptf = doc.FirstChild("PlayerTurnFile");
 	if (!ptf) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", playerfile);
 		mess->AddItem("Section", "PlayerTurnFile");
 		return false;
@@ -441,7 +443,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 
 	mGameID = GetLong(ptf->FirstChild("GameID"));
 	if (mGameID == 0) {
-		Message * mess = TheGame->AddMessage("Error: Invalid Game ID");
+		Message * mess = this->AddMessage("Error: Invalid Game ID");
 		mess->AddLong("Game ID", mGameID);
 		return false;
 	}
@@ -449,7 +451,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 	node = ptf->FirstChild("Turn");
 	Turn = GetLong(node);
 	if (Turn < 1) {
-		Message * mess = TheGame->AddMessage("Error: Turn too low");
+		Message * mess = this->AddMessage("Error: Turn too low");
 		mess->AddLong("Turn", Turn);
 		return false;
 	}
@@ -462,13 +464,13 @@ bool Game::LoadPlayerFile(const char * playerfile)
 		const TiXmlNode * child2 = node->FirstChild("PlayerNumber");
 		unsigned int p = GetLong(child2);
 		if (p < 1 || p > NumberPlayers()) {
-			Message * mess = TheGame->AddMessage("Error: Invalid player number");
+			Message * mess = this->AddMessage("Error: Invalid player number");
 			mess->AddLong("", p);
 			return false;
 		}
 
 		Player * dummy = NULL;
-		mPlayers[p-1] = TheGame->ObjectFactory(dummy, p);
+		mPlayers[p-1] = this->ObjectFactory(dummy, p);
 		if (!mPlayers[p-1]->ParseNode(node, p != mCurrentPlayer))
 			return false;
 	}
@@ -482,7 +484,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 	// Load after getting # of players, will cause problems with the mSeenBy array otherwise
 	node = ptf->FirstChild("Galaxy");
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", playerfile);
 		mess->AddItem("Section", "Galaxy");
 		return false;
@@ -503,7 +505,7 @@ bool Game::CheckMetaInfo(const TiXmlNode * node, const char * file, double filev
 {
 	const TiXmlNode * mn = node->FirstChild("MetaInfo");
 	if (!mn) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", file);
 		mess->AddItem("Section", "MetaInfo");
 		return false;
@@ -511,7 +513,7 @@ bool Game::CheckMetaInfo(const TiXmlNode * node, const char * file, double filev
 
 	double meta = GetDouble(mn->FirstChild("FileVersion"));
 	if (meta > fileversion + epsilon || meta < fileversion - epsilon) {
-		Message * mess = TheGame->AddMessage("Error: Invalid FileVersion");
+		Message * mess = this->AddMessage("Error: Invalid FileVersion");
 		mess->AddItem("File name", file);
 		mess->AddItem("FileVersion", GetString(node->FirstChild("FileVersion")));
 		return false;
@@ -519,7 +521,7 @@ bool Game::CheckMetaInfo(const TiXmlNode * node, const char * file, double filev
 
 	meta = GetDouble(mn->FirstChild("FreeStarsVersion"));
 	if (meta > FREESTARSVERSION + epsilon || meta < FREESTARSVERSION - epsilon) {
-		Message * mess = TheGame->AddMessage("Error: Invalid FreeStarsVersion");
+		Message * mess = this->AddMessage("Error: Invalid FreeStarsVersion");
 		mess->AddItem("File name", file);
 		mess->AddItem("FreeStarsVersion", GetString(node->FirstChild("FreeStarsVersion")));
 		return false;
@@ -540,7 +542,7 @@ bool Game::LoadDefFile(const char * deffile)
 	TiXmlDocument doc(deffile);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("File name", deffile);
 		return false;
 	}
@@ -552,7 +554,7 @@ bool Game::LoadDefFile(const char * deffile)
 
 	df = doc.FirstChild("DefFile");
 	if (!df) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", deffile);
 		mess->AddItem("Section", "DefFile");
 		return false;
@@ -570,7 +572,7 @@ bool Game::LoadDefFile(const char * deffile)
 
 	node = df->FirstChild("Rules");
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", deffile);
 		mess->AddItem("Section", "Rules");
 		return false;
@@ -582,7 +584,7 @@ bool Game::LoadDefFile(const char * deffile)
 	node = df->FirstChild("Turn");
 	Turn = GetLong(node);
 	if (Turn < 1) {
-		Message * mess = TheGame->AddMessage("Error: Turn too low");
+		Message * mess = this->AddMessage("Error: Turn too low");
 		mess->AddLong("Turn", Turn);
 		return false;
 	}
@@ -624,7 +626,7 @@ bool Game::LoadDefFile(const char * deffile)
 		else if (randomize > 0 && seedc < seeds)
 			mSeed[seedc++] = randomize;
 
-		points = p->GetAdvantagePoints();
+		points = p->GetAdvantagePoints(*this);
 		if (points < 0)
 			return false;
 		p->SetLeftoverPoints(points / 3);
@@ -651,7 +653,7 @@ bool Game::LoadDefFile(const char * deffile)
 	NameFile = mFileLoc;
 	NameFile += GetString(df->FirstChild("PlanetNames"));
 	if (!mCreation->LoadNames(NameFile.c_str())) {
-		Message * mess = TheGame->AddMessage("Error: Cannot load planet names");
+		Message * mess = this->AddMessage("Error: Cannot load planet names");
 		return false;
 	}
 
@@ -662,7 +664,7 @@ bool Game::LoadDefFile(const char * deffile)
 	}
 
 	if (mCreation->mWorlds > galaxy->GetPlanetCount())
-		galaxy->Build(mCreation);	// make one
+		galaxy->Build(mCreation, this);	// make one
 
 	PlacePlayers();
 
@@ -686,7 +688,7 @@ void Game::PlacePlayers()
 
 	// for all left over home worlds
 	Planet * hw;
-	while ((hw = TheGame->GetCreation()->GetNextHW()) != NULL) {
+	while ((hw = this->GetCreation()->GetNextHW()) != NULL) {
 		hw->SetBaseNumber(-1);
 	}
 }
@@ -696,7 +698,7 @@ bool Game::LoadRules(const char * file, const char * MainNode)
 	TiXmlDocument doc(file);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("", file);
 		return false;
 	}
@@ -706,7 +708,7 @@ bool Game::LoadRules(const char * file, const char * MainNode)
 
 	node = doc.FirstChild(MainNode);
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", file);
 		mess->AddItem("Section", MainNode);
 		return false;
@@ -714,7 +716,7 @@ bool Game::LoadRules(const char * file, const char * MainNode)
 
 	child = node->FirstChild("Rules");
 	if (!child) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", file);
 		mess->AddItem("Section", "Rules");
 		return false;
@@ -741,18 +743,18 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 /*
 	if (Rules::ModFileName != "") {
 		if (Rules::ModFileName != File) {
-			Message * mess = TheGame->AddMessage("Error: Different Rules Files");
+			Message * mess = this->AddMessage("Error: Different Rules Files");
 			mess->AddItem("File name", File);
 			return false;
 		}
 		if (Rules::ModFileVersion != version) {
-			Message * mess = TheGame->AddMessage("Error: Different Rules Versions");
+			Message * mess = this->AddMessage("Error: Different Rules Versions");
 			mess->AddItem("File name", File);
 			mess->AddItem("File version", version);
 			return false;
 		}
 		if (Rules::ModFileCRC != verify) {
-			Message * mess = TheGame->AddMessage("Error: Different Rules Checksums");
+			Message * mess = this->AddMessage("Error: Different Rules Checksums");
 			mess->AddItem("File name", File);
 			return false;
 		}
@@ -762,7 +764,7 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 	TiXmlDocument doc(File);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("File name", File);
 		return false;
 	}
@@ -772,7 +774,7 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 
 	rd = doc.FirstChild("RulesDefinition");
 	if (!rd) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", File);
 		mess->AddItem("Section", "RulesDefinition");
 		return false;
@@ -780,7 +782,7 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 
 	node = rd->FirstChild("MetaInfo");
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", File);
 		mess->AddItem("Section", "MetaInfo");
 		return false;
@@ -788,7 +790,7 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 
 	double meta = GetDouble(node->FirstChild("FileVersion"));
 	if (meta > RULESFILEVERSION + epsilon || meta < RULESFILEVERSION - epsilon) {
-		Message * mess = TheGame->AddMessage("Warning: Incorrect FileVersion");
+		Message * mess = this->AddMessage("Warning: Incorrect FileVersion");
 		mess->AddItem("File name", File);
 		mess->AddItem("FileVersion", GetString(node->FirstChild("FileVersion")));
 		return false;
@@ -797,7 +799,7 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 	meta = GetDouble(node->FirstChild("RulesVersion"));
 	if (checkver) {
 		if (meta > version + epsilon || meta < version - epsilon) {
-			Message * mess = TheGame->AddMessage("Warning: Incorrect RulesVersion");
+			Message * mess = this->AddMessage("Warning: Incorrect RulesVersion");
 			mess->AddItem("File name", File);
 			mess->AddItem("RulesVersion", GetString(node->FirstChild("RulesVersion")));
 			return false;
@@ -806,10 +808,10 @@ bool Game::LoadRules(const char * file, const char * verify, double version, boo
 		version = meta;
 	}
 
-	if (!Rules::LoadRules(rd->FirstChild("Rules"), file, verify, version))
+	if (!Rules::LoadRules(rd->FirstChild("Rules"), file, verify, version, *this))
 		return false;
 
-	if (!RacialTrait::LoadRacialTraits(rd->FirstChild("RacialTraits")))
+	if (!RacialTrait::LoadRacialTraits(this, rd->FirstChild("RacialTraits")))
 		return false;
 
 	if (!LoadComponents(rd->FirstChild("Components")))
@@ -833,7 +835,7 @@ bool Game::LoadXYFile()
 	TiXmlDocument doc(File);
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("File name", File);
 		return false;
 	}
@@ -843,7 +845,7 @@ bool Game::LoadXYFile()
 
 	xy = doc.FirstChild("XYFile");
 	if (!xy) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", File);
 		mess->AddItem("Section", "XYFile");
 		return false;
@@ -853,8 +855,8 @@ bool Game::LoadXYFile()
 		return false;
 
 	long id = GetLong(xy->FirstChild("GameID"));
-	if (id != TheGame->GetGameID()) {
-		Message * mess = TheGame->AddMessage("Error: Missmatched Game IDs");
+	if (id != this->GetGameID()) {
+		Message * mess = this->AddMessage("Error: Missmatched Game IDs");
 		mess->AddLong("Host file GameID", mGameID);
 		mess->AddLong("XY file GameID", id);
 		return false;
@@ -862,7 +864,7 @@ bool Game::LoadXYFile()
 
 	node = xy->FirstChild("Rules");
 	if (!node) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", File);
 		mess->AddItem("Section", "Rules");
 		return false;
@@ -877,7 +879,7 @@ bool Game::LoadXYFile()
 
 	mNumberOfPlayers = GetLong(xy->FirstChild("NumberOfPlayers"));
 	if (mNumberOfPlayers < 1) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", File);
 		mess->AddItem("Section", "NumberOfPlayers");
 		return false;
@@ -910,7 +912,7 @@ void Game::WriteXYFile()
 	AddDouble(MetaInfo, "FreeStarsVersion", FREESTARSVERSION);
 	AddDouble(MetaInfo, "FileVersion", HOSTFILEVERSION);
 	XYFile->LinkEndChild(MetaInfo);
-	AddLong(XYFile, "GameID", TheGame->GetGameID());
+	AddLong(XYFile, "GameID", this->GetGameID());
 	Rules::WriteRulesFile(XYFile);
 	AddLong(XYFile, "NumberOfPlayers", mNumberOfPlayers);
 
@@ -1016,7 +1018,7 @@ bool Game::WriteHostFile()
 	AddDouble(MetaInfo, "FileVersion", HOSTFILEVERSION);
 	HostFile->LinkEndChild(MetaInfo);
 
-	AddLong(HostFile, "GameID", TheGame->GetGameID());
+	AddLong(HostFile, "GameID", this->GetGameID());
 	AddLong(HostFile, "Turn", Turn);
 
 	// Add seeds for the prior turn so that we can regen a turn if there is some hard to reproduce bug
@@ -1274,7 +1276,7 @@ bool Game::WritePlayerFiles()
 		AddDouble(MetaInfo, "FileVersion", TURNFILEVERSION);
 		TurnFile->LinkEndChild(MetaInfo);
 
-		AddLong(TurnFile, "GameID", TheGame->GetGameID());
+		AddLong(TurnFile, "GameID", this->GetGameID());
 		AddLong(TurnFile, "Turn", Turn);
 
 		TiXmlElement * player = new TiXmlElement("Player");
@@ -1356,7 +1358,7 @@ bool Game::ProcessWaypoints(long pnumber)
 	TiXmlDocument doc(File.c_str());
 	doc.SetCondenseWhiteSpace(false);
 	if (!doc.LoadFile()) {
-		Message * mess = TheGame->AddMessage("Error: Cannot open file");
+		Message * mess = this->AddMessage("Error: Cannot open file");
 		mess->AddItem("File name", File);
 		return false;
 	}
@@ -1365,7 +1367,7 @@ bool Game::ProcessWaypoints(long pnumber)
 	const TiXmlNode * node;
 	orders = doc.FirstChild("OrdersFile");
 	if (!orders) {
-		Message * mess = TheGame->AddMessage("Error: Missing section");
+		Message * mess = this->AddMessage("Error: Missing section");
 		mess->AddItem("File name", File);
 		mess->AddItem("Section", "OrdersFile");
 		return false;
@@ -1375,8 +1377,8 @@ bool Game::ProcessWaypoints(long pnumber)
 		return false;
 
 	long id = GetLong(orders->FirstChild("GameID"));
-	if (id != TheGame->GetGameID()) {
-		Message * mess = TheGame->AddMessage("Error: Missmatched Game IDs");
+	if (id != this->GetGameID()) {
+		Message * mess = this->AddMessage("Error: Missmatched Game IDs");
 		mess->AddLong("Host file GameID", mGameID);
 		mess->AddLong("Orders file GameID", id);
 		return false;
@@ -1402,7 +1404,7 @@ bool Game::ProcessWaypoints(long pnumber)
 	for (node = orders->FirstChild("Waypoints"); node; node = node->NextSibling("Waypoints")) {
 		WayOrderList & wol = *mOrders.insert(mOrders.end(), WayOrderList());
 		wol.SetFleet(GetLong(node->FirstChild("Fleet")));
-		wol.ParseNode(node, player, galaxy);
+		wol.ParseNode(node, player, this);
 	}
 
 	return true;
@@ -1454,8 +1456,8 @@ bool Game::ProcessOrders(long pnumber)
 	}
 
 	long id = GetLong(orders->FirstChild("GameID"));
-	if (id != TheGame->GetGameID()) {
-		Message * mess = TheGame->AddMessage("Error: Missmatched Game IDs");
+	if (id != this->GetGameID()) {
+		Message * mess = this->AddMessage("Error: Missmatched Game IDs");
 		mess->AddLong("Host file GameID", mGameID);
 		mess->AddLong("Orders file GameID", id);
 		return false;
@@ -1990,12 +1992,12 @@ Component * Game::ObjectFactory(const Component *)
 
 Player * Game::ObjectFactory(const Player *, int PlayerNumber)
 {
-	return new Player(galaxy, PlayerNumber);
+	return new Player(this, PlayerNumber);
 }
 
 RacialTrait * Game::ObjectFactory(const RacialTrait *)
 {
-	return new RacialTrait();
+	return new RacialTrait(this);
 }
 
 Race * Game::ObjectFactory(const Race *)
@@ -2005,27 +2007,27 @@ Race * Game::ObjectFactory(const Race *)
 
 Ship * Game::ObjectFactory(const Ship *)
 {
-	return new Ship();
+	return new Ship(this);
 }
 
 Planet * Game::ObjectFactory(const Planet *)
 {
-	return new Planet(galaxy);
+	return new Planet(this);
 }
 
 Salvage * Game::ObjectFactory(const Salvage *)
 {
-	return new Salvage(galaxy);
+	return new Salvage(this);
 }
 
 Packet * Game::ObjectFactory(const Packet *)
 {
-	return new Packet(galaxy);
+	return new Packet(this);
 }
 
 Wormhole * Game::ObjectFactory(const Wormhole *)
 {
-	return new Wormhole(galaxy);
+	return new Wormhole(this);
 }
 
 }

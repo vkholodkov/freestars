@@ -31,9 +31,9 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Salvage::Salvage(Galaxy *galaxy)
-    : CargoHolder(galaxy)
-    , TurnCreated(TheGame->GetTurn())
+Salvage::Salvage(Game *game)
+    : CargoHolder(game)
+    , TurnCreated(game->GetTurn())
     , MaxSize(0)
 {
 	SetID(0);
@@ -41,10 +41,10 @@ Salvage::Salvage(Galaxy *galaxy)
 
 Salvage::Salvage(const CargoHolder &source)
 :	CargoHolder(source),
-	TurnCreated(TheGame->GetTurn()),
+	TurnCreated(mGame->GetTurn()),
 	MaxSize(0)
 {
-	SetID(mGalaxy->GetSalvageID());
+	SetID(mGame->GetGalaxy()->GetSalvageID());
 }
 
 Salvage::~Salvage()
@@ -53,7 +53,7 @@ Salvage::~Salvage()
 
 void Salvage::Decay()
 {
-	if (TheGame->GetTurn() > TurnCreated + 1) {
+	if (mGame->GetTurn() > TurnCreated + 1) {
 		for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct) {
 			long amt = GetContain(ct);
 			if (amt > 100)
@@ -73,13 +73,13 @@ bool Salvage::ParseNode(const TiXmlNode * node)
 		return false;
 
 	TurnCreated = GetLong(node->FirstChild("TurnCreated"));
-	if (TurnCreated < 1 || TurnCreated >= TheGame->GetTurn()) {
-		Message * mess = TheGame->AddMessage("Error: Wrong year number in turn file");
+	if (TurnCreated < 1 || TurnCreated >= mGame->GetTurn()) {
+		Message * mess = mGame->AddMessage("Error: Wrong year number in turn file");
 		mess->AddLong("Salvage created", TurnCreated);
 		return false;
 	}
 
-	TheGame->AddAlsoHere(this);
+	mGame->AddAlsoHere(this);
 
 	return true;
 }

@@ -48,7 +48,7 @@ double Location::Distance(double px, double py) const
 	return sqrt((double(posX) - px) * (double(posX) - px) + (double(posY) - py) * (double(posY) - py));
 }
 
-bool Location::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
+bool Location::ParseNode(const TiXmlNode * node, Game *game)
 {
 	const TiXmlNode * child = node->FirstChild("XCoord");
 	if (child) {
@@ -56,14 +56,14 @@ bool Location::ParseNode(const TiXmlNode * node, Galaxy *galaxy)
 		posY = GetLong(node->FirstChild("YCoord"));
 
 		if (posX <= 0 || posY <= 0) {
-			Message * mess = TheGame->AddMessage("Error: Invalid Location");
+			Message * mess = game->AddMessage("Error: Invalid Location");
 			mess->AddItem("", this);
 			return false;
 		}
 	} else {
-		Planet * p = galaxy->GetPlanet(GetString(node->FirstChild("Planet")));
+		Planet * p = game->GetGalaxy()->GetPlanet(GetString(node->FirstChild("Planet")));
 		if (p == NULL) {
-			Message * mess = TheGame->AddMessage("Error: Invalid Location");
+			Message * mess = game->AddMessage("Error: Invalid Location");
 			mess->AddItem("", this);
 			return false;
 		}

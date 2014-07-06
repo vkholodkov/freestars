@@ -62,6 +62,7 @@ private:
     std::vector<Race*> races;
     std::vector<QLabel*> raceLabels;
 
+    std::auto_ptr<Game> game;
     int currentPlayer;
 };
 

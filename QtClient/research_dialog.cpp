@@ -10,16 +10,17 @@ namespace FreeStars {
 ResearchDialog::ResearchDialog(Player *_player, QWidget *parent)
     : QDialog(parent)
     , player(_player)
+    , game(_player->GetGame())
     , researchFieldGroup(new QButtonGroup(this))
     , totalResources(0)
     , techTypeOffset(0)
 {
     long researchField = _player->GetResearchField();
 
-    unsigned num_planets = TheGame->GetGalaxy()->GetPlanetCount();
+    unsigned num_planets = game->GetGalaxy()->GetPlanetCount();
 
     for(unsigned n = 1 ; n <= num_planets ; n++) {
-        Planet *p = TheGame->GetGalaxy()->GetPlanet(n);
+        Planet *p = game->GetGalaxy()->GetPlanet(n);
 
         if(p->GetOwner() == player && p->GetPayTax()) {
             totalResources += p->GetResources();
@@ -80,7 +81,7 @@ void ResearchDialog::setResearchField(int researchField)
 
     researchBenefitsList->clear();
 
-    const std::deque<Component *> &components = TheGame->GetComponents();
+    const std::deque<Component *> &components = game->GetComponents();
     std::list<Component*> available1, available24, available10;
     size_t available_count = 0;
 

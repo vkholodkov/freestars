@@ -44,8 +44,6 @@ MainWindow::~MainWindow() {
     Component::Cleanup();
     Battle::Cleanup();
     Ship::Cleanup();
-
-    delete TheGame;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -81,12 +79,14 @@ void MainWindow::open()
 
 bool MainWindow::save()
 {
-    if(TheGame != NULL) {
+    GameView *gameView = dynamic_cast<GameView*>(tabWidget->currentWidget());
+
+    if(gameView != NULL) {
 #ifndef QT_NO_CURSOR
         QApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
 
-        Player *player = TheGame->GetCurrentPlayer();
+        Player *player = gameView->getGame()->GetCurrentPlayer();
         player->SaveXFile();
 
 #ifndef QT_NO_CURSOR
@@ -384,14 +384,12 @@ void MainWindow::loadPlayerFile(const QString &fileName)
 
     file.close();
 
-    delete TheGame;
-
-    TheGame = new Game;
+    std::auto_ptr<Game> game(new Game);
 
     try {
         std::string filename_ascii(fileName.toAscii());
 
-        if(!TheGame->LoadPlayerFile(filename_ascii.c_str())) {
+        if(!game->LoadPlayerFile(filename_ascii.c_str())) {
             QMessageBox::warning(this, tr("Application"),
                                  tr("Cannot open player file %1")
                                  .arg(fileName));
@@ -408,8 +406,7 @@ void MainWindow::loadPlayerFile(const QString &fileName)
 
     setCurrentFile(fileName);
 
-    closeAllViews();
-    openGameView();
+    openGameView(game.release());
 
     statusBar()->showMessage(tr("File loaded"), 2000);
 }
@@ -464,12 +461,13 @@ void MainWindow::updateRecentFileActions()
 void MainWindow::updateModel() {
 }
 
-void MainWindow::openGameView() {
-    Player *player = TheGame->GetCurrentPlayer();
-    GameView *gameView = new GameView(player, componentPictures.get());
+void MainWindow::openGameView(Game *game) {
+    Player *player = game->GetCurrentPlayer();
+    GameView *gameView = new GameView(game, player, componentPictures.get());
     tabWidget->addTab(gameView, QString("%0 -- %1")
         .arg(strippedName(curFile))
         .arg(player->GetPluralName().c_str()));
+    tabWidget->setCurrentWidget(gameView);
 }
 
 void MainWindow::closeAllViews() {

@@ -48,7 +48,7 @@ namespace FreeStars {
 class Packet : public CargoHolder 
 {
 public:
-	Packet(Galaxy *galaxy) : CargoHolder(galaxy), mSpeed(0), mDriverSpeed(0), mDestination(NULL), mFirstYear(false) { SetID(0); }
+	Packet(Game *game) : CargoHolder(game), mSpeed(0), mDriverSpeed(0), mDestination(NULL), mFirstYear(false) { SetID(0); }
 	Packet(const CargoHolder &source, long speed, long driverSpeed, Planet * destination);
 
 	/// Name of XML element associated with class.

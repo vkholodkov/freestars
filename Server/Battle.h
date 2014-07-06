@@ -34,6 +34,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
+class Game;
+
 /**
  * Battle.
  * A battle happens when two or more hostile players
@@ -43,14 +45,14 @@ namespace FreeStars {
  */
 class Battle : public Location {
 public:
-	Battle(const Location & loc);
+	Battle(Game*, const Location & loc);
 	virtual ~Battle();
 
 	void AddFleet(Fleet * fleet);
 	void SetPlanet(Planet * planet)	{ mBPlanet = planet; }
 	void AddFleets();
 	void Resolve();
-	static void SetStartPos();
+	static void SetStartPos(const Game*);
 	static void Cleanup();
 
 protected:
@@ -65,6 +67,7 @@ protected:
 
 	long mRound;
 
+    Game *game;
 	deque<Fleet *> mThere;
 	deque<Stack *> mFighting;
 	deque<Slot *> mFireOrder;
@@ -74,6 +77,7 @@ protected:
 
 	static long **StartX;
 	static long **StartY;
+    static long NumberOfPlayers;
 
 	class bSlot {
 	public:

@@ -57,7 +57,7 @@ private:
     void updateRecentFileActions();
 
     void updateModel();    
-    void openGameView();
+    void openGameView(Game*);
     void closeAllViews();
 
     QString strippedName(const QString &fullFileName);

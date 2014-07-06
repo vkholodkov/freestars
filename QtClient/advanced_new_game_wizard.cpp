@@ -26,6 +26,7 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     , messages()
     , races(16, (Race*)0)
     , raceLabels(16, (QLabel*)0)
+    , game(new Game)
     , currentPlayer(0)
 {
     newRaceAction = new QAction(tr("New..."), this);
@@ -221,8 +222,7 @@ void AdvancedNewGameWizard::newRace()
 
 void AdvancedNewGameWizard::openRace()
 {
-    QString gameDir(TheGame != NULL ? TheGame->GetFileLoc().c_str()
-        : qApp->applicationDirPath());
+    QString gameDir(game->GetFileLoc().c_str());
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                      gameDir,
@@ -247,7 +247,7 @@ void AdvancedNewGameWizard::openRace()
         return;
     }
 
-    if (!Game::CheckMetaInfo(node, fileName.toAscii().constData(), RACEFILEVERSION)) {
+    if (!game->CheckMetaInfo(node, fileName.toAscii().constData(), RACEFILEVERSION)) {
         QMessageBox::critical(this, tr("Error"),
             tr("File %0 cannot be opened in this version of the game").arg(fileName));
         return;

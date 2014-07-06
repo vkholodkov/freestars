@@ -148,11 +148,12 @@ void Component::Cleanup()
 	Subtypes.clear();
 }
 
-bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &CompList)
+bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &CompList, MessageSink &messageSink)
 {
 	const TiXmlNode * child1;
 	const TiXmlNode * child2;
 	const char * ptr;
+	ArrayParser arrayParser(messageSink);
 
 	Component * temp = NULL;
 	for (child1 = comps->FirstChild("Component"); child1; child1 = child1->NextSibling("Component")) {
@@ -161,7 +162,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 		if (ptr == NULL)
 			return false;
 
-		ComponentType ct = ParseCompType(ptr);
+		ComponentType ct = ParseCompType(ptr, messageSink);
 		if (ct == CT_HULL) {
 			temp = new FreeStars::Hull();
 			temp->mHullType = HC_NONE;
@@ -169,7 +170,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 			temp = new Hull();
 			temp->mHullType = HC_NONE;
 		} else
-			temp = TheGame->ObjectFactory(temp);
+			temp = new Component;
 
 		temp->Type = ct;
 
@@ -188,15 +189,15 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 					temp->mHullType = HC_NONE;
 
 				if ((temp->Type == CT_HULL || temp->Type == CT_BASE) && temp->mHullType != HC_NONE) {
-					Message * mess = TheGame->AddMessage("Error: More then one HullType specified");
+					Message * mess = messageSink.AddMessage("Error: More then one HullType specified");
 					mess->AddItem("Component", temp->Name);
 					continue;
 				}
-				temp->mHullType |= ParseHullType(GetString(child2));
+				temp->mHullType |= ParseHullType(GetString(child2), messageSink);
 			} else if (stricmp(child2->Value(), "Costs") == 0) {
-				temp->mCost.ReadCosts(child2);
+				temp->mCost.ReadCosts(child2, messageSink);
 			} else if (stricmp(child2->Value(), "TechnologyRequirements") == 0) {
-				Rules::ParseArray(child2, temp->Tech, TECHS);
+				Rules::ParseArray(child2, temp->Tech, TECHS, messageSink);
 			} else if (stricmp(child2->Value(), "Mass") == 0) {
 				temp->Mass = GetLong(child2);
 			} else if (stricmp(child2->Value(), "PRTNeeded") == 0) {
@@ -204,7 +205,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				ptr = GetString(child2);
 				rt = RacialTrait::ParsePRT(ptr);
 				if (rt == NULL) {
-					Message * mess = TheGame->AddMessage("Error: Unknown PRT");
+					Message * mess = messageSink.AddMessage("Error: Unknown PRT");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("PRT", ptr);
 					return false;
@@ -216,7 +217,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				ptr = GetString(child2);
 				rt = RacialTrait::ParsePRT(ptr);
 				if (rt == NULL) {
-					Message * mess = TheGame->AddMessage("Error: Unknown PRT");
+					Message * mess = messageSink.AddMessage("Error: Unknown PRT");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("PRT", ptr);
 					return false;
@@ -228,7 +229,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				ptr = GetString(child2);
 				rt = RacialTrait::ParseLRT(ptr);
 				if (rt == NULL) {
-					Message * mess = TheGame->AddMessage("Error: Unknown LRT");
+					Message * mess = messageSink.AddMessage("Error: Unknown LRT");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("LRT", ptr);
 					return false;
@@ -240,7 +241,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				ptr = GetString(child2);
 				rt = RacialTrait::ParseLRT(ptr);
 				if (rt == NULL) {
-					Message * mess = TheGame->AddMessage("Error: Unknown LRT");
+					Message * mess = messageSink.AddMessage("Error: Unknown LRT");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("LRT", ptr);
 					return false;
@@ -307,7 +308,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				temp->MaxSpeed = GetLong(child2);
 				if (temp->MaxSpeed > Rules::GetConstant("MaxSpeed")) {
 					temp->MaxSpeed = Rules::GetConstant("MaxSpeed");
-					Message * mess = TheGame->AddMessage("Error: Max speed too high");
+					Message * mess = messageSink.AddMessage("Error: Max speed too high");
 					mess->AddItem("Component", temp->Name);
 					return false;
 				}
@@ -315,12 +316,12 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				temp->BattleSpeed = GetLong(child2);
 			} else if (stricmp(child2->Value(), "FuelUsage") == 0) {
 				if (temp->FuelUsage.size() > 0) {
-					Message * mess = TheGame->AddMessage("Warning: Duplicate FuelUsage");
+					Message * mess = messageSink.AddMessage("Warning: Duplicate FuelUsage");
 					mess->AddItem("Component", temp->Name);
 					return false;
 				}
 				temp->FuelUsage.insert(temp->FuelUsage.begin(), Rules::GetConstant("MaxSpeed"), 0);
-				Rules::ParseArrayFloat(child2, "Warp", "Speed", temp->FuelUsage, NULL);
+				arrayParser.ParseArrayFloat(child2, "Warp", "Speed", temp->FuelUsage, NULL);
 			} else if (stricmp(child2->Value(), "MineAmount") == 0) {
 				temp->MineAmount = GetLong(child2);
 			} else if (stricmp(child2->Value(), "Mines") == 0) {
@@ -353,7 +354,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				else if (stricmp(ptr, "Missile") == 0)
 					temp->WeaponType = WT_MISSILE;
 				else {
-					Message * mess = TheGame->AddMessage("Warning: Unkown weapon type");
+					Message * mess = messageSink.AddMessage("Warning: Unkown weapon type");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("Type", ptr);
 				}
@@ -369,7 +370,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				else if (stricmp(ptr, "Terra") == 0)
 					temp->BombType = BT_TERRA;
 				else {
-					Message * mess = TheGame->AddMessage("Warning: Unknown bomb type");
+					Message * mess = messageSink.AddMessage("Warning: Unknown bomb type");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("Type", ptr);
 				}
@@ -380,7 +381,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 
 				temp->MineType = Rules::MineID(ptr);
 				if (temp->MineType < 0) {
-					Message * mess = TheGame->AddMessage("Warning: Unknown mine type");
+					Message * mess = messageSink.AddMessage("Warning: Unknown mine type");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("Type", ptr);
 				}
@@ -404,7 +405,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 				else if (stricmp(ptr, "Terraform phase") == 0)
 					temp->RemoteTerraform |= TERRA_REMOTE;
 				else {
-					Message * mess = TheGame->AddMessage("Warning: Unknown terraformer type");
+					Message * mess = messageSink.AddMessage("Warning: Unknown terraformer type");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("Type", ptr);
 				}
@@ -423,7 +424,7 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 					temp->StealShip = true;
 					temp->StealPlanet = true;
 				} else {
-					Message * mess = TheGame->AddMessage("Warning: Unknown thieving type");
+					Message * mess = messageSink.AddMessage("Warning: Unknown thieving type");
 					mess->AddItem("Component", temp->Name);
 					mess->AddItem("Type", ptr);
 				}
@@ -457,8 +458,8 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 			} else if (stricmp(child2->Value(), "EngineType") == 0) {
 				// For expansion
 			} else if (stricmp(child2->Value(), "Slot") == 0) {
-				if (!dynamic_cast<Hull *>(temp) || !dynamic_cast<Hull *>(temp)->LoadSlot(child2)) {
-					Message * mess = TheGame->AddMessage("Error: Slot problem on hull");
+				if (!dynamic_cast<Hull *>(temp) || !dynamic_cast<Hull *>(temp)->LoadSlot(child2, messageSink)) {
+					Message * mess = messageSink.AddMessage("Error: Slot problem on hull");
 					mess->AddItem("Component", temp->Name);
 					return false;
 				}
@@ -470,19 +471,19 @@ bool Component::LoadComponents(const TiXmlNode * comps, deque<Component *> &Comp
 			} else if (stricmp(child2->Value(), "CargoWidth") == 0) {
 			} else if (stricmp(child2->Value(), "CargoHeight") == 0) {
 			} else {
-				Message * mess = TheGame->AddMessage("Warning: Unknown Section in Component");
+				Message * mess = messageSink.AddMessage("Warning: Unknown Section in Component");
 				mess->AddItem("Component", temp->Name);
 				mess->AddItem("Section", child2->Value());
 			}
 		}
 
 		if (temp->Type == CT_HULL && ((temp->mHullType & HC_BASE) || temp->mHullType == HC_ALL || temp->mHullType == HC_UNARMED || temp->mHullType == HC_ARMED)) {
-			Message * mess = TheGame->AddMessage( "Error: Invalid HullType");
+			Message * mess = messageSink.AddMessage( "Error: Invalid HullType");
 			mess->AddItem("Component", temp->Name);
 			continue;
 			
 		} else if (temp->Type == CT_BASE && !(temp->mHullType & HC_BASE)) {
-			Message * mess = TheGame->AddMessage( "Error: Invalid HullType");
+			Message * mess = messageSink.AddMessage( "Error: Invalid HullType");
 			mess->AddItem("Component", temp->Name);
 			continue;
 		} else if (temp->Type == CT_DEFENSE) {
@@ -511,10 +512,10 @@ long Component::ParseSubType(const char * ptr, bool insert)
 	return iter - Subtypes.begin();
 }
 
-ComponentType Component::ParseCompType(const char * ptr)
+ComponentType Component::ParseCompType(const char * ptr, MessageSink &messageSink)
 {
 	if (ptr == NULL || *ptr == '\0') {
-		TheGame->AddMessage("Error: Missing Component type");
+		messageSink.AddMessage("Error: Missing Component type");
 		return CT_NONE;
 	}
 
@@ -557,16 +558,16 @@ ComponentType Component::ParseCompType(const char * ptr)
 	else if (stricmp(ptr, "Alchemy") == 0)
 		return CT_ALCHEMY;
 	else {
-		Message* mess = TheGame->AddMessage("Error: Invalid Component type");
+		Message* mess = messageSink.AddMessage("Error: Invalid Component type");
 		mess->AddItem("Type", ptr);
 		return CT_NONE;
 	}
 }
 
-HullType Component::ParseHullType(const char * ptr)
+HullType Component::ParseHullType(const char * ptr, MessageSink &messageSink)
 {
 	if (ptr == NULL || *ptr == '\0') {
-		TheGame->AddMessage("Error: Missing HullType");
+		messageSink.AddMessage("Error: Missing HullType");
 		return HC_NONE;
 	}
 
@@ -601,7 +602,7 @@ HullType Component::ParseHullType(const char * ptr)
 	else if (stricmp(ptr, "All") == 0)
 		return HC_ALL;
 	else {
-		Message* mess = TheGame->AddMessage("Error: Invalid HullType");
+		Message* mess = messageSink.AddMessage("Error: Invalid HullType");
 		mess->AddItem("Type", ptr);
 		return HC_NONE;
 	}

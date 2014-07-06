@@ -51,7 +51,7 @@ public:
 	virtual void WriteNode(TiXmlNode * node) const = 0;
 	virtual string ToString() const = 0;
 	void AddDesc(TiXmlElement * node) const;
-	static MessItem * ParseNode(const TiXmlNode * node, Galaxy*);
+	static MessItem * ParseNode(const TiXmlNode * node, Game*);
 
 	string mDesc;
 
@@ -69,7 +69,7 @@ public:
 	virtual ~MessLoc();
 	virtual void WriteNode(TiXmlNode * node) const;
 	virtual string ToString() const;
-	static MessLoc * ParseNode(const TiXmlNode * node, Galaxy*);
+	static MessLoc * ParseNode(const TiXmlNode * node, Game*);
 	bool StoreMessageLocation(const Location * loc);
 
 	const Location * mLoc;
@@ -88,7 +88,7 @@ public:
 	virtual ~MessPlayer();
 	virtual void WriteNode(TiXmlNode * node) const;
 	virtual string ToString() const;
-	static MessPlayer * ParseNode(const TiXmlNode * node);
+	static MessPlayer * ParseNode(const TiXmlNode * node, Game*);
 
 	const Player * mPlayer;
 };
@@ -186,7 +186,7 @@ public:
 
 	bool IsType(const char * t)			{ return mType.find(t) >= 0; }
 	void WriteNode(TiXmlNode * node) const;
-	bool ParseNode(const TiXmlNode * node, Galaxy*);
+	bool ParseNode(const TiXmlNode * node, Game*);
 	string ToString() const;
 
     void ApplyVisitor(MessageVisitor&) const;

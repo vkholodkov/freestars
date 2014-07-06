@@ -52,7 +52,7 @@ class Hull : public Component {
 public:
 	Hull();
 	virtual ~Hull();
-	bool LoadSlot(const TiXmlNode * node);
+	bool LoadSlot(const TiXmlNode * node, MessageSink &messageSink);
 	bool CheckSlots();
 	const Slot & GetSlot(int i) const	{ return Slots[i]; }
 	unsigned int GetNumberSlots() const			{ return Slots.size(); }

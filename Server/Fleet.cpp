@@ -48,8 +48,8 @@ Fleet::Fleet(int id, const CargoHolder &loc) : CargoHolder(loc), mStartPos(loc)
 	Init();
 }
 
-Fleet::Fleet(Galaxy *galaxy)
-    : CargoHolder(galaxy)
+Fleet::Fleet(Game *game)
+    : CargoHolder(game)
 {
 	Init();
 }
@@ -59,7 +59,7 @@ void Fleet::Init()
 	mName.erase();
 	ResetDefaults();	// Set all calculated values to defaults
 	mCanLoadBy.clear();
-	mCanLoadBy.insert(mCanLoadBy.begin(), TheGame->NumberPlayers(), false);
+	mCanLoadBy.insert(mCanLoadBy.begin(), mGame->NumberPlayers(), false);
 	mRepeatOrders = false;
 
 	mRepairRate = 2;	// how much this fleet will repair this turn
@@ -135,6 +135,7 @@ bool Fleet::ParseNode(const TiXmlNode * node, Player * player, bool other)
 	mStartPos = *this;
 	const TiXmlNode * child1;
 	const char * ptr;
+    ArrayParser arrayParser(*player->GetGame());
 
 	if (mID < 1 || mID > (int)Rules::MaxFleets)
 		return false;
@@ -154,7 +155,7 @@ bool Fleet::ParseNode(const TiXmlNode * node, Player * player, bool other)
 
 		mRepeatOrders = GetBool(node->FirstChild("Repeat"));
 
-		Rules::ParseArrayBool(node->FirstChild("CanLoadBy"), "Race", "Number", mCanLoadBy);
+		arrayParser.ParseArrayBool(node->FirstChild("CanLoadBy"), "Race", "Number", mCanLoadBy);
 	}
 
 	for (child1 = node->FirstChild("Stack"); child1; child1 = child1->NextSibling("Stack")) {
@@ -175,7 +176,7 @@ bool Fleet::ParseNode(const TiXmlNode * node, Player * player, bool other)
 	if (!other) {
 		WayOrderList ords;
 		ords.SetFleet(GetID());
-		ords.ParseNode(node, player, mGalaxy);
+		ords.ParseNode(node, player, mGame);
 		ChangeWaypoints(ords);
 		mBattlePlan = GetLong(node->FirstChild("BattlePlan"));
 	}
@@ -451,7 +452,7 @@ void Fleet::SweepMines()
 	if (sweep <= 0)
 		return;
 
-	TheGame->SweepMines(this, sweep, mOwner->GetBattlePlan(mBattlePlan));
+	mGame->SweepMines(this, sweep, mOwner->GetBattlePlan(mBattlePlan));
 }
 
 void Fleet::LayMines()
@@ -498,7 +499,7 @@ void Fleet::Patrol()
 	if (mOrders.size() > 1)	// don't go on patrol if other orders still pending
 		return;
 
-	SpaceObject * target = TheGame->GetPatrolTarget(this, wo->GetPatrolRange());
+	SpaceObject * target = mGame->GetPatrolTarget(this, wo->GetPatrolRange());
 	if (target == NULL)
 		return;
 
@@ -631,7 +632,7 @@ void Fleet::Scrap(bool colonize)
 			planet->AdjustPopulation(GetCost().GetCrew());	// recover crew too
 		}
 	} else {
-		Salvage * salvage = mGalaxy->AddSalvage(*this);
+		Salvage * salvage = mGame->GetGalaxy()->AddSalvage(*this);
 		double percent = Rules::ScrapRecover(NULL, false);
 		for (int i = 0; i < Rules::MaxMinType; ++i) {
 			long temp = GetContain(i);
@@ -880,7 +881,7 @@ bool Fleet::Move()
 				if (lost > 0) {
 					mess->AddItem("Ships lost name", mStacks[i].GetDesign()->GetName());
 					mess->AddLong("Ships lost number", lost);
-					if (mStacks[i].KillShips(lost, false, mGalaxy)) {
+					if (mStacks[i].KillShips(lost, false, mGame->GetGalaxy())) {
 						mStacks.erase(mStacks.begin()+i);
 						i--;	// adjust loop counter if the whole stack is gone
 					}
@@ -933,7 +934,7 @@ bool Fleet::Move()
 	mRepairRate = 1;
 	double safe;
 	mPossibleMines.clear();
-	safe = TheGame->GetPossibleMines(&mPossibleMines, this, dist);
+	safe = mGame->GetPossibleMines(&mPossibleMines, this, dist);
 	if (safe > dist || mPossibleMines.size() == 0) {
 		SetLocation(long(mPX), long(mPY));
 		AdjustFuel(-long(fuelU * Distance(&mStartPos) + .5));
@@ -983,7 +984,7 @@ void Fleet::MoveArrive()
 
 	WayOrder * wo = mOrders[1];
 	if (!IsWith(*wo->GetLocation())) {
-		TheGame->MoveAlsoHere(this);
+		mGame->MoveAlsoHere(this);
 		return;	// could happen if movement stopped for some reason (mine hits), or didn't reach destination
 	}
 
@@ -1002,14 +1003,14 @@ void Fleet::MoveArrive()
 		wh->GetAttached()->Exit(mOwner->GetID());
 	}
 
-	TheGame->MoveAlsoHere(this);
+	mGame->MoveAlsoHere(this);
 }
 
 double Fleet::ReClosestMinefield(double dist)
 {
 	///@todo OPTIMIZE: don't recalc this every step, just every 10ly or so
 
-	double Result = mGalaxy->MaxX() + mGalaxy->MaxY();
+	double Result = mGame->GetGalaxy()->MaxX() + mGame->GetGalaxy()->MaxY();
 
 	int i;
 	double d;
@@ -1386,14 +1387,14 @@ void Fleet::ResetSeen()
 	CargoHolder::ResetSeen();
 
 	mCanLoadBy.clear();
-	mCanLoadBy.insert(mCanLoadBy.begin(), TheGame->NumberPlayers(), false);
+	mCanLoadBy.insert(mCanLoadBy.begin(), mGame->NumberPlayers(), false);
 }
 
 void Fleet::SetSeenBy(long p, long seen)
 {
 	mSeenBy[p] = seen;
 
-	SetSeenDesign(p, seen != 0, TheGame->GetPlayer(p+1)->ScanDesign());
+	SetSeenDesign(p, seen != 0, mGame->GetPlayer(p+1)->ScanDesign());
 }
 
 void Fleet::SetSeenDesign(long p, bool seen, bool design)
@@ -1582,7 +1583,7 @@ void Fleet::TakeMinefieldDamage(const MineField * field)
 			temp -= min(mStacks[i].GetDesign()->GetShield(GetOwner()), long((temp + 1) / 2));
 			long lost = mStacks[i].DamageAllShips(temp);
 			ReportedKills += lost;
-			if (mStacks[i].KillShips(lost, true, mGalaxy)) {
+			if (mStacks[i].KillShips(lost, true, mGame->GetGalaxy())) {
 				mStacks.erase(mStacks.begin()+i);
 				i--;	// adjust loop counter if the whole stack is gone
 			}
@@ -1678,7 +1679,7 @@ long Fleet::TechLevel(TechType tech) const
 const Cost & Fleet::GetCost() const
 {
 	if (ReCost <= mOwner->GetLastTechGainPhase()) {
-		const_cast<Fleet *>(this)->ReCost = TheGame->GetTurnPhase();
+		const_cast<Fleet *>(this)->ReCost = mGame->GetTurnPhase();
 		// loop through ships
 		deque<Stack>::const_iterator iter;
 

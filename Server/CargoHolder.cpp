@@ -46,7 +46,7 @@ bool CargoHolder::ParseNode(const TiXmlNode * node)
 	if (!SpaceObject::ParseNode(node))
 		return false;
 
-	Rules::ReadCargo(node->FirstChild("Contains"), mContains, &mPopulation);
+	Rules::ReadCargo(node->FirstChild("Contains"), mContains, &mPopulation, *mGame);
 	return true;
 }
 

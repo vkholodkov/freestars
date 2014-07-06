@@ -34,7 +34,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 namespace FreeStars {
 void SpaceObject::Init()
 {
-	mSeenBy.insert(mSeenBy.begin(), TheGame->NumberPlayers(), 0L);
+	mSeenBy.insert(mSeenBy.begin(), mGame->NumberPlayers(), 0L);
 	mID = 0;
 }
 
@@ -45,25 +45,27 @@ SpaceObject::~SpaceObject()
 bool SpaceObject::ParseNode(const TiXmlNode * node)
 {
 	unsigned long num = GetLong(node->FirstChild("Owner"));
-	if (num < 0 || num > TheGame->NumberPlayers()) {
-		Message * mess = TheGame->AddMessage("Error: Invalid player number");
+	if (num < 0 || num > mGame->NumberPlayers()) {
+		Message * mess = mGame->AddMessage("Error: Invalid player number");
 		mess->AddLong("", num);
 		mess->AddItem("Owener of", this);
 		return false;
 	}
 
-	return ParseNode(node, TheGame->NCGetPlayer(num));
+	return ParseNode(node, mGame->NCGetPlayer(num));
 }
 
 bool SpaceObject::ParseNode(const TiXmlNode * node, Player * player)
 {
-	if (!Location::ParseNode(node->FirstChild("Location"), mGalaxy))
+	if (!Location::ParseNode(node->FirstChild("Location"), mGame))
 		return false;
+
+    ArrayParser arrayParser(*mGame);
 
 	mOwner = player;
 	const TiXmlElement * tie = node->ToElement();
 	mID = atol(tie->Attribute("IDNumber"));
-	Rules::ParseArray(node->FirstChild("SeenBy"), "Race", "Number", mSeenBy);
+	arrayParser.ParseArray(node->FirstChild("SeenBy"), "Race", "Number", mSeenBy);
 
 	return true;
 }
@@ -109,7 +111,7 @@ long SpaceObject::SeenBy(const Player * p) const
 
 long SpaceObject::SeenBy(unsigned long p) const
 {
-	if (p < 0 || p >= TheGame->NumberPlayers())
+	if (p < 0 || p >= mGame->NumberPlayers())
 		return SEEN_NONE;
 	else
 		return mSeenBy[p];
@@ -118,7 +120,7 @@ long SpaceObject::SeenBy(unsigned long p) const
 void SpaceObject::ResetSeen()
 {
 	mSeenBy.clear();
-	mSeenBy.insert(mSeenBy.begin(), TheGame->NumberPlayers(), false);
+	mSeenBy.insert(mSeenBy.begin(), mGame->NumberPlayers(), false);
 }
 
 void SpaceObject::GoingAwayNotifyChasers()

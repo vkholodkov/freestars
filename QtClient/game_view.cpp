@@ -33,9 +33,10 @@
 
 namespace FreeStars {
 
-GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
+GameView::GameView(Game *_game, Player *_player, const GraphicsArray *_graphicsArray)
     : QSplitter(Qt::Horizontal)
     , graphicsArray(_graphicsArray)
+    , game(_game)
     , player(_player)
     , mapView(0)
     , mapScroller(0)
@@ -43,7 +44,7 @@ GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
     , currentMessage(0)
     , currentSelection(0)
 {
-    mapView = new MapView(TheGame->GetGalaxy(), TheGame, _player);
+    mapView = new MapView(game->GetGalaxy(), game, _player);
     mapScroller = new QScrollArea;
     mapScroller->setWidget(mapView);
 //    mapScroller->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
@@ -82,10 +83,10 @@ GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
 
     setupMessages();
 
-    unsigned num_planets = TheGame->GetGalaxy()->GetPlanetCount();
+    unsigned num_planets = game->GetGalaxy()->GetPlanetCount();
 
     for(unsigned n = 1 ; n <= num_planets ; n++) {
-        Planet *p = TheGame->GetGalaxy()->GetPlanet(n);
+        Planet *p = game->GetGalaxy()->GetPlanet(n);
 
         if(p->GetOwner() == player) {
             selectObject(p);
@@ -98,6 +99,11 @@ GameView::GameView(Player *_player, const GraphicsArray *_graphicsArray)
     connect(mapView, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
     connect(mapView, SIGNAL(listObjectsInLocation(const SpaceObject*, const QPoint&)),
         this, SLOT(listObjectsInLocation(const SpaceObject*, const QPoint&)));
+}
+
+GameView::~GameView()
+{
+    delete game;
 }
 
 void GameView::setupMessages() {
@@ -541,7 +547,7 @@ void GameView::displayMessage(const Message &_message) {
     _message.ApplyVisitor(messageFormatter);
     ui_MessageWidget.messagePane->setText(messageFormatter.toString());    
     ui_MessageWidget.titleLabel->setText(tr("Year %0   Messages: %1 of %2")
-        .arg(TheGame->GetTurn())
+        .arg(game->GetTurn())
         .arg(currentMessage + 1)
         .arg(messages.size()));
     

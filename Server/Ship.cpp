@@ -35,7 +35,8 @@ namespace FreeStars {
 
 Cost Ship::mUpCost;
 
-Ship::Ship()
+Ship::Ship(Game *game)
+	: mGame(game)
 {
 	ReCost = 0;
 	ResetSeen();
@@ -44,8 +45,9 @@ Ship::Ship()
 	mCannotBuild = NULL;	// for starting ships
 }
 
-Ship::Ship(const Hull *hull)
+Ship::Ship(Game *game, const Hull *hull)
 	: mHull(hull)
+	, mGame(game)
 {
 	mName = hull->GetName();
 	mGraphicNumber = 0;
@@ -139,9 +141,9 @@ void Ship::ResetDefaults()
 void Ship::ResetSeen()
 {
 	mSeenHull.clear();
-	mSeenHull.insert(mSeenHull.begin(), TheGame->NumberPlayers(), false);
+	mSeenHull.insert(mSeenHull.begin(), mGame->NumberPlayers(), false);
 	mSeenDesign.clear();
-	mSeenDesign.insert(mSeenDesign.begin(), TheGame->NumberPlayers(), false);
+	mSeenDesign.insert(mSeenDesign.begin(), mGame->NumberPlayers(), false);
 }
 
 bool Ship::ParseNode(const TiXmlNode * node, Player * player, bool other)
@@ -159,18 +161,18 @@ bool Ship::ParseNode(const TiXmlNode * node, Player * player, bool other)
 	mBuilt = GetLong(node->FirstChild("Built"));
 	if (mBuilt < 0) {
 		if (player == NULL)
-			mess = TheGame->AddMessage("Error: Invalid data");
+			mess = mGame->AddMessage("Error: Invalid data");
 		else
 			mess = player->AddMessage("Error: Invalid data");
 		mess->AddLong("Number ships built", mBuilt);
 		return false;
 	}
 
-	comp = TheGame->ParseComponent(GetString(node->FirstChild("Hull")));
+	comp = mGame->ParseComponent(GetString(node->FirstChild("Hull")));
 	mHull = dynamic_cast<const Hull *>(comp);
 	if (mHull == NULL) {
 		if (player == NULL)
-			mess = TheGame->AddMessage("Error: Invalid hull for ship design");
+			mess = mGame->AddMessage("Error: Invalid hull for ship design");
 		else
 			mess = player->AddMessage("Error: Invalid hull for ship design");
 		mess->AddItem(mName.c_str(), GetString(node->FirstChild("Hull")));
@@ -180,7 +182,7 @@ bool Ship::ParseNode(const TiXmlNode * node, Player * player, bool other)
 	mGraphicNumber = GetLong(node->FirstChild("GraphicNumber"), -1);
 	if (mGraphicNumber < 1) {
 		if (player == NULL)
-			mess = TheGame->AddMessage("Error: Invalid ship graphic for ship design");
+			mess = mGame->AddMessage("Error: Invalid ship graphic for ship design");
 		else
 			mess = player->AddMessage("Error: Invalid ship graphic for ship design");
 		mess->AddItem(mName.c_str(), GetString(node->FirstChild("GraphicNumber")));
@@ -193,7 +195,7 @@ bool Ship::ParseNode(const TiXmlNode * node, Player * player, bool other)
 	mSlots.erase(mSlots.begin(), mSlots.end());	// in case this is a existing design, shouldn't happen
 	for (child1 = node->FirstChild("Slot"); child1; child1 = child1->NextSibling("Slot")) {
 		amount = GetLong(child1->FirstChild("Number"));
-		comp = TheGame->ParseComponent(GetString(child1->FirstChild("Component")));
+		comp = mGame->ParseComponent(GetString(child1->FirstChild("Component")));
 
 		mSlots.push_back(Slot(comp, amount, mSlots.size(), mHull->GetSlot(mSlots.size())));
 	}
@@ -340,7 +342,7 @@ const Cost & Ship::GetCost(const Player * owner, const Ship * from /*=NULL*/, co
 		sameHull = true;
 
 	if (ReCost <= owner->GetLastTechGainPhase()) {
-		const_cast<Ship *>(this)->ReCost = TheGame->GetTurnPhase();
+		const_cast<Ship *>(this)->ReCost = mGame->GetTurnPhase();
 		if (!sameHull) {
 			const_cast<Ship *>(this)->CVCost = mHull->GetCost(owner);
 		} else
@@ -426,7 +428,7 @@ void Ship::Upgrade(const Player * player)
 	const Component * best;
 	for (deque<Slot>::iterator i = mSlots.begin(); i != mSlots.end(); ++i) {
 		if (i->GetComp() != NULL) {
-			best = TheGame->GetBestComp(player, i->GetComp()->GetValueType(), (mHull->GetHullType() & HC_COL) != 0, mHull->GetHullType());
+			best = mGame->GetBestComp(player, i->GetComp()->GetValueType(), (mHull->GetHullType() & HC_COL) != 0, mHull->GetHullType());
 			if (best != NULL)
 				i->SetComp(best);
 		}

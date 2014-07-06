@@ -65,8 +65,9 @@ class EditableSlotWidget : public SlotWidget {
     Q_OBJECT
 
 public:
-    EditableSlotWidget(const GraphicsArray *_graphicsArray, Slot &_shipSlot, const Slot &_hullSlot, QWidget *parent = 0)
+    EditableSlotWidget(Game *_game, const GraphicsArray *_graphicsArray, Slot &_shipSlot, const Slot &_hullSlot, QWidget *parent = 0)
         : SlotWidget(_graphicsArray, _shipSlot, _hullSlot, parent)
+        , game(_game)
     {
         setAcceptDrops(true);
     }
@@ -85,6 +86,7 @@ private:
     static int getAmount();
 
 private:
+    Game *game;
     QPoint dragStartPos;
 };
 

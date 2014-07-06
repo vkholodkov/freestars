@@ -64,8 +64,8 @@ public:
 	void SetDefault();
 
 	bool ParseNode(const TiXmlNode * node, Player * owner);
-	void WriteNode(TiXmlNode * node) const;
-	void WriteNodeBattle(TiXmlNode * node) const;
+	void WriteNode(TiXmlNode * node, MessageSink&) const;
+	void WriteNodeBattle(TiXmlNode * node, MessageSink&) const;
 	bool IsDefined() const	{ return mDefined; }
 	void Undefine()			{ mDefined = false; }
 	unsigned long GetEnemy() const	{ return mEnemy; }
@@ -77,7 +77,7 @@ public:
 
 protected:
 	static HullType GetTarget(const char *ptr);
-	static const char * WriteTarget(HullType target);
+	static const char * WriteTarget(HullType target, MessageSink&);
 	string mName;
 	HullType mPrimary;
 	HullType mSecondary;

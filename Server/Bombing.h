@@ -45,7 +45,7 @@ public:
     ~Bombing();
 
     void SetPlanet(Planet* targetPlanet);
-	void AddFleets();
+	void AddFleets(Game*);
 	void AddTerraFleet(Fleet* f){mTerraBombingFleets.push_back(f);}
 	void AddSmartFleet(Fleet* f){mSmartBombingFleets.push_back(f);}
 	void AddNormalFleet(Fleet* f){mNormalBombingFleets.push_back(f);}

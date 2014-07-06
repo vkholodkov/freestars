@@ -151,19 +151,19 @@ bool Galaxy::ParseNode(const TiXmlNode * node)
 		p = GetPlanet(GetString(child1, "Name"));
 		addit = (p == NULL);
 		if(addit){
-			p = TheGame->ObjectFactory(p);
+			p = game->ObjectFactory(p);
 			mPlanets.push_back(p);
 		}
 		
-		if(!p->ParseNode(child1))
+		if(!p->ParseNode(child1, game->GetCreation()))
 			return false;
 		
 		if(addit)
-			TheGame->AddAlsoHere(p);
+			game->AddAlsoHere(p);
 	}
 	
 	/* Salvage */
-	ParseGroup<Salvage>(node,mScrap);
+	ParseGroup<Salvage>(game, node,mScrap);
 	
 	/* Mystery Trader */
 	for(child1 = node->FirstChildElement("MTs"); child1; child1 = child1->NextSibling("MTs")) {
@@ -172,16 +172,16 @@ bool Galaxy::ParseNode(const TiXmlNode * node)
 	}
 	
 	/* Wormholes */
-	ParseGroup<Wormhole>(node,mWormholes);
+	ParseGroup<Wormhole>(game, node,mWormholes);
 	
 	/* Packets */
-	ParseGroup<Packet>(node,mPackets);
+	ParseGroup<Packet>(game, node,mPackets);
 	
 	/* Check for extra sections */
 	const char* valid[] = {"Planet","Salvage","MTs","Wormhole","Packet",0};
 	for(child1 = node->FirstChildElement(); child1; child1 = child1->NextSiblingElement()) {
 		if(!NodeIsOneOf(child1,valid)) {
-			Message * mess = TheGame->AddMessage("Warning: Unknown section in Galaxy");
+			Message * mess = game->AddMessage("Warning: Unknown section in Galaxy");
 			mess->AddItem("Section", child1->Value());
 		}
 	}
@@ -231,7 +231,7 @@ Salvage * Galaxy::AddSalvage(const CargoHolder & ch)
 	}
 
 	Salvage * scrap = NULL;
-	scrap = TheGame->ObjectFactory(scrap);
+	scrap = game->ObjectFactory(scrap);
 	scrap->SetLocation(ch);
 	mScrap.push_back(scrap);
 	return scrap;
@@ -289,7 +289,7 @@ void Galaxy::TechSpent(long TechGain, TechType tech)
 	if (tech < 0 || tech >= Rules::MaxTechType)
 		return;
 
-	assert(Rules::GetTurnEvent(TheGame->GetTurnPhase()) == TP_PRODUCTION);
+	assert(Rules::GetTurnEvent(game->GetTurnPhase()) == TP_PRODUCTION);
 	mTechSpent[tech] += TechGain;
 }
 
@@ -297,7 +297,7 @@ void Galaxy::GainSpyTech(Player * player)
 {
 	long gain;
 	for (TechType tech = 0; tech < Rules::MaxTechType; ++tech) {
-		gain = long(player->SpyTechBonus() * mTechSpent[tech] / TheGame->NumberPlayers() + .5);
+		gain = long(player->SpyTechBonus() * mTechSpent[tech] / game->NumberPlayers() + .5);
 		if (gain > 0)
 			player->GainSpyTech(gain, tech);
 	}
@@ -327,7 +327,7 @@ void Galaxy::DoBombing()
 			
 		Bombing bom(*(*target_planet));
 		bom.SetPlanet((*target_planet));
-		bom.AddFleets();
+		bom.AddFleets((*target_planet)->GetGame());
 		bom.Resolve();
 	}
 }
@@ -377,7 +377,7 @@ long Galaxy::GetWormholeID() const
  * This function will create the galaxy, based on the parameters from the Creation object c.
  * @param c Galaxy creation settings.
  */
-void Galaxy::Build(Creation * c)
+void Galaxy::Build(Creation * c, Game *game)
 {
 	long i;
 
@@ -385,27 +385,27 @@ void Galaxy::Build(Creation * c)
 	for (i = GetPlanetCount(); i < c->mWorlds; ++i) {
 		// create a planet
 		Planet * p = NULL;
-		p = TheGame->ObjectFactory(p);
+		p = game->ObjectFactory(p);
 		c->SetLocation(p, this);
 		p->CreateRandom(c);
 		mPlanets.push_back(p);
-		TheGame->AddAlsoHere(p);
+		game->AddAlsoHere(p);
 	}
 
 	// add wormholes
-	if (TheGame->GetRandomEvents() | RE_WORMHOLE) {
-		i = Random(TheGame->MinWormholes(), TheGame->MaxWormholes());
+	if (game->GetRandomEvents() | RE_WORMHOLE) {
+		i = Random(game->MinWormholes(), game->MaxWormholes());
 		for ( ; i > 0; --i) {
-			Wormhole * wh1 = new Wormhole(this);
-			Wormhole * wh2 = new Wormhole(this);
+			Wormhole * wh1 = new Wormhole(game);
+			Wormhole * wh2 = new Wormhole(game);
 			wh1->Shift();
 			wh2->Shift();
 			wh1->SetAttached(wh2);
 			wh2->SetAttached(wh1);
 			mWormholes.push_back(wh1);
 			mWormholes.push_back(wh2);
-			TheGame->AddAlsoHere(wh1);
-			TheGame->AddAlsoHere(wh2);
+			game->AddAlsoHere(wh1);
+			game->AddAlsoHere(wh2);
 		}
 	}
 }
@@ -416,7 +416,7 @@ void Galaxy::PlacePlayer(Player * player)
 		return;
 
 	Planet * world;
-	world = TheGame->GetCreation()->GetNextHW();
+	world = game->GetCreation()->GetNextHW();
 	if (world == NULL) {
 		// for now, just random selection
 		long count = 0;
@@ -433,9 +433,9 @@ void Galaxy::PlacePlayer(Player * player)
 
 
 	// place secondary planets
-	if (player->HasSecondPlanet() && TheGame->GetCreation()->mSecondaryWorlds) {
+	if (player->HasSecondPlanet() && game->GetCreation()->mSecondaryWorlds) {
 		Planet * second = NULL;
-		second = TheGame->GetCreation()->GetSecond(player);
+		second = game->GetCreation()->GetSecond(player);
 		if (second == NULL) {
 			long count = 0;
 			long dist;
@@ -447,7 +447,7 @@ void Galaxy::PlacePlayer(Player * player)
 
 				second = mPlanets[w];
 				dist = long(second->Distance(world));
-				if (dist < TheGame->GetCreation()->mMinSWDistance || dist > TheGame->GetCreation()->mMaxSWDistance)
+				if (dist < game->GetCreation()->mMinSWDistance || dist > game->GetCreation()->mMaxSWDistance)
 					continue;
 
 				break;
@@ -479,28 +479,28 @@ void Galaxy::LoadPlanets()
 {
 	int i;
 	for (i = 0; i < mPlanets.size(); ++i)
-		TheGame->AddAlsoHere(mPlanets[i]);
+		game->AddAlsoHere(mPlanets[i]);
 }
 
 void Galaxy::LoadScrap()
 {
 	int i;
 	for (i = 0; i < mScrap.size(); ++i)
-		TheGame->AddAlsoHere(mScrap[i]);
+		game->AddAlsoHere(mScrap[i]);
 }
 
 void Galaxy::LoadPackets()
 {
 	int i;
 	for (i = 0; i < mPackets.size(); ++i)
-		TheGame->AddAlsoHere(mPackets[i]);
+		game->AddAlsoHere(mPackets[i]);
 }
 
 void Galaxy::LoadWormholes()
 {
 	int i;
 	for (i = 0; i < mWormholes.size(); ++i)
-		TheGame->AddAlsoHere(mWormholes[i]);
+		game->AddAlsoHere(mWormholes[i]);
 }
 
 CargoHolder * Galaxy::GetJettison(const CargoHolder * ch, CargoHolder * ch2)

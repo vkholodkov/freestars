@@ -80,7 +80,7 @@ public:
 	Player * GetCurrentPlayer()		{ return NCGetPlayer(mCurrentPlayer); }
 	Player * NCGetPlayer(unsigned int n);
 	const Player * GetPlayer(unsigned int n) const	{ return const_cast<Game *>(this)->NCGetPlayer(n); }	// Same thing just const
-	unsigned int NumberPlayers()	{ return mNumberOfPlayers; }
+	unsigned int NumberPlayers() const { return mNumberOfPlayers; }
 	bool ProcessTurn();
 	void WriteXYFile();
 	bool WriteHostFile();
@@ -110,7 +110,7 @@ public:
 	Creation * GetCreation()	{ return mCreation; }
 
 	long GetGameID() const		{ return mGameID; }
-	static bool CheckMetaInfo(const TiXmlNode * node, const char * file, double fileversion);
+	bool CheckMetaInfo(const TiXmlNode * node, const char * file, double fileversion);
 
 	deque<SpaceObject *> * GetClosestTop(int x, int y, long max = 0);
 	void AddAlsoHere(SpaceObject * loc);
@@ -217,7 +217,5 @@ const long TP_REMOTE_TERRAFORM	= 400;
 const long TP_UPDATESCANNING	= 405;
 const long TP_PATROL			= 410;
 }
-
-extern FreeStars::Game * TheGame;
 
 #endif // !defined(FreeStars_Game_h)

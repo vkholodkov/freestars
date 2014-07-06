@@ -38,6 +38,7 @@ using namespace std;
 
 #include "FSTypes.h"
 #include "Component.h"
+#include "MessageSink.h"
 class TiXmlNode;
 
 namespace FreeStars {
@@ -54,11 +55,11 @@ class Race;
  */
 class RacialTrait {
 public:
-	RacialTrait();
+	RacialTrait(Game*);
 	virtual ~RacialTrait();
 	static void CleanUp();
-	static RacialTrait * ParseNode(const TiXmlNode * node, bool interaction = false);
-	static bool LoadRacialTraits(const TiXmlNode * node);
+	static RacialTrait * ParseNode(Game *, const TiXmlNode * node, bool interaction = false);
+	static bool LoadRacialTraits(Game*, const TiXmlNode * node);
 	static const RacialTrait * ParsePRT(const char * str);
 	static const RacialTrait * ParseLRT(const char * str);
 	static void AddInteractions(deque<const RacialTrait *> & mLRTs, const RacialTrait * mPRT);
@@ -147,6 +148,7 @@ public:
 	long BuiltinScan(const Player * player, HullType hc, bool PenScan, long pop = 0) const;
 
 private:
+    Game *mGame;
 	string mName;
 	long mPointCost;
 	double mGroundAttackFactor;

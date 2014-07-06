@@ -25,10 +25,14 @@ class GameView  : public QSplitter {
     Q_OBJECT
 
 public:
-    GameView(Player*, const GraphicsArray*);
+    GameView(Game*, Player*, const GraphicsArray*);
+    ~GameView();
 
     void setupMessages();
     void displayMessage(const Message&);
+
+    const Game *getGame() const { return game; }
+    Game *getGame() { return game; }
 
     const MapView *getMapView() const { return mapView; }
     MapView *getMapView() { return mapView; }
@@ -74,8 +78,9 @@ private:
     void clearDetailedSelection();
 
 private:
-    const GraphicsArray *graphicsArray;
+    Game *game;
     Player *player;
+    const GraphicsArray *graphicsArray;
     std::vector<Message*> messages;
     PlanetProductionWidget *planetProductionWidget;
     Ui_MessageWidget ui_MessageWidget;

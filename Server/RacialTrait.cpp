@@ -41,7 +41,8 @@ deque<RacialTrait *> RacialTrait::mPRTs;
 deque<RacialTrait *> RacialTrait::mLRTs;
 deque<RacialTrait *> RacialTrait::mInteractions;
 
-RacialTrait::RacialTrait()
+RacialTrait::RacialTrait(Game *game)
+	: mGame(game)
 {
 	mPointCost = 0;
 	mGroundAttackFactor = 1.0;
@@ -195,9 +196,9 @@ void RacialTrait::ParseStartShips(const TiXmlNode * node)
 void RacialTrait::ParseStartShip(bool base, const TiXmlNode * node)
 {
 	Ship * sd = NULL;
-	sd = TheGame->ObjectFactory(sd);
+	sd = mGame->ObjectFactory(sd);
 
-	sd->SetCannotBuild(TheGame->ParseComponent(GetString(node->FirstChild("IfCannotBuild"))));
+	sd->SetCannotBuild(mGame->ParseComponent(GetString(node->FirstChild("IfCannotBuild"))));
 	if (sd->ParseNode(node, NULL, false)) {
 		mShipDesigns.push_back(sd);
 		mShipCounts.push_back(GetLong(node->FirstChild("ShipCount")));
@@ -206,22 +207,22 @@ void RacialTrait::ParseStartShip(bool base, const TiXmlNode * node)
 		delete sd;
 }
 
-bool RacialTrait::LoadRacialTraits(const TiXmlNode * node)
+bool RacialTrait::LoadRacialTraits(Game *game, const TiXmlNode * node)
 {
 	if (!node)
 		return false;
 
 	const TiXmlNode * child;
 	for (child = node->FirstChild("PrimaryRacialTrait"); child != NULL; child = child->NextSibling("PrimaryRacialTrait")) {
-		mPRTs.push_back(RacialTrait::ParseNode(child));
+		mPRTs.push_back(RacialTrait::ParseNode(game, child));
 	}
 
 	for (child = node->FirstChild("LesserRacialTrait"); child != NULL; child = child->NextSibling("LesserRacialTrait")) {
-		mLRTs.push_back(RacialTrait::ParseNode(child));
+		mLRTs.push_back(RacialTrait::ParseNode(game, child));
 	}
 
 	for (child = node->FirstChild("Interaction"); child != NULL; child = child->NextSibling("Interaction")) {
-		mInteractions.push_back(RacialTrait::ParseNode(child, true));
+		mInteractions.push_back(RacialTrait::ParseNode(game, child, true));
 	}
 
 	return true;
@@ -279,14 +280,15 @@ void RacialTrait::AddInteractions(deque<const RacialTrait *> & mLRTs, const Raci
 	}
 }
 
-RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*= false*/)
+RacialTrait * RacialTrait::ParseNode(Game *game, const TiXmlNode * node, bool interaction /*= false*/)
 {
 	RacialTrait * rt = NULL;
-	rt = TheGame->ObjectFactory(rt);
+	rt = game->ObjectFactory(rt);
 
 	const TiXmlNode * child1;
 	const TiXmlNode * child2;
 	const char * ptr;
+	ArrayParser arrayParser(*game);
 
 	for (child1 = node->FirstChild(); child1; child1 = child1->NextSibling()) {
 		if (child1->Type() == TiXmlNode::COMMENT)
@@ -303,7 +305,7 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 				if (rti != NULL)
 					rt->mInteractionTraits.push_back(rti);
 				else {
-					Message * mess = TheGame->AddMessage("Warning: Invalid Racial Trait");
+					Message * mess = game->AddMessage("Warning: Invalid Racial Trait");
 					mess->AddItem("Racial Interactions", child1->Value());
 				}
 			} else {
@@ -324,7 +326,7 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 			rt->mPopulationFactor = GetDouble(child1, 1.0);
 		} else if (stricmp(child1->Value(), "InherentCloaking") == 0) {
 			child2 = child1->FirstChild("HullType");
-			rt->mInherentCloakHull = Component::ParseHullType(GetString(child2));
+			rt->mInherentCloakHull = Component::ParseHullType(GetString(child2), *game);
 			child2 = child1->FirstChild("Cloaking");
 			rt->mInherentCloakAmount = GetLong(child2);
 		} else if (stricmp(child1->Value(), "CloakCargo") == 0) {
@@ -337,7 +339,7 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 			rt->mBattleSpeedBonus = GetDouble(child1, 0.0);
 		} else if (stricmp(child1->Value(), "ComponentCostFactor") == 0) {
 			child2 = child1->FirstChild("ComponentType");
-			rt->mComponentCostType.insert(rt->mComponentCostType.end(), Component::ParseCompType(GetString(child2)));
+			rt->mComponentCostType.insert(rt->mComponentCostType.end(), Component::ParseCompType(GetString(child2), *game));
 			child2 = child1->FirstChild("CostFactor");
 			rt->mComponentCostFactor.insert(rt->mComponentCostFactor.end(), GetDouble(child2, 1.0));
 		} else if (stricmp(child1->Value(), "Permaform") == 0) {
@@ -384,7 +386,7 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 			rt->mPacketDecayPenalty = GetLong(child1);
 
 		} else if (stricmp(child1->Value(), "StartingTech") == 0) {
-			Rules::ParseArray(child1, rt->mStartingTech, TECHS);
+			Rules::ParseArray(child1, rt->mStartingTech, TECHS, *game);
 		} else if (stricmp(child1->Value(), "StartAtBonus") == 0) {
 			rt->mStartAtBonus = GetLong(child1, 3);
 		} else if (stricmp(child1->Value(), "SecondPlanet") == 0) {
@@ -399,7 +401,7 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 			rt->mARTechType = Rules::TechID(GetString(child1));
 			if (rt->mARTechType < 0) {
 				rt->mARTechType = 0;
-				TheGame->AddMessage("Invalid AR Tech Type");
+				game->AddMessage("Invalid AR Tech Type");
 			}
 		} else if (stricmp(child1->Value(), "ARDivisor") == 0) {
 			rt->mARDivisor = GetLong(child1, 10);
@@ -443,9 +445,9 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 			rt->mFactoryProductionCost = GetLong(child1, 2);
 		} else if (stricmp(child1->Value(), "BuiltInScan") == 0) {
 			child2 = child1->FirstChild("HullType");
-			rt->mBISHull = Component::ParseHullType(GetString(child2));
+			rt->mBISHull = Component::ParseHullType(GetString(child2), *game);
 			child2 = child1->FirstChild("PenScanHullType");
-			rt->mBISHullPen = Component::ParseHullType(GetString(child2));
+			rt->mBISHullPen = Component::ParseHullType(GetString(child2), *game);
 			child2 = child1->FirstChild("TechType");
 			rt->mBISTech = GetLong(child2, -1);
 			child2 = child1->FirstChild("Multiplier");
@@ -457,7 +459,7 @@ RacialTrait * RacialTrait::ParseNode(const TiXmlNode * node, bool interaction /*
 		} else if (stricmp(child1->Value(), "DefenseFactor") == 0) {
 			rt->mDefenseFactor = GetDouble(child1, 1.0);
 		} else {
-			Message * mess = TheGame->AddMessage("Warning: Unknown section");
+			Message * mess = game->AddMessage("Warning: Unknown section");
 			mess->AddItem("Racial trait", rt->mName);
 			mess->AddItem("Section", child1->Value());
 			continue;

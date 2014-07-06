@@ -52,8 +52,8 @@ class Player;
  */
 class Ship {
 public:
-	Ship();
-	Ship(const Hull*);
+	Ship(Game*);
+	Ship(Game*, const Hull*);
 	virtual ~Ship();
 	static void Cleanup();
 
@@ -182,6 +182,7 @@ public:
 
 private:
 	void ResetDefaults();
+	Game *mGame;
 	std::string mName;
 	long mGraphicNumber;
 	///Was the ship a gift?

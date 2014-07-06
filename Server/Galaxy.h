@@ -46,6 +46,7 @@ class Creation;
 class TempFleet;
 class SpaceObject;
 class CargoHolder;
+class Game;
 
 /**
  * The galaxy.
@@ -53,8 +54,10 @@ class CargoHolder;
  */
 class Galaxy {
 public:
-	Galaxy() : mMaxX(0), mMaxY(0) {}
+	Galaxy() : game(0), mMaxX(0), mMaxY(0) {}
 	virtual ~Galaxy();
+
+    void SetGame(Game *_game) { game = _game; }
 
 	bool ParseNode(const TiXmlNode * node);
 	void WriteNode(TiXmlNode * node, const Player * viewer) const;
@@ -126,7 +129,7 @@ public:
 
 	/// Get the number of planets in the galaxy.
 	int GetPlanetCount() const	{ return mPlanets.size(); }
-	void Build(Creation * c);	///< Create the universe.
+	void Build(Creation * c, Game*);	///< Create the universe.
 	void PlacePlayer(Player * player);
 	const Planet * ClosestPlanet(const Location * loc);
 	long MinX() const		{ return mMinX; }
@@ -146,6 +149,7 @@ public:
 	bool ParseSize(const TiXmlNode * node);
 
 protected:
+    Game *game;
 	deque<Planet *> mPlanets;
 	deque<Planet *> invasions;
 	deque<Salvage *> mScrap;

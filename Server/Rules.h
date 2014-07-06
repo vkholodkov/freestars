@@ -43,6 +43,8 @@ class Player;
 class Planet;
 class Fleet;
 class MineFieldType;
+class MessageSink;
+class Creation;
 
 /**
  * Array class.
@@ -67,6 +69,21 @@ public:
 private:
 	deque<Type> Items;
 	int First;
+};
+
+class ArrayParser {
+public:
+	ArrayParser(MessageSink &_messageSink)
+		: messageSink(_messageSink)
+	{
+	}
+
+	bool ParseArrayBool(const TiXmlNode * node, const char * name, const char * Attrib, deque<bool> & arr, const deque<string> * desc = NULL);
+	bool ParseArray(const TiXmlNode * node, const char * name, const char * Attrib, deque<long> & arr, const deque<string> * desc = NULL);
+	bool ParseArrayFloat(const TiXmlNode * node, const char * name, const char * Attrib, deque<double> & arr, const deque<string> * desc = NULL);
+
+private:
+	MessageSink &messageSink;
 };
 
 /**
@@ -97,10 +114,10 @@ public:
 	static long CloakValue(long Cloaking, long Mass);
 	static double CalcScanning(double base, long newscan, long count);
 
-	static void ReadCargo(const TiXmlNode * node, deque<long> & q, long * pop);
+	static void ReadCargo(const TiXmlNode * node, deque<long> & q, long * pop, MessageSink&);
 	static TiXmlElement * WriteCargo(TiXmlNode * node, const char * name, const deque<long> &q, long pop);
 
-	static bool LoadRules(const TiXmlNode * node, const char * file, const char * verify, double version);
+	static bool LoadRules(const TiXmlNode * node, const char * file, const char * verify, double version, MessageSink&);
 	static void WriteRulesFile(TiXmlNode * node);
 	static long GetConstant(const string name, long Default = 0);
 	static double GetFloat(const string name, double Default = 0.0);
@@ -132,20 +149,17 @@ public:
 
 	static TiXmlElement * WriteArray(const char * node, const deque<long> & q, long Type);
 	static TiXmlElement * WriteArrayFloat(const char * node, const deque<double> & q, long Type);
-	static bool ParseArray(const TiXmlNode * node, deque<long> & q, long Type);
-	static bool ParseArrayFloat(const TiXmlNode * node, deque<double> & q, long Type);
+	static bool ParseArray(const TiXmlNode * node, deque<long> & q, long Type, MessageSink&);
+	static bool ParseArrayFloat(const TiXmlNode * node, deque<double> & q, long Type, MessageSink&);
 
 	static TiXmlElement * WriteArrayBool(const char * node, const char * name, const char * Attrib, const deque<bool> & arr, const deque<string> * desc = NULL);
 	static TiXmlElement * WriteArray(const char * node, const char * name, const char * Attrib, const deque<long> & arr, const deque<string> * desc = NULL);
 	static TiXmlElement * WriteArrayFloat(const char * node, const char * name, const char * Attrib, const deque<double> & arr, const deque<string> * desc = NULL);
-	static bool ParseArrayBool(const TiXmlNode * node, const char * name, const char * Attrib, deque<bool> & arr, const deque<string> * desc = NULL);
-	static bool ParseArray(const TiXmlNode * node, const char * name, const char * Attrib, deque<long> & arr, const deque<string> * desc = NULL);
-	static bool ParseArrayFloat(const TiXmlNode * node, const char * name, const char * Attrib, deque<double> & arr, const deque<string> * desc = NULL);
 
-	static bool ParsePacketMapping(const TiXmlNode * node, deque<long> & array);
+	static bool ParsePacketMapping(const TiXmlNode * node, deque<long> & array, MessageSink&);
 	static long RandomHab(HabType ht);
 	static long GetSecondHab(HabType ht, const Player * owner);
-	static bool ParseMinSettings(const TiXmlNode * node);
+	static bool ParseMinSettings(const TiXmlNode * node, MessageSink&);
 	static void WriteMinSettings(TiXmlNode * node);
 	static long MinMC(long i)	{ return mMinMC[i]; }
 	static long MaxMC(long i)	{ return mMaxMC[i]; }
@@ -154,8 +168,8 @@ public:
 	static long HWFloorMC(long i)	{ return mHWFloorMC[i]; }
 	static deque<long> * GetHabOddArray(HabType ht, bool Create = false);
 	static long GetHWMC(long mintype);
-	static long GetHWStartMinerals(long mintype);
-	static long GetSWStartMinerals(long mintype);
+	static long GetHWStartMinerals(long mintype, const Creation*);
+	static long GetSWStartMinerals(long mintype, const Creation*);
 
 	static long MultiOdds(double odds, long trials);
 
@@ -191,6 +205,7 @@ const long TECHS	= 2;
 const long HABS		= 3;
 
 // Non mineral cargo Types
+const CargoType UNKNOWN_CARGO	= -3;
 const CargoType POPULATION	= -1;
 const CargoType FUEL		= -2;
 const CargoType RESOURCES	= -2; /**<@bug Woah, there! Shouldn't this be different than FUEL?
