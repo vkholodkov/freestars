@@ -43,6 +43,9 @@ Player::Player(Game *_game, int id)
     : game(_game)
     , mID(id)
 {
+  mResearchField = 0;
+  mResearchNext = 0;
+  mResearchTax = 0.0;
 	mTechLevel.insert(mTechLevel.begin(), Rules::MaxTechType, -1);
 	mTempTechLevel.insert(mTempTechLevel.begin(), Rules::MaxTechType, 0);
 	mTechProgress.insert(mTechProgress.begin(), Rules::MaxTechType, -1);
@@ -54,6 +57,7 @@ Player::Player(Game *_game, int id)
 	mBattlePlans.insert(mBattlePlans.begin(), Rules::GetConstant("MaxBattlePlans"), (BattlePlan *)NULL);
 	mHasHW = false;
 	mWriteXFile = false;
+	mWriteHistoryFile = false;
 	mUnsavedChanges = 0;
 	mMO = NULL;
 	mLastTechGainPhase = 0;
@@ -318,6 +322,9 @@ void Player::SetShipDesign(unsigned long n, Ship *ship)
 	if(n <= 0 || n > mShipDesigns.size())
 		return;
 
+  if (mShipDesigns[n-1] != ship && mWriteXFile)
+    AddOrder(new ShipDesignOrder(this, n));
+
     delete mShipDesigns[n-1];
     mShipDesigns[n-1] = ship;
 }
@@ -326,6 +333,9 @@ void Player::SetBaseDesign(unsigned long n, Ship *ship)
 {
 	if(n >= mBaseDesigns.size())
 		return;
+
+  if (mBaseDesigns[n-1] != ship && mWriteXFile)
+    AddOrder(new BaseDesignOrder(this, n));
 
     delete mBaseDesigns[n];
 	mBaseDesigns[n] = ship;
@@ -436,7 +446,7 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 	mID = GetLong(node->FirstChild("PlayerNumber"));
 	if (mID < 1 || mID > game->NumberPlayers()) {
 		Message * mess = game->AddMessage("Error: Invalid player number");
-		mess->AddLong("", mID);
+		mess->AddLong("PlayerNumber", mID);
 		return false;
 	}
 
@@ -456,7 +466,7 @@ bool Player::ParseNode(const TiXmlNode * node, bool other)
 			// skip, already done.
 		} else if (!other && stricmp(child->Value(), "Password") == 0) {
 		} else if (stricmp(child->Value(), "RaceDefinition") == 0) {
-			if (!Race::ParseNode(child, other))
+			if (!Race::ParseNode(child, other, *GetGame()))
 				return false;
 		} else if (stricmp(child->Value(), "ResearchTax") == 0) {
 		} else if (stricmp(child->Value(), "ResearchField") == 0) {
@@ -917,6 +927,34 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			Rules::ReadCargo(child, cargo, &pop, *GetGame());
 			fuel = GetLong(child->FirstChild("Fuel"));
 			TransferCargo(owned, other, pop, fuel, cargo);
+		} else if (stricmp(node->Value(), "ShipDesign") == 0) {
+			int num;
+			node->ToElement()->Attribute("IDNumber", &num);
+			if (num < 0 || num >= Rules::GetConstant("MaxShipDesigns")) {
+				Message * mess = AddMessage("Error: Invalid ship design number");
+				mess->AddLong("", num);
+			} else {
+        std::unique_ptr<Ship> ship(new Ship(GetGame()));
+        if(ship->ParseNode(node, this, false)) {
+          SetShipDesign(num, ship.get());
+          ship.release();
+        }
+			}
+
+		} else if (stricmp(node->Value(), "BaseDesign") == 0) {
+			int num;
+			node->ToElement()->Attribute("IDNumber", &num);
+			if (num < 0 || num >= Rules::GetConstant("MaxBaseDesigns")) {
+				Message * mess = AddMessage("Error: Invalid base design number");
+				mess->AddLong("", num);
+			} else {
+        std::unique_ptr<Ship> base(new Ship(GetGame()));
+        if(base->ParseNode(node, this, false)) {
+          SetBaseDesign(num, base.get());
+          base.release();
+        }
+			}
+
 		} else if (stricmp(node->Value(), "BattlePlan") == 0) {
 			int num;
 			node->ToElement()->Attribute("IDNumber", &num);
@@ -1541,7 +1579,7 @@ bool Player::OpenOrdersFile()
 	string File;
 	File = game->GetFileLoc();
 	File += game->GetFileName();
-	File += ".x" + Long2String(GetID() + 1);
+	File += ".x" + Long2String(GetID());
 
 	return OpenOrdersFile(File.c_str());
 }
@@ -1623,17 +1661,129 @@ bool Player::OpenOrdersFile(const char * file)
 	}
 
 	child = orders->FirstChild("Turn");
-	if (GetLong(child) != game->GetTurn()) {
-		Message * mess = AddMessage("Error: Wrong year number in turn file");
+  long OrdersFileTurn = GetLong(child);
+
+	if (OrdersFileTurn != game->GetTurn() && OrdersFileTurn + 1 != game->GetTurn()) {
+		Message * mess = AddMessage("Error: Wrong year number in orders file");
 		mess->AddLong("Turn specified", GetLong(child));
 		mess->AddLong("Actual turn", game->GetTurn());
 		return false;
 	}
 
-	ParseOrders(orders);
+  if(OrdersFileTurn == game->GetTurn()) {
+    ParseOrders(orders);
+  }
+
 	mUnsavedChanges = 0;
 
 	return true;
+}
+
+bool Player::OpenHistoryFile()
+{
+	string File;
+	File = game->GetFileLoc();
+	File += game->GetFileName();
+	File += ".h" + Long2String(GetID());
+
+	return OpenHistoryFile(File.c_str());
+}
+
+bool Player::OpenHistoryFile(const char * file)
+{
+	TiXmlDocument doc(file);
+	doc.SetCondenseWhiteSpace(false);
+	if (!doc.LoadFile())
+		return false;
+
+	const TiXmlNode * history;
+	history = doc.FirstChild("HistoryFile");
+	if (!history) {
+		Message * mess = AddMessage("Error: Missing section");
+		mess->AddItem("File name", file);
+		mess->AddItem("Section", "HistoryFile");
+		return false;
+	}
+
+	long id = GetLong(history->FirstChild("GameID"));
+	if (id != game->GetGameID()) {
+		Message * mess = AddMessage("Error: Mismatched Game IDs");
+		mess->AddLong("Host file GameID", game->GetGameID());
+		mess->AddLong("History file GameID", id);
+		return false;
+	}
+
+	if (!game->CheckMetaInfo(history, file, ORDERSFILEVERSION))
+		return false;
+
+	const TiXmlNode * child;
+	child = history->FirstChild("PlayerNo");
+	if (GetLong(child) != GetID()) {
+		Message * mess = AddMessage("Error: Invalid player number");
+		mess->AddLong("PlayerNo", GetLong(child));
+		mess->AddItem("File name", file);
+		return false;
+	}
+
+	child = history->FirstChild("Turn");
+  long HistoryTurn = GetLong(child);
+
+  if(HistoryTurn < 0 || HistoryTurn > game->GetTurn()) {
+		Message * mess = AddMessage("Error: Invalid history turn number");
+		mess->AddLong("PlayerNo", GetLong(child));
+		mess->AddItem("File name", file);
+		mess->AddLong("Turn", HistoryTurn);
+		return false;
+  }
+
+  game->SetHistoryTurn(HistoryTurn);
+
+  const TiXmlNode * node = history->FirstChild("Galaxy");
+  if (!node) {
+    Message * mess = this->AddMessage("Error: Missing section");
+    mess->AddItem("File name", file);
+    mess->AddItem("Section", "Galaxy");
+    return false;
+  }
+  if (!game->GetGalaxy()->ParseNode(node))
+    return false;
+
+	return true;
+}
+
+bool Player::SaveHistoryFile()
+{
+	TiXmlDocument doc;
+
+	doc.SetCondenseWhiteSpace(false);
+
+	TiXmlDeclaration decl("1.0", "", "yes");
+	doc.InsertEndChild(decl);
+
+	TiXmlElement node("HistoryFile");
+
+	TiXmlElement MetaInfo("MetaInfo");
+	AddDouble(&MetaInfo, "FreeStarsVersion", FREESTARSVERSION);
+	AddDouble(&MetaInfo, "FileVersion", ORDERSFILEVERSION);
+	node.InsertEndChild(MetaInfo);
+
+	AddLong(&node, "GameID", game->GetGameID());
+	AddLong(&node, "Turn", game->GetTurn());
+	AddLong(&node, "PlayerNo", GetID());
+
+  TiXmlElement * galaxyElement = new TiXmlElement("Galaxy");
+  game->GetGalaxy()->WriteHistory(galaxyElement, this);
+  node.LinkEndChild(galaxyElement);
+
+	doc.InsertEndChild(node);
+
+	char buf[1024];
+#ifdef _DEBUG
+	sprintf(buf, "%snew/%s.h%ld", game->GetFileLoc().c_str(), game->GetFileName().c_str(), GetID());
+#else
+	sprintf(buf, "%s%s.h%ld", game->GetFileLoc().c_str(), game->GetFileName().c_str(), GetID());
+#endif // _DEBUG
+	return doc.SaveFile(buf);
 }
 
 void Player::StartMultipleOrder()

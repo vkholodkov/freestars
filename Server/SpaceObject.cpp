@@ -36,6 +36,7 @@ void SpaceObject::Init()
 {
 	mSeenBy.insert(mSeenBy.begin(), mGame->NumberPlayers(), 0L);
 	mID = 0;
+  mReportYear = -1;
 }
 
 SpaceObject::~SpaceObject()
@@ -52,6 +53,13 @@ bool SpaceObject::ParseNode(const TiXmlNode * node)
 		return false;
 	}
 
+  if(mGame->GetHistoryTurn() != -1) {
+    mReportYear = mGame->GetHistoryTurn();
+  }
+  else {
+    mReportYear = mGame->GetTurn();
+  }
+
 	return ParseNode(node, mGame->NCGetPlayer(num));
 }
 
@@ -60,12 +68,30 @@ bool SpaceObject::ParseNode(const TiXmlNode * node, Player * player)
 	if (!Location::ParseNode(node->FirstChild("Location"), mGame))
 		return false;
 
-    ArrayParser arrayParser(*mGame);
+  ArrayParser arrayParser(*mGame);
+  mOwner = player;
+  const TiXmlElement * tie = node->ToElement();
+  mID = atol(tie->Attribute("IDNumber"));
+  arrayParser.ParseArray(node->FirstChild("SeenBy"), "Race", "Number", mSeenBy);
 
-	mOwner = player;
-	const TiXmlElement * tie = node->ToElement();
-	mID = atol(tie->Attribute("IDNumber"));
-	arrayParser.ParseArray(node->FirstChild("SeenBy"), "Race", "Number", mSeenBy);
+  auto seenByViewerNode = node->FirstChild("SeenByViewer");
+  if(seenByViewerNode != NULL) {
+    mSeenBy[mGame->GetCurrentPlayer()->GetID()-1] = GetLong(seenByViewerNode);
+  }
+
+  /*
+   * Only in history file
+   */
+  auto reportYearNode = node->FirstChild("ReportYear");
+  if(reportYearNode != NULL) {
+    long year = GetLong(reportYearNode);
+    if (year < 0 || year > mGame->GetTurn()) {
+      Message * mess = mGame->AddMessage("Error: Invalid report year");
+      mess->AddLong("Year", year);
+      return false;
+    }
+    mReportYear = year;
+  }
 
 	return true;
 }
@@ -95,6 +121,21 @@ TiXmlNode * SpaceObject::WriteNode(TiXmlNode * node, const Player * viewer) cons
 
 	if (viewer == NULL)
 		node->LinkEndChild(Rules::WriteArray("SeenBy", "Race", "Number", mSeenBy));
+  else {
+		std::unique_ptr<TiXmlElement> seenByViewerNode(new TiXmlElement("SeenByViewer"));
+    TiXmlText txt(Long2String(SeenBy(viewer)));
+    seenByViewerNode->InsertEndChild(txt);
+		node->LinkEndChild(seenByViewerNode.get());
+    seenByViewerNode.release();
+  }
+
+  if(viewer != NULL && mReportYear != mGame->GetTurn()) {
+		std::unique_ptr<TiXmlElement> reportYearNode(new TiXmlElement("ReportYear"));
+    TiXmlText txt(Long2String(mReportYear));
+    reportYearNode->InsertEndChild(txt);
+		node->LinkEndChild(reportYearNode.get());
+    reportYearNode.release();
+  }
 
 	return node;
 }

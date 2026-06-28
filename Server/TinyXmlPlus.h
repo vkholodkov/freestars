@@ -50,8 +50,8 @@ inline string Float2String(double x)
 	return s;
 }
 
-extern const char * GetString(const TiXmlNode * node);
-extern const char * GetString(const TiXmlNode * node, const char * name);
+extern const char *GetString(const TiXmlNode * node);
+extern const char *GetString(const TiXmlNode * node, const char * name);
 extern bool NodeIs(const TiXmlNode *node, const char * id);
 extern bool NodeIsOneOf(const TiXmlNode * node, const char * ids[]);
 extern TiXmlNode * FindNextNotOf(TiXmlNode * node, const char * ids[]);

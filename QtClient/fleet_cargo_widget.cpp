@@ -24,6 +24,11 @@ FleetCargoWidget::FleetCargoWidget(const Fleet *_fleet, const Player *_player, Q
     ui_FleetCargoWidget.fuelWidget->setMaxCargo(_fleet->GetFuelCapacity());
     ui_FleetCargoWidget.fuelWidget->setUnit(tr("mg"));
 
+    ui_FleetCargoWidget.cargoWidget->setCargoHolder(fleet);
+    ui_FleetCargoWidget.cargoWidget->setUnit(tr("KT"));
+
+    connect(ui_FleetCargoWidget.cargoWidget, SIGNAL(clicked()), this, SLOT(cargoWidgetClicked()));
+
     long ironium = _fleet->GetContain(0);
     long boranium = _fleet->GetContain(1);
     long germanium = _fleet->GetContain(2);
@@ -35,6 +40,15 @@ FleetCargoWidget::FleetCargoWidget(const Fleet *_fleet, const Player *_player, Q
     ui_FleetCargoWidget.colonistsLabel->setText(tr("%0kT").arg(colonists));
 
     this->addWidget(widget);
+}
+
+void FleetCargoWidget::cargoWidgetClicked()
+{
+    const Planet *planet = fleet->InOrbit();
+
+    if(planet != NULL) {
+      emit exchangeCargo(planet, fleet);
+    }
 }
 
 void FleetCargoWidget::updateLabels()

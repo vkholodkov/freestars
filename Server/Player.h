@@ -180,6 +180,11 @@ public:
 	bool SaveXFile();
 	bool WriteXFile() const		{ return mWriteXFile; }
 	void SetWriteXFile()		{ mWriteXFile = true; }
+	bool OpenHistoryFile();
+	bool OpenHistoryFile(const char * file);
+	bool SaveHistoryFile();
+	bool WriteHistoryFile() const		{ return mWriteHistoryFile; }
+	void SetWriteHistoryFile()		{ mWriteHistoryFile = true; }
 	void AddOrder(Order * o);
 	void TestUndoRedo();
 	const Order * GetOrder(int i)		{ return mOrders[i]; }
@@ -232,6 +237,7 @@ private:
 	deque<bool> mSeenHab;
 
 	bool mWriteXFile;
+	bool mWriteHistoryFile;
 	long mUnsavedChanges;
 	deque<Order *> mOrders;
 	MultipleOrder * mMO;

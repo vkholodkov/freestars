@@ -1,7 +1,10 @@
 ui_*.h
 moc_*.cxx
+moc_*.cxx_parameters
 qrc_*.cxx
 *.qm
 debug.sh
 run.sh
 application.qrc.depends
+fs-client-qt
+fs-client-qt_autogen

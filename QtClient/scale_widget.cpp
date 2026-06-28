@@ -20,16 +20,16 @@ void ScaleWidget::paintEvent(QPaintEvent *event)
 
     painter.setPen(Qt::black);
 
-    painter.drawText(QPoint(mineralReport->geometry().x() - fm.width(kt) - 10, rect.bottom()), kt);
+    painter.drawText(QPoint(mineralReport->geometry().x() - fm.size(Qt::TextSingleLine, kt).width() - 10, rect.bottom()), kt);
 
-    int labelSpacing = fm.width(QString("5000")) * 1.5;
+    int labelSpacing = fm.size(Qt::TextSingleLine, QString("5000")).width() * 1.5;
 
     int numLabels = mineralReport->geometry().width() / labelSpacing;
     int value = 0, increment = 5000 / numLabels;
 
     for(int x = mineralReport->geometry().x() ; x <= mineralReport->geometry().right() ; x += labelSpacing, value += increment) {
         QString label(QString::number(value));
-        int labelWidth = fm.width(label);
+        int labelWidth = fm.size(Qt::TextSingleLine, label).width();
         painter.drawText(QPoint(x - labelWidth / 2, rect.bottom()), label);
     }
 }

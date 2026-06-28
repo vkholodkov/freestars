@@ -4,6 +4,7 @@
 #include <set>
 
 #include <QMenu>
+#include <QButtonGroup>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>

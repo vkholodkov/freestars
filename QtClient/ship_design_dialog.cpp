@@ -88,8 +88,8 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     connect(enemyHullsButton, SIGNAL(clicked(bool)), viewModeMapper, SLOT(map()));
     connect(componentsButton, SIGNAL(clicked(bool)), viewModeMapper, SLOT(map()));
 
-    connect(designModeMapper, SIGNAL(mapped(int)), this, SLOT(setDesignMode(int)));
-    connect(viewModeMapper, SIGNAL(mapped(int)), this, SLOT(setViewMode(int)));
+    connect(designModeMapper, SIGNAL(mappedInt(int)), this, SLOT(setDesignMode(int)));
+    connect(viewModeMapper, SIGNAL(mappedInt(int)), this, SLOT(setViewMode(int)));
 
     connect(copyDesignButton, SIGNAL(clicked(bool)), this, SLOT(copyDesign()));
     connect(editDesignButton, SIGNAL(clicked(bool)), this, SLOT(editDesign()));

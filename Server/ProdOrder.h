@@ -65,10 +65,13 @@ public:
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy) = 0;
 	virtual void Built(Planet * planet, long number) = 0;
 	ProdOrder * Copy() const;
+  virtual Cost GetCost(const Planet*) const = 0;
 	Cost& GetPartial() {return Partial;}
 	virtual string TypeToString() const = 0;
     virtual string AmountToString() const;
 	long GetType() const	{ return Type; }
+  long GetAmount() const { return Amount; }
+  void SetAmount(long _Amount) { Amount = _Amount; }
 
 protected:
 	ProdOrder();
@@ -96,6 +99,7 @@ public:
 	~POBase();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
+  virtual Cost GetCost(const Planet*) const;
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual void Built(Planet * planet, long number);
 	virtual string TypeToString() const;
@@ -111,6 +115,7 @@ public:
 	~POPlanetary();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
+  virtual Cost GetCost(const Planet*) const;
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual void Built(Planet * planet, long number);
 	virtual string TypeToString() const;
@@ -127,6 +132,7 @@ public:
 	~POAuto();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
+  virtual Cost GetCost(const Planet*) const;
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual string TypeToString() const;
     virtual string AmountToString() const;
@@ -144,6 +150,7 @@ public:
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 	static bool CheckPacket(Planet * planet);
 
+  virtual Cost GetCost(const Planet*) const;
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual string TypeToString() const;
 };
@@ -159,6 +166,7 @@ public:
 	~POShip();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
+  virtual Cost GetCost(const Planet*) const;
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual void Built(Planet * planet, long number);
 	virtual string TypeToString() const;
@@ -175,6 +183,7 @@ public:
 	virtual ~POTerraform();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
+  virtual Cost GetCost(const Planet*) const;
 	virtual bool Produce(Planet * planet, long * resources, bool * AutoAlchemy);
 	virtual void Built(Planet * planet, long number);
 	virtual string TypeToString() const;

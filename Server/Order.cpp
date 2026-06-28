@@ -175,4 +175,40 @@ TiXmlNode * TransportOrder::WriteNode(TiXmlNode * node) const
 	return trans;
 }
 
+bool ShipDesignOrder::DoUndo()
+{
+	return true;
+}
+
+TiXmlNode * ShipDesignOrder::WriteNode(TiXmlNode * node) const
+{
+  const Ship *ship = mPlayer->GetShipDesign(mSlot);
+
+	TiXmlElement *sdnode = new TiXmlElement("ShipDesign");
+  sdnode->SetAttribute("IDNumber", mSlot);
+  ship->WriteNode(sdnode, false, true, false);
+
+  node->LinkEndChild(sdnode);
+
+	return sdnode;
+}
+
+bool BaseDesignOrder::DoUndo()
+{
+	return true;
+}
+
+TiXmlNode * BaseDesignOrder::WriteNode(TiXmlNode * node) const
+{
+  const Ship *ship = mPlayer->GetBaseDesign(mSlot);
+
+	TiXmlElement *sdnode = new TiXmlElement("BaseDesign");
+  sdnode->SetAttribute("IDNumber", mSlot);
+  ship->WriteNode(sdnode, false, true, false);
+
+  node->LinkEndChild(sdnode);
+
+	return sdnode;
+}
+
 }

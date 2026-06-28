@@ -75,7 +75,7 @@ Planet::~Planet()
 		delete *iter;
 }
 
-bool Planet::ParseNode(const TiXmlNode * node, Creation *creation)
+bool Planet::ParseNode(const TiXmlNode * node, Creation *creation, bool TrustInput)
 {
 	if (!CargoHolder::ParseNode(node))
 		return false;
@@ -246,7 +246,7 @@ bool Planet::ParseNode(const TiXmlNode * node, Creation *creation)
 			SetRoute(pdest);
 		}
 		SetPacketSpeed(GetLong(node->FirstChild("PacketSpeed")));
-		ParseProduction(node->FirstChild("ProductionQueue"));
+		ParseProduction(node->FirstChild("ProductionQueue"), TrustInput);
 		mPayTax = GetBool(node->FirstChild("PayTax"));
 		mArtifactType = ARTI_NONE;
 		mArtifactAmount = 0;
@@ -1159,10 +1159,10 @@ void Planet::AdjustSecondWorld(Player * player)
 		mScanner = true;
 }
 
-void Planet::ParseProduction(const TiXmlNode * node)
+void Planet::ParseProduction(const TiXmlNode * node,bool TrustInput)
 {
 	if (node != NULL)
-		SetProduction(ProdOrder::ParseNode(node, this));
+		SetProduction(ProdOrder::ParseNode(node, this, NULL, TrustInput));
 }
 
 void Planet::SetProduction(const deque<ProdOrder *> & ords)
@@ -1305,12 +1305,12 @@ HabType Planet::BestHabForTerraform(const Player * owner, const Player * perform
 
 		tempv = 0;
 		// figure out the lowest we could terraform this hab:
-		long gminT = min(mHabTerra[h], mHabStart[h] - (performer == NULL) ? performer->TerraLimit(h) : 0L);
+		long gminT = min(mHabTerra[h], mHabStart[h] - ((performer == NULL) ? performer->TerraLimit(h) : 0L));
 		gminT = max(gminT, Rules::GetConstant("MinHabValue"));
 		long minT = max(gminT, mHabTerra[h] - amt);
 
 		// figure out the highest we could terraform this hab:
-		long gmaxT = max(mHabTerra[h], mHabStart[h] + (performer == NULL) ? performer->TerraLimit(h) : 0L);
+		long gmaxT = max(mHabTerra[h], mHabStart[h] + ((performer == NULL) ? performer->TerraLimit(h) : 0L));
 		gmaxT = min(gmaxT, Rules::GetConstant("MaxHabValue"));
 		long maxT = min(gmaxT, mHabTerra[h] + amt);
 
@@ -1514,17 +1514,20 @@ void Planet::RemoteTerraform(Fleet * fleet, bool bomb)
 	Terraform(totech, toinit, -1, fleet->GetOwner(), GetOwner(), NULL);
 	long endHab = mOwner->HabFactor(this);
 
-	Message * mess = fleet->NCGetOwner()->AddMessage("Remote Terraform", this);
-	mess->AddItem("Terraforming fleet", fleet);
-	mess->AddLong("Start Hab", startHab);
-	mess->AddLong("End Hab", endHab);
+  if(startHab != endHab) {
+    Message * mess = fleet->NCGetOwner()->AddMessage("Remote Terraform", this);
+    mess->AddItem("Terraforming fleet", fleet);
+    mess->AddLong("Start Hab", startHab);
+    mess->AddLong("End Hab", endHab);
 
-	if (startHab != endHab && mOwner != fleet->GetOwner()) {
-		mess = mOwner->AddMessage("Remote Terraform", this);
-		mess->AddItem("Terraforming fleet", fleet);
-		mess->AddLong("Start Hab", startHab);
-		mess->AddLong("End Hab", endHab);
-	}
+    // Send message to the other player
+    if (mOwner != fleet->GetOwner()) {
+      mess = mOwner->AddMessage("Remote Terraform", this);
+      mess->AddItem("Terraforming fleet", fleet);
+      mess->AddLong("Start Hab", startHab);
+      mess->AddLong("End Hab", endHab);
+    }
+  }
 }
 
 void Planet::SweepMines()

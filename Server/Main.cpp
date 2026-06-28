@@ -76,13 +76,17 @@ int main (int argc, char * argv[])
 		if (!game->LoadHostFile(argv[1]))
 			error = true;
 
-		cout << "Loading Turns" << endl;
-		if (!error && !game->LoadTurns())
-			error = true;
-		
-		cout << "Processing Turns" << endl;
-		if (!error && !game->ProcessTurn())
-			error = true;
+    if(!error) {
+      cout << "Loading Turns" << endl;
+      if (!game->LoadTurns())
+        error = true;
+      
+      if(!error) {
+        cout << "Processing Turns" << endl;
+        if (!game->ProcessTurn())
+          error = true;
+      }
+    }
 	} else if (FileType[1] == 'm') {
 		cout << "Loading player file and orders (.x file)" << endl;
 		if (!game->LoadPlayerFile(argv[1]))
@@ -110,7 +114,7 @@ int main (int argc, char * argv[])
 		}
 
 		delete p;
-		error = true;	// always set to true to prevent host file being written when .m file is read
+		error = true;	// always set to true to prevent host file being written when .r file is read
 	} else {
 		cout << "Unknown file type " << FileType << endl;
 		error = true;

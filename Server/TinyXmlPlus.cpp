@@ -40,7 +40,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #pragma warning(disable : 4245)		// 'initializing' : conversion signed/unsigned mismatch
 #endif
 
-#include <stdlib.h>
+//#include <stdlib.h>
+//#include <cstdlib>
 #include "TinyXmlPlus.h"
 
 #ifndef WIN32
@@ -48,7 +49,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #define stricmp strcasecmp
 #endif
 
-const char * GetString(const TiXmlNode * node)
+const char *GetString(const TiXmlNode * node)
 {
 	const TiXmlNode * node2;
 	const TiXmlText * text;
@@ -70,7 +71,7 @@ const char * GetString(const TiXmlNode * node)
 	return text->Value();
 }
 
-const char * GetString(const TiXmlNode * node, const char * name)
+const char *GetString(const TiXmlNode * node, const char * name)
 {
 	if(!node)
 		return NULL;
@@ -91,13 +92,15 @@ long GetLong(const TiXmlNode * node, long def)
 		return atol(ptr);
 }
 
+float mystrtof(const char*, char **endPtr);
+
 double GetDouble(const TiXmlNode * node, double def)
 {
 	const char * ptr = GetString(node);
 	if (ptr == NULL)
 		return def;
-	else
-		return atof(ptr);
+	else 
+		return mystrtof(ptr, NULL);
 }
 
 bool GetBool(const TiXmlNode * node)
@@ -159,7 +162,6 @@ TiXmlNode * FindNextNotOf(TiXmlNode * node, const char * ids[])
 		return NULL;
 	TiXmlNode * loc;
 	int index;
-		return false;
 	for(loc = node->NextSibling(); loc; loc = loc->NextSibling()) {
 		if (loc->Type() == TiXmlNode::COMMENT)
 			continue;

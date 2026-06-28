@@ -1,4 +1,7 @@
-INCLUDE(${QT_USE_FILE})
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 include_directories(
     ${FREESTARS_SOURCE_DIR}/tinyxml
@@ -7,6 +10,7 @@ include_directories(
 
 SET(freestars_SOURCES
     main.cpp
+    translations.cpp
     mainwindow.cpp
     advanced_new_game_wizard.cpp
     race_wizard.cpp
@@ -18,12 +22,14 @@ SET(freestars_SOURCES
     mineral_report.cpp
     scale_widget.cpp
     cargo_widget.cpp
+    multi_cargo_widget.cpp
     diamond_button.cpp
     planet_production_widget.cpp
     fleets_in_orbit_widget.cpp
     fleet_widget.cpp
     fleet_cargo_widget.cpp
     fleet_composition_widget.cpp
+    fleet_composition_model.cpp
     fleet_waypoints_widget.cpp
     orbiting_widget.cpp
     production_queue_model.cpp
@@ -35,6 +41,9 @@ SET(freestars_SOURCES
     slot_widget.cpp
     ship_avatar_widget.cpp
     ship_describer.cpp
+    production_queue_dialog.cpp
+    order_template_list_model.cpp
+    cargo_transfer_dialog.cpp
 )
 
 SET(freestars_HEADERS
@@ -89,6 +98,8 @@ SET(freestars_FORMS
     starbase_widget.ui
     research_dialog.ui
     ship_design_dialog.ui
+    production_queue_dialog.ui
+    cargo_transfer_dialog.ui
 )
 
 SET(freestars_RESOURCES application.qrc)
@@ -97,13 +108,15 @@ link_directories(${FREESTARS_BINARY_DIR}/tinyxml ${FREESTARS_BINARY_DIR}/Server)
 
 add_definitions(-DTIXML_USE_STL)
 
-QT4_WRAP_CPP(freestars_HEADERS_MOC ${freestars_HEADERS})
-QT4_WRAP_UI(freestars_FORMS_HEADERS ${freestars_FORMS})
-QT4_ADD_RESOURCES(freestars_RESOURCES_RCC ${freestars_RESOURCES})
-QT4_CREATE_TRANSLATION(${freestars_SOURCES} ${freestars_FORMS_HEADERS} freestars.ts)
-QT4_ADD_TRANSLATION(messages.qm messages.ts)
+#QT4_WRAP_CPP(freestars_HEADERS_MOC ${freestars_HEADERS})
+#QT4_WRAP_UI(freestars_FORMS_HEADERS ${freestars_FORMS})
+#QT4_ADD_RESOURCES(freestars_RESOURCES_RCC ${freestars_RESOURCES})
+#QT4_CREATE_TRANSLATION(${freestars_SOURCES} ${freestars_FORMS_HEADERS} freestars.ts)
+#QT4_ADD_TRANSLATION(messages.qm messages.ts)
 
-add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS_MOC} ${freestars_FORMS_HEADERS} ${freestars_RESOURCES_RCC} freestars.qm messages.qm)
+qt6_wrap_ui(UI_HEADERS ${freestars_FORMS})
 
-target_link_libraries(fs-client-qt fsserver MersenneTwister tinyxml Qt4::QtGui Qt4::QtCore)
+add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS} ${freestars_RESOURCES} ${UI_HEADERS} freestars.qm messages.qm)
+
+target_link_libraries(fs-client-qt fsserver MersenneTwister tinyxml Qt6::Core Qt6::Gui Qt6::Widgets)
 

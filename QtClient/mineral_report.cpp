@@ -3,6 +3,7 @@
  */
 
 #include <QPainter>
+#include <QPainterPath>
 
 #include "mineral_report.h"
 
@@ -19,11 +20,11 @@ void MineralReport::paintEvent(QPaintEvent *event)
 
     QFontMetrics fm(this->font());
 
-    int labelSpacing = fm.width(QString("5000")) * 1.5;
+    auto labelSpacing = fm.size(Qt::TextSingleLine, QString("5000")).width() * 1.5;
 
     painter.setPen(Qt::white);
 
-    for(int x = labelSpacing ; x <= rect.width() ; x += labelSpacing) {
+    for(auto x = labelSpacing ; x <= rect.width() ; x += labelSpacing) {
         painter.drawLine(x, 0, x, rect.height());
     }
 

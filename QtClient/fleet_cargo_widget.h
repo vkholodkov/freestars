@@ -24,6 +24,9 @@ public:
 signals:
     void exchangeCargo(const Planet*, const Fleet*);
 
+private slots:
+    void cargoWidgetClicked();
+
 private:
     void updateLabels();
 

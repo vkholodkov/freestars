@@ -106,7 +106,7 @@ FoldingWidget::FoldingWidget(const QString &_title, QWidget *parent)
     font.setFamily(QString::fromUtf8("Arial"));
     font.setPointSize(12);
     font.setBold(true);
-    font.setWeight(75);
+    font.setWeight(QFont::Bold);
     title->setFont(font);
 
     QWidget *bar = new QWidget;

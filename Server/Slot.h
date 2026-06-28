@@ -59,6 +59,7 @@ public:
 	long GetLeft() const { return mSlotLeft; }
 	long GetTop() const { return mSlotTop; }
 
+  bool hasComp() const { return component != NULL; }
 	void SetComp(const Component * comp)	{ component = comp; }
 
 	friend bool operator==(const Slot & s1, const Slot & s2);

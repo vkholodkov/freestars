@@ -105,6 +105,8 @@ public:
 	virtual Planet * InOrbit(); ///< Get planet this object is in orbit of, or NULL if none.
 	virtual const Planet * InOrbit() const; ///< Get planet this object is in orbit of, or NULL if none.
 
+  long GetReportYear() const { return mReportYear; }
+
 protected:
     Game *mGame;
 	deque<long> mSeenBy;
@@ -113,6 +115,7 @@ protected:
 	long mID; ///< ID of this SpaceObject.
 	deque<SpaceObject *> * mAlsoHere; ///< Other SpaceObjects located here.
 	void GoingAwayNotifyChasers(); ///< Inform chasers that this SpaceObject is going away.
+  long mReportYear;
 };
 }
 #endif // !defined(FreeStars_SpaceObject_h)

@@ -272,5 +272,49 @@ private:
 	long mFuel;
 	deque<long> mCargo;
 };
+
+/**
+ * Ship Design order.
+ * @ingroup Server
+ */
+class ShipDesignOrder : public Order {
+public:
+	ShipDesignOrder(Player * p, long slot)
+		: Order(), mPlayer(p), mSlot(slot) {}
+
+	virtual bool DoUndo();
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order *_new) {
+		const ShipDesignOrder *o = dynamic_cast<const ShipDesignOrder*>(_new);
+		return o != NULL && this->mPlayer == o->mPlayer
+			&& this->mSlot == o->mSlot;
+	}
+
+private:
+	Player * mPlayer;
+	long mSlot;
+};
+
+/**
+ * Base Design order.
+ * @ingroup Server
+ */
+class BaseDesignOrder : public Order {
+public:
+	BaseDesignOrder(Player * p, long slot)
+		: Order(), mPlayer(p), mSlot(slot) {}
+
+	virtual bool DoUndo();
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order *_new) {
+		const BaseDesignOrder *o = dynamic_cast<const BaseDesignOrder*>(_new);
+		return o != NULL && this->mPlayer == o->mPlayer
+			&& this->mSlot == o->mSlot;
+	}
+
+private:
+	Player * mPlayer;
+	long mSlot;
+};
 }
 #endif // !defined(FreeStars_Order_h)

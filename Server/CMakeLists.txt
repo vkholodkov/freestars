@@ -44,6 +44,7 @@ SET(fsserver_SOURCES
 	WayOrder.cpp
 	WayOrderList.cpp
     Wormhole.cpp
+  strtof.cpp
 )
 
 add_executable(fs-server Main.cpp)

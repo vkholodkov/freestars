@@ -60,7 +60,7 @@ public:
 //	Planet(int x, int y);
 	virtual ~Planet();
 	static const char* ELEMENT_NAME()	{return "Planet";}; ///< Name of XML element associated with class.
-	virtual bool ParseNode(const TiXmlNode * node, Creation*);
+	virtual bool ParseNode(const TiXmlNode * node, Creation*,bool TrustInput = false);
 	virtual TiXmlNode * WriteNode(TiXmlNode * node, const Player * viewer) const;
 	/// planets are not technically 'in orbit', but return ourselves if some one asks
 	virtual Planet * InOrbit()				{ return this; }
@@ -73,7 +73,7 @@ public:
 	void AddScrapRes(int amount)	{ mScrapRes += amount; }
 	long GetBaseNumber() const		{ return mBaseDesign; }
 	void SetBaseNumber(long n);
-	const Ship * GetBaseDesign() const	{ return GetOwner()->GetBaseDesign(mBaseDesign); }
+	const Ship * GetBaseDesign() const	{ return GetOwner() != NULL ? GetOwner()->GetBaseDesign(mBaseDesign) : NULL; }
 	long GetBaseDamage() const		{ return mBaseDamage; }
 	void SetBaseDamage(long bd)		{ mBaseDamage = bd; }
 	virtual const string GetName(const Player *) const	{ return mName; }
@@ -174,7 +174,7 @@ public:
     bool IsHW() const { return mHomeWorld; }
 	void CreateSecondWorld(const Planet*, const Creation*);
 	void AdjustSecondWorld(Player * player);
-	void ParseProduction(const TiXmlNode * node);
+	void ParseProduction(const TiXmlNode * node,bool TrustInput = false);
     const deque<ProdOrder *> GetProduction() const { return mProductionQ; }
 	void SetProduction(const deque<ProdOrder *> & ords);
 	void SetPayTax(bool paytax);

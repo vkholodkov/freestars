@@ -21,7 +21,7 @@ public:
     ResearchDialog(Player*, QWidget *parent = 0);
 
 private slots:
-    void setResearchField(int);
+    void setResearchField(QAbstractButton*);
     void setResearchTax(int);
     void accept();
 

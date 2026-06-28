@@ -6,6 +6,7 @@
 #include <set>
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QMouseEvent>
 #include <QScrollArea>
 #include <QApplication>
@@ -248,25 +249,25 @@ void MapView::normalPlanetDrawer(QPainter &painter, const Planet *planet, const 
             }
         }
         else {
-            drawDot(painter, pos, Qt::white);
+            fillCircle(painter, pos, 2, Qt::white);
         }
     }
     else {
-        drawDot(painter, pos, Qt::white);
+        fillCircle(painter, pos, 2, Qt::white);
     }
 
-    if(seen & SEEN_HULL) {
-        const deque<SpaceObject *> *alsoHere = planet->GetAlsoHere();
+    const deque<SpaceObject *> *alsoHere = planet->GetAlsoHere();
 
-        if(alsoHere && !alsoHere->empty()) {
-            diameter += 3;
-            painter.setPen(Qt::white);
-            drawCircle(painter, pos, diameter);
-        }
+    if(alsoHere && !alsoHere->empty()
+      && std::any_of(alsoHere->begin(), alsoHere->end(), [](SpaceObject *p) { return typeid(*p) == typeid(Fleet); }))
+    {
+        diameter += 3;
+        painter.setPen(Qt::white);
+        drawCircle(painter, pos, diameter);
+    }
 
-        if(planet->GetBaseDesign() != NULL) {
-            fillCircle(painter, pos + QPoint(3, -3), 2, Qt::yellow);
-        }
+    if(planet->GetBaseDesign() != NULL) {
+        fillCircle(painter, pos + QPoint(3, -3), 2, Qt::yellow);
     }
 }
 

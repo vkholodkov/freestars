@@ -5,6 +5,11 @@
 #include <memory>
 
 #include <QtGui>
+#include <QtWidgets>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QStatusBar>
+#include <QRegularExpression>
 
 #include "advanced_new_game_wizard.h"
 #include "game_view.h"
@@ -87,7 +92,14 @@ bool MainWindow::save()
 #endif
 
         Player *player = gameView->getGame()->GetCurrentPlayer();
+
+        std::string prev_loc = std::setlocale(LC_NUMERIC, nullptr);
+        std::setlocale(LC_NUMERIC, "C");
+
         player->SaveXFile();
+        player->SaveHistoryFile();
+
+        std::setlocale(LC_NUMERIC, prev_loc.c_str());
 
 #ifndef QT_NO_CURSOR
         QApplication::restoreOverrideCursor();
@@ -123,7 +135,7 @@ void MainWindow::loadGraphics()
 
     QString fileName("rules/Graphics.xml");
   
-    TiXmlDocument doc(fileName.toAscii().constData());
+    TiXmlDocument doc(fileName.toUtf8().constData());
     doc.SetCondenseWhiteSpace(false);
     if (!doc.LoadFile()) {
         QMessageBox::critical(this, tr("Error"),
@@ -359,9 +371,9 @@ bool MainWindow::maybeSave()
 
 void MainWindow::loadFile(const QString &fileName)
 {
-    QRegExp mfiles("\\.m[0-9]+$", Qt::CaseInsensitive);
+    QRegularExpression mfiles("\\.m[0-9]+$", QRegularExpression::CaseInsensitiveOption);
 
-    if(mfiles.indexIn(fileName) > 1) {
+    if(mfiles.match(fileName).hasMatch()) {
         this->loadPlayerFile(fileName);
     }
     else {
@@ -387,14 +399,24 @@ void MainWindow::loadPlayerFile(const QString &fileName)
     std::auto_ptr<Game> game(new Game);
 
     try {
-        std::string filename_ascii(fileName.toAscii());
+        std::string filename_ascii(fileName.toUtf8());
+
+        std::string prev_loc = std::setlocale(LC_NUMERIC, nullptr);
+        std::setlocale(LC_NUMERIC, "C");
 
         if(!game->LoadPlayerFile(filename_ascii.c_str())) {
+
+            std::setlocale(LC_NUMERIC, prev_loc.c_str());
+
             QMessageBox::warning(this, tr("Application"),
                                  tr("Cannot open player file %1")
                                  .arg(fileName));
             return;
         }
+
+        game->LoadHistoryFile();
+
+        std::setlocale(LC_NUMERIC, prev_loc.c_str());
     }
     catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Application"),
@@ -502,7 +524,7 @@ void MainWindow::activateTab(int index)
 
             connect(viewRaceAction, SIGNAL(triggered()), gameView, SLOT(viewRaceDialog()));
 
-            connect(viewModeMapper, SIGNAL(mapped(int)), mapView, SLOT(setViewMode(int)));
+            connect(viewModeMapper, SIGNAL(mappedInt(int)), mapView, SLOT(setViewMode(int)));
 
             connect(submitTurnAction, SIGNAL(triggered()), gameView, SLOT(submitTurn()));
             connect(shipDesignAction, SIGNAL(triggered()), gameView, SLOT(shipDesignDialog()));

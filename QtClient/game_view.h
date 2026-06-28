@@ -55,7 +55,6 @@ public slots:
     void changeProductionQueue(const Planet*);
     void clearProductionQueue(const Planet*);
     void setRouteDest();
-    void showProductionDialog(bool);
     void exchangeCargo(const Planet*, const Fleet*);
     void splitFleet(const Fleet*);
     void splitAllFleet(const Fleet*);
@@ -66,6 +65,8 @@ public slots:
     void battlePlansDialog();
     void playerRelationsDialog();
     void viewRaceDialog();
+
+    void ordersChanged();
 
     void submitTurn();
 

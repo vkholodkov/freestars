@@ -179,6 +179,7 @@ bool Ship::ParseNode(const TiXmlNode * node, Player * player, bool other)
 		return false;
 	}
 
+#if 0
 	mGraphicNumber = GetLong(node->FirstChild("GraphicNumber"), -1);
 	if (mGraphicNumber < 1) {
 		if (player == NULL)
@@ -188,6 +189,7 @@ bool Ship::ParseNode(const TiXmlNode * node, Player * player, bool other)
 		mess->AddItem(mName.c_str(), GetString(node->FirstChild("GraphicNumber")));
 		return false;
 	}
+#endif
 
 	mGift = GetBool(node->FirstChild("Gift"));
 
@@ -214,7 +216,7 @@ void Ship::WriteNode(TiXmlNode * node, bool Host, bool Owner, bool SeeDesign) co
 		SeeDesign = true;
 
 	AddString(node, "Hull", mHull->GetName().c_str());
-	AddLong(node, "GraphicNumber", mGraphicNumber);
+	AddLong(node, "GraphicNumber", 0 /*mGraphicNumber*/); // Not used for now
 	if (Owner) {
 		AddLong(node, "Built", mBuilt);
 		AddString(node, "Gift", mGift ? "true" : "false");
@@ -325,7 +327,7 @@ bool Ship::IsValidDesign(const Player * player) const	// can this player build t
 const Component * Ship::GetGate() const
 {
 	for (unsigned int i = 0; i < mSlots.size(); ++i) {
-		if (mSlots[i].GetComp()->GetGateMass() != 0)
+		if (mSlots[i].hasComp() && mSlots[i].GetComp()->GetGateMass() != 0)
 			return mSlots[i].GetComp();
 	}
 

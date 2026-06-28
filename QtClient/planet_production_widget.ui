@@ -14,13 +14,13 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="margin" stdset="0">
     <number>4</number>
    </property>
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="margin">
+      <property name="margin" stdset="0">
        <number>0</number>
       </property>
       <item>
@@ -70,14 +70,14 @@
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
         </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>19</number>
+        </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>19</number>
         </attribute>
         <attribute name="verticalHeaderHighlightSections">
          <bool>true</bool>
-        </attribute>
-        <attribute name="verticalHeaderMinimumSectionSize">
-         <number>19</number>
         </attribute>
        </widget>
       </item>
@@ -90,14 +90,13 @@
          <property name="verticalSpacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="margin" stdset="0">
           <number>0</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -107,7 +106,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLabel" name="completionLabel">
+          <widget class="QLabel" name="completionValueLabel">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -120,7 +119,6 @@
           <widget class="QLabel" name="label_3">
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -145,7 +143,7 @@
       <item>
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="margin">
+         <property name="margin" stdset="0">
           <number>0</number>
          </property>
          <item>

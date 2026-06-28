@@ -130,7 +130,7 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     connect(nextButton, SIGNAL(clicked(bool)), this, SLOT(nextClicked(bool)));
     connect(finishButton, SIGNAL(clicked(bool)), this, SLOT(finishClicked(bool)));
 
-    connect(playerButtonsMapper, SIGNAL(mapped(int)), this, SLOT(selectPlayer(int)));
+    connect(playerButtonsMapper, SIGNAL(mappedInt(int)), this, SLOT(selectPlayer(int)));
 
     connect(newRaceAction, SIGNAL(triggered()), this, SLOT(newRace()));
     connect(openRaceAction, SIGNAL(triggered()), this, SLOT(openRace()));
@@ -230,7 +230,7 @@ void AdvancedNewGameWizard::openRace()
 
     QFileInfo fi(fileName);
 
-    TiXmlDocument doc(fileName.toAscii().constData());
+    TiXmlDocument doc(fileName.toUtf8().constData());
     doc.SetCondenseWhiteSpace(false);
     if (!doc.LoadFile()) {
         QMessageBox::critical(this, tr("Error"),
@@ -247,7 +247,7 @@ void AdvancedNewGameWizard::openRace()
         return;
     }
 
-    if (!game->CheckMetaInfo(node, fileName.toAscii().constData(), RACEFILEVERSION)) {
+    if (!game->CheckMetaInfo(node, fileName.toUtf8().constData(), RACEFILEVERSION)) {
         QMessageBox::critical(this, tr("Error"),
             tr("File %0 cannot be opened in this version of the game").arg(fileName));
         return;

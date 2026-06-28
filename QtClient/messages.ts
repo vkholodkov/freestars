@@ -13,7 +13,11 @@
         </message>
         <message>
             <source>Homeworld is</source>
-            <translation type="unfinished">Your home planet is %{planet}. Your people are ready to leave the nest an explore the universe. Good luck.</translation>
+            <translation type="unfinished">Your home planet is %{planet}. Your people are ready to leave the nest an explore the universe. Good luck!</translation>
+        </message>
+        <message>
+            <source>Factories built</source>
+            <translation type="unfinished">You have built %1 new factories.</translation>
         </message>
         <message>
             <source>New ships built into new fleet</source>
@@ -25,7 +29,7 @@
         </message>
         <message>
             <source>Error: Invalid battle plan number</source>
-            <translation type="unfinished">Error: Invalif battle plan number %0</translation>
+            <translation type="unfinished">Error: Invalid battle plan number %0</translation>
         </message>
     </context>
     <context>

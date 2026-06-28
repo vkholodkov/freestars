@@ -23,6 +23,12 @@ FleetsInOrbitWidget::FleetsInOrbitWidget(const Planet *_planet, const Player *_p
     fuelWidget = ui_FleetsInOrbitWidget.fuelWidget;
     cargoWidget = ui_FleetsInOrbitWidget.cargoWidget;
 
+    fuelWidget->setChangeable(false);
+    fuelWidget->setCargoColor(Qt::red);
+    fuelWidget->setUnit(tr("mg"));
+
+    cargoWidget->setUnit(tr("kT"));
+
     fleetsComboBox = ui_FleetsInOrbitWidget.fleetsComboBox;
     textWidget = ui_FleetsInOrbitWidget.textWidget;
 
@@ -38,11 +44,23 @@ FleetsInOrbitWidget::FleetsInOrbitWidget(const Planet *_planet, const Player *_p
         objectActivated(ui_FleetsInOrbitWidget.fleetsComboBox->currentIndex());
     }
 
+    connect(ui_FleetsInOrbitWidget.cargoWidget, SIGNAL(clicked()), this, SLOT(cargoWidgetClicked()));
     connect(ui_FleetsInOrbitWidget.gotoButton, SIGNAL(clicked(bool)), this, SLOT(gotoButtonClicked(bool)));
     connect(ui_FleetsInOrbitWidget.cargoButton, SIGNAL(clicked(bool)), this, SLOT(cargoButtonClicked(bool)));
     connect(ui_FleetsInOrbitWidget.fleetsComboBox, SIGNAL(activated(int)), this, SLOT(objectActivated(int)));
 
     this->addWidget(widget);
+}
+
+void FleetsInOrbitWidget::cargoWidgetClicked()
+{
+    long id = fleetsComboBox->itemData(fleetsComboBox->currentIndex()).toLongLong();
+    const Fleet *fleet = player->GetFleet(id);
+
+    if(fleet == NULL)
+        return;
+
+    emit exchangeCargo(planet, fleet);
 }
 
 void FleetsInOrbitWidget::gotoButtonClicked(bool)
@@ -58,13 +76,7 @@ void FleetsInOrbitWidget::gotoButtonClicked(bool)
 
 void FleetsInOrbitWidget::cargoButtonClicked(bool)
 {
-    long id = fleetsComboBox->itemData(fleetsComboBox->currentIndex()).toLongLong();
-    const Fleet *fleet = player->GetFleet(id);
-
-    if(fleet == NULL)
-        return;
-
-    emit exchangeCargo(planet, fleet);
+    cargoWidgetClicked();
 }
 
 void FleetsInOrbitWidget::objectActivated(int index)
@@ -77,14 +89,10 @@ void FleetsInOrbitWidget::objectActivated(int index)
 
     textWidget->setVisible(true);
     
-    fuelWidget->setChangeable(false);
-    fuelWidget->setCargoColor(Qt::red);
     fuelWidget->setCargo(fleet->GetFuel());
     fuelWidget->setMaxCargo(fleet->GetFuelCapacity());
-    fuelWidget->setUnit(tr("mg"));
 
-    cargoWidget->setChangeable(false);
-    cargoWidget->setCargoColor(Qt::white);
+    cargoWidget->setCargoHolder(fleet);
 }
 
 };

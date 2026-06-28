@@ -8,6 +8,7 @@
 #include <QLayout>
 #include <QRect>
 #include <QWidgetItem>
+#include <QStyle>
 
 class VerticalFlowLayout : public QLayout
 {

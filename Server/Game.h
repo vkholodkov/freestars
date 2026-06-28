@@ -55,11 +55,14 @@ public:
 	double GetTechFactor() const	{ return TechFactor; }
 	long GetTurnPhase() const	{ return mTurnPhase; }
 	long GetTurn() const		{ return Turn; }
+  void SetHistoryTurn(long _HistoryTurn) { HistoryTurn = _HistoryTurn; }
+	long GetHistoryTurn() const		{ return HistoryTurn; }
 	bool LoadDefFile(const char * deffile);
 	void PlacePlayers();
 	void SetFileLocation(const char * hostfile);
 	bool LoadHostFile(const char * hostfile);
 	bool LoadPlayerFile(const char * playerfile);
+  bool LoadHistoryFile() { return mPlayers[mCurrentPlayer-1]->OpenHistoryFile(); };
 	bool LoadXYFile();
 	bool LoadRules(const char * file, const char * verify, double version, bool checkver);
 	bool LoadRules(const char * file, const char * MainNode);
@@ -145,7 +148,7 @@ protected:
 	long mGameID;
 	double TechFactor;		///< 1.0 for normal games, 2.0 for slow tech games
 	long mTurnPhase;
-	long Turn;
+	long Turn, HistoryTurn;
 	string Name;
 	string mFileLoc;
 	string mFileName;

@@ -1,6 +1,8 @@
 
 #include <QUrl>
 #include <QApplication>
+#include <QMimeData>
+#include <QDrag>
 
 #include "slot_widget.h"
 
@@ -45,7 +47,9 @@ void HullSlotWidget::paintEvent(QPaintEvent *event)
     QString description(describe());
     QString text(tr(hullSlot.IsAllowed(CT_ENGINE) ? "needs %0" : "up to %0").arg(hullSlot.GetCount()));
 
-    int width = fm.width(text);
+    auto s = fm.size(Qt::TextSingleLine, text);
+
+    int width = s.width();
 
     base.rx() -= (width / 2);
 
@@ -112,7 +116,8 @@ void SlotWidget::drawComponent(QPainter &painter, const QRect &rect)
         .arg(shipSlot.GetCount())
         .arg(hullSlot.GetCount()));
 
-    int width = fm.width(text);
+    auto s = fm.size(Qt::TextSingleLine, text);
+    int width = s.width();
 
     base.rx() -= (width / 2);
 
@@ -241,7 +246,7 @@ void EditableSlotWidget::mouseMoveEvent(QMouseEvent *e)
     QMimeData *mimeData = new QMimeData;
 
     QString mimeType("text/plain");
-    mimeData->setData(mimeType, QString("test").toAscii());
+    mimeData->setData(mimeType, QString("test").toUtf8());
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap);
     drag->setHotSpot(rect().center());

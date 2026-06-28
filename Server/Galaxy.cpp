@@ -137,7 +137,7 @@ bool Galaxy::ParseSize(const TiXmlNode * node)
 		return true;
 }
 
-bool Galaxy::ParseNode(const TiXmlNode * node)
+bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput)
 {
 	if (stricmp(node->Value(), "Galaxy") != 0)
 		return false;
@@ -155,7 +155,7 @@ bool Galaxy::ParseNode(const TiXmlNode * node)
 			mPlanets.push_back(p);
 		}
 		
-		if(!p->ParseNode(child1, game->GetCreation()))
+		if(!p->ParseNode(child1, game->GetCreation(), TrustInput))
 			return false;
 		
 		if(addit)
@@ -198,6 +198,11 @@ void Galaxy::WriteNode(TiXmlNode * node, const Player * viewer) const
 	WriteGroup<Salvage>(node,viewer,mScrap);
 	WriteGroup<Packet>(node,viewer,mPackets);
 	WriteGroup<Wormhole>(node,viewer,mWormholes);
+}
+
+void Galaxy::WriteHistory(TiXmlNode * node, const Player * viewer) const
+{
+  WriteGroup<Planet>(node,viewer,mPlanets);
 }
 
 void Galaxy::WriteXYFile(TiXmlNode * node)

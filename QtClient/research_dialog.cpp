@@ -22,7 +22,7 @@ ResearchDialog::ResearchDialog(Player *_player, QWidget *parent)
     for(unsigned n = 1 ; n <= num_planets ; n++) {
         Planet *p = game->GetGalaxy()->GetPlanet(n);
 
-        if(p->GetOwner() == player && p->GetPayTax()) {
+        if(p->GetOwner() == player) {
             totalResources += p->GetResources();
         }
     }
@@ -64,16 +64,18 @@ ResearchDialog::ResearchDialog(Player *_player, QWidget *parent)
     if(researchField >= 0 && researchField < Rules::MaxTechType) {
         QAbstractButton *button = researchFieldGroup->button(researchField);
         button->setChecked(true);
-        setResearchField(researchField);
+        setResearchField(button);
     }
 
-    connect(researchFieldGroup, SIGNAL(buttonClicked(int)), this, SLOT(setResearchField(int)));
+    connect(researchFieldGroup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(setResearchField(QAbstractButton*)));
     connect(researchTaxBox, SIGNAL(valueChanged(int)), this, SLOT(setResearchTax(int)));
     connect(doneButton, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-void ResearchDialog::setResearchField(int researchField)
+void ResearchDialog::setResearchField(QAbstractButton *button)
 {
+    int researchField = researchFieldGroup->id(button);
+
     currentFieldNameLabel->setText(tr(Rules::GetTechName(researchField).c_str()) + QString(","));
     currentTechLevelLabel->setText(researchField < Rules::MaxTechLevel
         ? tr("Tech Level %0").arg(player->GetTechLevel(researchField) + 1)
@@ -136,8 +138,8 @@ void ResearchDialog::setResearchField(int researchField)
     nextYearBudgetLabel->setText(QString::number(nextYearBudget));
 
     if(nextYearBudget > 0) {
-        long years = ::ceil(resourcesNeeded / nextYearBudget);
-        estTimeLabel->setText(QString::number(years));
+        long years = ::ceil((double)resourcesNeeded / nextYearBudget);
+        estTimeLabel->setText(years > 1 ? tr("%0 years").arg(years) : tr("%0 year").arg(years));
     }
     else {
         estTimeLabel->setText(tr("Never"));
@@ -148,7 +150,7 @@ void ResearchDialog::setResearchField(int researchField)
 
 void ResearchDialog::setResearchTax(int tax)
 {
-    setResearchField(researchFieldGroup->checkedId());
+    setResearchField(researchFieldGroup->checkedButton());
 }
 
 void ResearchDialog::accept()

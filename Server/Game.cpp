@@ -56,6 +56,7 @@ Game::Game()
 	mGameID = 0;
 
 	mSeed = NULL;
+  HistoryTurn = -1;
 	Rules::Init();
 }
 
@@ -399,7 +400,8 @@ bool Game::LoadHostFile(const char * hostfile)
 		mess->AddItem("Section", "Galaxy");
 		return false;
 	}
-	if (!galaxy->ParseNode(node))
+  // Trust input from the host file
+	if (!galaxy->ParseNode(node, true))
 		return false;
 
 	if (mNumberOfPlayers != mPlayers.size())
@@ -489,7 +491,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 		mess->AddItem("Section", "Galaxy");
 		return false;
 	}
-	if (!galaxy->ParseNode(node))
+	if (!galaxy->ParseNode(node, true))
 		return false;
 
 	mPlayers[mCurrentPlayer-1]->ParseMessages(ptf->FirstChild("Messages"));
@@ -515,7 +517,7 @@ bool Game::CheckMetaInfo(const TiXmlNode * node, const char * file, double filev
 	if (meta > fileversion + epsilon || meta < fileversion - epsilon) {
 		Message * mess = this->AddMessage("Error: Invalid FileVersion");
 		mess->AddItem("File name", file);
-		mess->AddItem("FileVersion", GetString(node->FirstChild("FileVersion")));
+		mess->AddItem("FileVersion", GetString(mn->FirstChild("FileVersion")));
 		return false;
 	}
 
@@ -523,7 +525,7 @@ bool Game::CheckMetaInfo(const TiXmlNode * node, const char * file, double filev
 	if (meta > FREESTARSVERSION + epsilon || meta < FREESTARSVERSION - epsilon) {
 		Message * mess = this->AddMessage("Error: Invalid FreeStarsVersion");
 		mess->AddItem("File name", file);
-		mess->AddItem("FreeStarsVersion", GetString(node->FirstChild("FreeStarsVersion")));
+		mess->AddItem("FreeStarsVersion", GetString(mn->FirstChild("FreeStarsVersion")));
 		return false;
 	}
 
@@ -1171,15 +1173,16 @@ for all topobjects
 		pen = viewer->GetScanPenetrating();
 		space = viewer->GetScanSpace();
 
-		if (pen <= 0 && space < 0 && mradius <= 0)	// if viewer can't see, stop now
+		if (pen < 0 && space < 0)	// if viewer can't see, stop now
 			continue;
 
-		if (space >= 0) {
+		if (space >= 0 || pen >= 0) {
 			// see everything else at the same location
 			for (l = 0; l < mTopObjects[i]->size(); ++l) if (j != l) {
 				other = mTopObjects[i]->at(l);
-				if (viewer->GetOwner() != other->GetOwner())
+				if (viewer->GetOwner() != other->GetOwner()) {
 					other->SetSeenBy(viewer->GetOwner()->GetID()-1, pen >= 0 ? SEEN_PENSCAN : SEEN_SCANNER);
+        }
 			}
 		}
 
@@ -1393,7 +1396,10 @@ bool Game::ProcessWaypoints(long pnumber)
 	}
 
 	node = orders->FirstChild("Turn");
-	if (GetLong(node) != Turn-1) {
+
+  auto PlayerTurn = GetLong(node);
+
+	if (PlayerTurn != Turn-1) {
 		Message * mess = player->AddMessage("Error: Wrong year number in turn file");
 		mess->AddLong("Turn specified", GetLong(node));
 		mess->AddLong("Actual turn", Turn);
@@ -1812,6 +1818,9 @@ bool Game::ProcessTurn()
 			break;
 		}
 	}
+	// Add production tech
+	for (i = 0; i < NumberPlayers(); ++i)
+		mPlayers[i]->AddProductionTech();
 	// clear old orders
 	for (i = 0; i < NumberPlayers(); ++i)
 		mPlayers[i]->ForEachFleet(Fleet::FTClearWaypoint, true);

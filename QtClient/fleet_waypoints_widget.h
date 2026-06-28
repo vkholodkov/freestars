@@ -13,6 +13,8 @@
 
 #include "FSServer.h"
 
+#include "ui_fleet_waypoints_widget.h"
+
 namespace FreeStars {
 
 class FleetWaypointsWidget : public FoldingWidget {
@@ -39,6 +41,7 @@ private:
     void changeWayorderList();
 
 private:
+    Ui_FleetWaypointsWidget ui_FleetWaypointsWidget;
     QListWidget *waypointListBox;
     Fleet *fleet;
     const Player *player;

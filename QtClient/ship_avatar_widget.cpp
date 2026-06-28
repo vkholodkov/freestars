@@ -12,7 +12,7 @@ void ShipAvatarWidget::paintEvent(QPaintEvent *event)
     painter.fillRect(rect, Qt::black);
 
     if(graphicsArray != NULL && !m_hullName.isEmpty()) {
-        const QIcon *icon = graphicsArray->GetComponentIcon(m_hullName.toAscii().constData());
+        const QIcon *icon = graphicsArray->GetComponentIcon(m_hullName.toUtf8().constData());
 
         if(icon != NULL) {
             painter.drawPixmap(rect.topLeft(), icon->pixmap(rect.size()));

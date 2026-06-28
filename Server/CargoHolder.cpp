@@ -351,7 +351,7 @@ void CargoHolder::TransferCargo(CargoHolder * dest, CargoType ct, long * amount,
 	assert(*amount > 0);
 
 	if (GetContain(ct) < *amount) {
-		Message * mess = player->AddMessage("Warning: Transfer more then carried", this);
+		Message * mess = player->AddMessage("Warning: Transfer more than carried", this);
 		mess->AddLong("Attempted amount", *amount);
 		*amount = GetContain(ct);
 		mess->AddLong("Actual amount", *amount);
@@ -360,7 +360,7 @@ void CargoHolder::TransferCargo(CargoHolder * dest, CargoType ct, long * amount,
 	if (ct == POPULATION) {
 		*amount -= *amount % Rules::PopEQ1kT;	// only transfer full groups
 		if (dest->GetCargoCapacity() >= 0 && dest->GetCargoCapacity() < dest->GetCargoMass() + (*amount / Rules::PopEQ1kT)) {
-			Message * mess = player->AddMessage("Warning: Transfer more then capacity", this);
+			Message * mess = player->AddMessage("Warning: Transfer more than capacity", this);
 			mess->AddItem("", dest);
 			mess->AddLong("Attempted amount", *amount);
 			*amount = (dest->GetCargoCapacity() - dest->GetCargoMass()) * Rules::PopEQ1kT;
@@ -369,7 +369,7 @@ void CargoHolder::TransferCargo(CargoHolder * dest, CargoType ct, long * amount,
 	} else if (ct == FUEL) {
 		Fleet * destf = dynamic_cast<Fleet *>(dest);
 		if (destf->GetFuelCapacity() >= 0 && destf->GetFuelCapacity() < destf->GetFuel() + *amount) {
-			Message * mess = player->AddMessage("Warning: Transfer more then capacity", this);
+			Message * mess = player->AddMessage("Warning: Transfer more than capacity", this);
 			mess->AddItem("", dest);
 			mess->AddLong("Attempted amount", *amount);
 			*amount = destf->GetFuelCapacity() - destf->GetFuel();
@@ -377,7 +377,7 @@ void CargoHolder::TransferCargo(CargoHolder * dest, CargoType ct, long * amount,
 		}
 	} else {
 		if (dest->GetCargoCapacity() >= 0 && dest->GetCargoCapacity() < dest->GetCargoMass() + *amount) {
-			Message * mess = player->AddMessage("Warning: Transfer more then capacity", this);
+			Message * mess = player->AddMessage("Warning: Transfer more than capacity", this);
 			mess->AddItem("", dest);
 			mess->AddLong("Attempted amount", *amount);
 			*amount = dest->GetCargoCapacity() - dest->GetCargoMass();

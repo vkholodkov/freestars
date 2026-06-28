@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <QtGui>
+#include <QtWidgets>
 
 #include "vertical_flow_layout.h"
 
@@ -69,7 +70,7 @@ QLayoutItem *VerticalFlowLayout::takeAt(int index)
 
 Qt::Orientations VerticalFlowLayout::expandingDirections() const
 {
-    return 0;
+    return (Qt::Orientations)0;
 }
 
 void VerticalFlowLayout::setGeometry(const QRect &rect)
@@ -90,7 +91,9 @@ QSize VerticalFlowLayout::minimumSize() const
     foreach (item, itemList)
         size = size.expandedTo(item->minimumSize());
 
-    size += QSize(2*margin(), 2*margin());
+    QMargins margins(contentsMargins());
+
+    size += QSize(2*margins.left(), 2*margins.right());
     return size;
 }
 

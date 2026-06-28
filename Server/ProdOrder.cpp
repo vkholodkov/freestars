@@ -503,6 +503,57 @@ string POAuto::AmountToString() const
 	return o.str();
 }
 
+Cost POAuto::GetCost(const Planet *planet) const
+{
+	auto owner = planet->GetOwner();
+
+	if (Type == POP_MINES) {
+    return owner->MineCost() * Amount;
+	} else if (Type == POP_FACTS) {
+    return owner->FactoryCost() * Amount;
+	} else if (Type == POP_DEFS) {
+    assert(Component::DefenseCost());
+    Cost cost;
+    cost.SetResources(long(Component::DefenseCost()->GetResources() * owner->ComponentCostFactor(CT_DEFENSE) + .5));
+    cost.SetCrew(long(Component::DefenseCost()->GetCrew() * owner->ComponentCostFactor(CT_DEFENSE) + .5));
+    for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
+      cost[ct] = long((*Component::DefenseCost())[ct] * owner->ComponentCostFactor(CT_DEFENSE) + .5);
+
+    return cost * Amount;
+	} else if (Type == POP_ALCHEMY) {
+    return POPlanetary::GetCost(planet);
+  } else if(Type == POP_MINTERRA || Type == POP_MAXTERRA) {
+    double cf = owner->ComponentCostFactor(CT_TERRAFORM);
+    if (cf <= epsilon)
+      return Cost();
+
+    Cost c;
+    
+    for (unsigned long i = 0; i < planet->GetGame()->GetComponents().size(); ++i) {
+      // Is it terraforming? can we build it? Will it help? Is it cheaper?
+      if (planet->GetGame()->GetComponents()[i]->GetType() == CT_TERRAFORM &&
+        planet->GetGame()->GetComponents()[i]->IsBuildable(owner) &&
+        planet->CanTerraform(planet->GetGame()->GetComponents()[i]))
+      {
+        c = planet->GetGame()->GetComponents()[i]->GetCost();
+      }
+    }
+
+    if (c.GetResources() == 0) {
+      if (Type == POP_TERRAFORM)
+        return Cost();	// this player cannot terraform yet
+    }
+
+    c *= cf;
+
+    return c;
+	} else if (Type >= POP_MIXEDPACKET && Type <= POP_MIXEDPACKET + Rules::MaxMinType) {
+    return planet->GetPacketCost(Type - POP_MIXEDPACKET - 1) * Amount;
+	} else {
+		return Cost();
+	}
+}
+
 bool POAuto::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 {
 	const Player * owner = planet->GetOwner();
@@ -510,6 +561,8 @@ bool POAuto::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 	if (Type == POP_MINES) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
@@ -521,6 +574,8 @@ bool POAuto::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 	} else if (Type == POP_FACTS) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
@@ -532,6 +587,8 @@ bool POAuto::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 	} else if (Type == POP_DEFS) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
@@ -589,6 +646,25 @@ string POBase::TypeToString() const
 	str = "Base design ";
 	str += Long2String(Type);
 	return str;
+}
+
+Cost POBase::GetCost(const Planet *planet) const
+{
+	Cost cost;
+
+	const Player * owner = planet->GetOwner();
+
+	// check for invalid designs
+	if (!owner->GetShipDesign(Type) || !owner->GetShipDesign(Type)->IsValidDesign(owner)) {
+		return Cost();
+	}
+
+	if (planet->GetBaseNumber() > 0)
+		cost = owner->GetBaseDesign(Type)->GetCost(owner, planet->GetBaseDesign(), planet);
+	else
+		cost = owner->GetBaseDesign(Type)->GetCost(owner);
+
+	return cost * Amount;
 }
 
 bool POBase::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
@@ -666,6 +742,10 @@ bool POPacket::CheckPacket(Planet * planet)
 		return true;
 }
 
+Cost POPacket::GetCost(const Planet *planet) const {
+  return planet->GetPacketCost(Type - POP_MIXEDPACKET - 1) * Amount;
+}
+
 bool POPacket::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 {
 	if (!CheckPacket(planet))
@@ -720,12 +800,52 @@ string POPlanetary::TypeToString() const
 	return str;
 }
 
+Cost POPlanetary::GetCost(const Planet *planet) const
+{
+	const Player * owner = planet->GetOwner();
+	if (Type == POP_FACTS) {
+		return owner->FactoryCost() * Amount;
+	} else if (Type == POP_MINES) {
+		return owner->MineCost() * Amount;
+	} else if (Type == POP_DEFS) {
+		assert(Component::DefenseCost());
+		Cost cost;
+		cost.SetResources(long(Component::DefenseCost()->GetResources() * owner->ComponentCostFactor(CT_DEFENSE) + .5));
+		cost.SetCrew(long(Component::DefenseCost()->GetCrew() * owner->ComponentCostFactor(CT_DEFENSE) + .5));
+		for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
+			cost[ct] = long((*Component::DefenseCost())[ct] * owner->ComponentCostFactor(CT_DEFENSE) + .5);
+
+    return cost * Amount;
+	} else if (Type == POP_ALCHEMY) {
+		Cost cost;
+		cost.SetResources(long(Rules::GetConstant("AlchemyCost") * owner->ComponentCostFactor(CT_ALCHEMY) + .5));
+		cost.SetCrew(0);
+		for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
+			cost[ct] = 0;
+
+		return cost * Amount;
+	} else if (Type == POP_SCANNER) {
+		assert(Component::ScannerCost());
+		Cost cost;
+		cost.SetResources(long(Component::ScannerCost()->GetResources() * owner->ComponentCostFactor(CT_PLANSCAN) + .5));
+		cost.SetCrew(long(Component::ScannerCost()->GetCrew() * owner->ComponentCostFactor(CT_PLANSCAN) + .5));
+		for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
+			cost[ct] = long((*Component::ScannerCost())[ct] * owner->ComponentCostFactor(CT_PLANSCAN) + .5);
+
+		return cost * Amount;
+	} else {
+		return Cost();
+	}
+}
+
 bool POPlanetary::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 {
 	const Player * owner = planet->GetOwner();
 	if (Type == POP_FACTS) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
@@ -739,6 +859,8 @@ bool POPlanetary::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 	} else if (Type == POP_MINES) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
@@ -752,6 +874,8 @@ bool POPlanetary::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 	} else if (Type == POP_DEFS) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
@@ -780,12 +904,15 @@ bool POPlanetary::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 	} else if (Type == POP_SCANNER) {
 		if (owner->ARTechType() >= 0) {
 			// AR trying to build planetary stuff, send message and delete from queue
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
+      mess->AddLong("Planetary", Type);
 			return true;
 		}
 
 		assert(Amount == 1);
 		if (planet->GetScanner()) {
 			// send message too
+      Message * mess = planet->NCGetOwner()->AddMessage("Error: Scanner already built", planet);
 			return true;
 		}
 
@@ -851,10 +978,22 @@ TiXmlNode * POShip::WriteNode(TiXmlNode * node) const
 
 string POShip::TypeToString() const
 {
-	string str;
-	str = "Ship design ";
-	str += Long2String(Type);
-	return str;
+  string str;
+  str = "Ship design ";
+  str += Long2String(Type);
+  return str;
+}
+
+Cost POShip::GetCost(const Planet *planet) const
+{
+	auto owner = planet->GetOwner();
+
+	// check for invalid designs
+	if (!owner->GetShipDesign(Type) || !owner->GetShipDesign(Type)->IsValidDesign(owner)) {
+		return Cost();
+	}
+
+	return owner->GetShipDesign(Type)->GetCost(owner) * Amount;
 }
 
 bool POShip::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
@@ -926,6 +1065,35 @@ string POTerraform::AmountToString() const
     ostringstream o;
     o << Amount << '%';
 	return o.str();
+}
+
+Cost POTerraform::GetCost(const Planet *planet) const {
+	const Player *owner = planet->GetOwner();
+	double cf = owner->ComponentCostFactor(CT_TERRAFORM);
+	if (cf <= epsilon)
+		return Cost();
+
+	Cost c;
+  
+  for (unsigned long i = 0; i < planet->GetGame()->GetComponents().size(); ++i) {
+    // Is it terraforming? can we build it? Will it help? Is it cheaper?
+    if (planet->GetGame()->GetComponents()[i]->GetType() == CT_TERRAFORM &&
+      planet->GetGame()->GetComponents()[i]->IsBuildable(owner) &&
+      planet->CanTerraform(planet->GetGame()->GetComponents()[i]) &&
+      (mResCost == 0 || mResCost >= planet->GetGame()->GetComponents()[i]->GetCost().GetResources()))
+    {
+      c = planet->GetGame()->GetComponents()[i]->GetCost();
+    }
+  }
+
+  if (c.GetResources() == 0) {
+    if (Type == POP_TERRAFORM)
+      return Cost();	// this player cannot terraform yet
+  }
+
+  c *= cf;
+
+  return c;
 }
 
 bool POTerraform::Produce(Planet * planet, long * resources, bool * AutoAlchemy)

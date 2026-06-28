@@ -51,7 +51,7 @@ void ShipDescriber::describe(const Ship *ship, QFormLayout *left, QFormLayout *r
 {
     const ShipDescriber::ShipProperty *property = interestingShipProperties;
 
-    while(property->name != NULL) {
+    while(!property->name.isNull()) {
         QString value((this->*property->handler)(ship));
 
         if(!value.isEmpty()) {
@@ -86,7 +86,7 @@ void HullDescriber::describe(const Hull *hull, QFormLayout *left, QFormLayout *r
 {
     const HullDescriber::HullProperty *property = interestingHullProperties;
 
-    while(property->name != NULL) {
+    while(!property->name.isNull()) {
         QString value((this->*property->handler)(hull));
 
         if(!value.isEmpty()) {
@@ -200,9 +200,9 @@ void ComponentDescriber::describe(const Component *component, QFormLayout *left,
 
     QFont bold(font);
     bold.setBold(true);
-    bold.setWeight(75);
+    bold.setWeight(QFont::Bold);
 
-    while(property->name != NULL) {
+    while(!property->name.isNull()) {
         if((property->left && left) || (!property->left && right)) {
             QString value((this->*property->handler)(component));
 

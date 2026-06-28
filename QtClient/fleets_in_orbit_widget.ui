@@ -30,14 +30,13 @@
    <item>
     <widget class="QWidget" name="textWidget" native="true">
      <layout class="QFormLayout" name="formLayout">
-      <property name="margin">
+      <property name="margin" stdset="0">
        <number>0</number>
       </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -50,7 +49,6 @@
        <widget class="QLabel" name="label_3">
         <property name="font">
          <font>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -62,12 +60,12 @@
       <item row="0" column="1">
        <widget class="CargoWidget" name="fuelWidget" native="true">
         <property name="cursor">
-         <cursorShape>ArrowCursor</cursorShape>
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="CargoWidget" name="cargoWidget" native="true">
+       <widget class="FreeStars::MultiCargoWidget" name="cargoWidget" native="true">
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
@@ -85,7 +83,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="margin">
+      <property name="margin" stdset="0">
        <number>0</number>
       </property>
       <item>
@@ -125,6 +123,12 @@
    <class>CargoWidget</class>
    <extends>QWidget</extends>
    <header>cargo_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FreeStars::MultiCargoWidget</class>
+   <extends>QWidget</extends>
+   <header>multi_cargo_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

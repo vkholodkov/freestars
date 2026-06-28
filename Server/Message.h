@@ -184,7 +184,7 @@ public:
 	void AddItem(const TiXmlNode * node)				{ AddItem(new MessXMLNode(node)); }
 	void StoreMessageLocation(const Location * loc, const Player * player);
 
-	bool IsType(const char * t)			{ return mType.find(t) >= 0; }
+	bool IsType(const char * t)			{ return mType.find(t) != string::npos; }
 	void WriteNode(TiXmlNode * node) const;
 	bool ParseNode(const TiXmlNode * node, Game*);
 	string ToString() const;

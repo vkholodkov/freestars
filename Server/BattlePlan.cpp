@@ -63,7 +63,7 @@ void BattlePlan::SetDefault()
 */
 bool BattlePlan::ParseNode(const TiXmlNode * node, Player * owner)
 {
-	const char * ptr;
+	const char *ptr;
 
 	int num;
 	node->ToElement()->Attribute("IDNumber", &num);

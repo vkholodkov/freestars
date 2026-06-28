@@ -21,7 +21,9 @@
 #include "fleet_composition_widget.h"
 #include "fleet_waypoints_widget.h"
 
+#include "cargo_transfer_dialog.h"
 #include "research_dialog.h"
+#include "production_queue_dialog.h"
 #include "ship_design_dialog.h"
 #include "race_wizard.h"
 
@@ -137,9 +139,21 @@ void GameView::setBriefSelection(const Planet *_planet) {
         ui_PlanetReport.setupUi(newPage);
         statusBed->addWidget(newPage);
 
+        long reportAge = game->GetTurn() - _planet->GetReportYear();
+
+        if(reportAge == 0) {
+          ui_PlanetReport.reportAgeLabel->setStyleSheet("");
+          ui_PlanetReport.reportAgeLabel->setText(tr("Report is current"));
+        }
+        else {
+          ui_PlanetReport.reportAgeLabel->setStyleSheet("QLabel { color: red; }");
+          ui_PlanetReport.reportAgeLabel->setText(tr("Report is %0 year%1 old")
+            .arg(reportAge).arg(reportAge > 1 ? "s" : ""));
+        }
+
         if(seen & SEEN_PLANETHAB) {
             ui_PlanetReport.valueLabel->setText(tr("Value: %0%")
-                .arg(_planet->GetOwner()->HabFactor(_planet)));
+                .arg(game->GetCurrentPlayer()->HabFactor(_planet)));
         }
 
         if(seen & SEEN_PLANETPOP) {
@@ -156,7 +170,7 @@ void GameView::setBriefSelection(const Planet *_planet) {
 
             ui_PlanetReport.habitationBar->setGravityValue(_planet->GetHabValue(0));
 
-            ui_PlanetReport.tempLabel->setText(trUtf8("%0°C")
+            ui_PlanetReport.tempLabel->setText(tr("%0°C")
                 .arg(_planet->GetHabValue(1)));
 
             ui_PlanetReport.habitationBar->setTempRange(HabRange(player->HabCenter(1),
@@ -254,7 +268,7 @@ void GameView::setDetailedSelection(const Planet *_planet) {
     /*
      * Planet production widget
      */
-    planetProductionWidget = new PlanetProductionWidget(_planet, player);
+    planetProductionWidget = new PlanetProductionWidget(const_cast<Planet*>(_planet), player);
     planetProductionWidget->setObjectName("w3_column2");
     verticalFlowLayout->addWidget(planetProductionWidget);
 
@@ -450,7 +464,7 @@ void GameView::selectObject(const SpaceObject *so)
     mapScroller->ensureVisible(pos.x(), pos.y());
     mapView->setSelection(so);
 
-    const Planet *p = dynamic_cast<const Planet*>(so);
+    auto *p = dynamic_cast<const Planet*>(so);
 
     if(p != NULL) {
         setBriefSelection(p);
@@ -461,7 +475,7 @@ void GameView::selectObject(const SpaceObject *so)
         return;
     }
 
-    const Fleet *f = dynamic_cast<const Fleet*>(so);
+    auto *f = dynamic_cast<const Fleet*>(so);
 
     if(f != NULL) {
         setBriefSelection(f);
@@ -481,10 +495,10 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
 
     QMenu menu(this);
 
-    for(std::vector<const SpaceObject*>::const_iterator i = sos.m_object_list.begin() ;
+    for(auto i = sos.m_object_list.begin() ;
         i != sos.m_object_list.end() ; i++)
     {
-        const Planet *p = dynamic_cast<const Planet*>(*i);
+        auto *p = dynamic_cast<const Planet*>(*i);
 
         if(p != NULL) {
             QAction *action = menu.addAction(QString(p->GetName().c_str()));
@@ -493,7 +507,7 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
             continue;
         }
 
-        const Fleet *f = dynamic_cast<const Fleet*>(*i);
+        auto *f = dynamic_cast<const Fleet*>(*i);
 
         if(f != NULL) {
             QAction *action = menu.addAction(QString(f->GetName(player).c_str()));
@@ -600,7 +614,11 @@ void GameView::prevObject()
 
 void GameView::changeProductionQueue(const Planet *planet)
 {
-    std::cout << "GameView::changeProductionQueue " << planet << std::endl;
+    ProductionQueueDialog productionQueueDialog(const_cast<Planet*>(planet), this);
+
+    if(productionQueueDialog.exec() == QDialog::Accepted) {
+      planetProductionWidget->productionQueueChanged();
+    }
 }
 
 void GameView::clearProductionQueue(const Planet *planet)
@@ -615,7 +633,8 @@ void GameView::setRouteDest()
 
 void GameView::exchangeCargo(const Planet *planet, const Fleet *fleet)
 {
-    std::cout << "GameView::exchangeCargo planet=" << planet << " fleet=" << fleet << std::endl;
+    CargoTransferDialog cargoTransferDialog(const_cast<Planet*>(planet), const_cast<Fleet*>(fleet), player, this);
+    cargoTransferDialog.exec();
 }
 
 void GameView::splitFleet(const Fleet *_fleet)
@@ -631,11 +650,6 @@ void GameView::splitAllFleet(const Fleet *_fleet)
 void GameView::mergeFleet(const Fleet *_fleet)
 {
     std::cout << "GameView::mergeFleet fleet=" << _fleet << std::endl;
-}
-
-void GameView::showProductionDialog(bool)
-{
-    std::cout << "GameView::showProductionDialog" << std::endl;
 }
 
 void GameView::shipDesignDialog()
@@ -666,9 +680,54 @@ void GameView::viewRaceDialog()
     raceWizard.exec();
 }
 
+void GameView::ordersChanged()
+{
+}
+
 void GameView::submitTurn()
 {
+    std::string prev_loc = std::setlocale(LC_NUMERIC, nullptr);
+    std::setlocale(LC_NUMERIC, "C");
     player->SaveXFile();
+    std::setlocale(LC_NUMERIC, prev_loc.c_str());
+
+    if(game->NumberPlayers() == 1) {
+
+/*
+      bool error = false;
+      cout << "Loading Turns" << endl;
+      if (!game->LoadTurns())
+        error = true;
+
+      if(!error) {
+        if (!game->ProcessTurn())
+          error = true;
+
+        if (!error) {
+          cout << "Writing Host File" << endl;
+          error = !game->WriteHostFile();
+        }
+
+        if (!error) {
+          cout << "Writing Players Files" << endl;
+          error = !game->WritePlayerFiles();
+          error = true;
+        }
+
+      }
+*/
+
+      // For debugging
+      for (unsigned int i = 0; i < game->GetMessages().size(); ++i)
+      {
+        string message = game->GetMessages()[i]->ToString();
+        /*if(message.find("Error") != -1 || message.find("Warn") != -1)*/
+          cout << message << endl;
+      }
+    }
+    else {
+      std::cout << "submit turn" << std::endl;
+    }
 }
 
 };

@@ -405,7 +405,7 @@ void Fleet::RemoteTerraform(bool bomb)
 	Planet * planet = InOrbit();
 	if (planet != NULL &&
 		planet->GetOwner() != NULL &&
-		(planet->GetOwner()->GetRelations(GetOwner()) > PR_NEUTRAL || planet->GetBaseDesign() < 0))
+		(planet->GetOwner()->GetRelations(GetOwner()) > PR_NEUTRAL || planet->GetBaseDesign() == NULL))
 	{
 		planet->RemoteTerraform(this, bomb);
 	}
@@ -1469,10 +1469,10 @@ long Fleet::GetBestSpeed(const Location * L1, const Location * L2, OrderType ot)
 
 		if (GetCargoMass() == 0 || GetOwner()->GateCargo()) {
 			if (p1 && p1->GetBaseNumber() >= 0) {
-				const Component * gate = p1->GetBaseDesign()->GetGate();
-				if (gate->GetGateMass() >= GetMaxMass() && gate->GetRange() >= dist) {
-					gate = p2->GetBaseDesign()->GetGate();
-					if (gate->GetGateMass() >= GetMaxMass())
+				auto gate1 = p1->GetBaseDesign()->GetGate();
+				if (gate1 && gate1->GetGateMass() >= GetMaxMass() && gate1->GetRange() >= dist) {
+					auto gate2 = p2->GetBaseDesign()->GetGate();
+					if (gate2 && gate2->GetGateMass() >= GetMaxMass())
 						return -1;	// gate
 				}
 			}

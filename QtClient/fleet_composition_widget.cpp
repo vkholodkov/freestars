@@ -18,6 +18,15 @@ FleetCompositionWidget::FleetCompositionWidget(const Fleet *_fleet, const Player
     Ui_FleetCompositionWidget ui_FleetCompositionWidget;
     ui_FleetCompositionWidget.setupUi(widget);
 
+    fleetCompositionModel = new FleetCompositionModel(_fleet, _player);
+    auto m = ui_FleetCompositionWidget.fleetCompositionView->model();
+    ui_FleetCompositionWidget.fleetCompositionView->setModel(fleetCompositionModel);
+    delete m;
+
+    ui_FleetCompositionWidget.fleetCompositionView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui_FleetCompositionWidget.fleetCompositionView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui_FleetCompositionWidget.fleetCompositionView->resizeColumnsToContents();
+
     long cloaked = _fleet->GetCloak(_player, true);
 
     if(cloaked) {

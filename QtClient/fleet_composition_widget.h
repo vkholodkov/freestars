@@ -10,6 +10,7 @@
 
 #include "folding_widget.h"
 #include "cargo_widget.h"
+#include "fleet_composition_model.h"
 
 #include "FSServer.h"
 
@@ -32,6 +33,7 @@ private slots:
     void mergeButtonClicked(bool);
 
 private:
+    FleetCompositionModel *fleetCompositionModel;
     const Fleet *fleet;
     const Player *player;
 };

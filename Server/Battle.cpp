@@ -425,7 +425,7 @@ bool Battle::MoveStack(long s)
 				bestP = DamTake[dx+1][dy+1];
 				bestD = DamDone[dx+1][dy+1];
 				count = 0;
-			} else if (dx > -1 || dy > -1 && (bestD == DamDone[dx+1][dy+1] && bestP == DamTake[dx+1][dy+1])) {
+			} else if ((dx > -1 || dy > -1) && (bestD == DamDone[dx+1][dy+1] && bestP == DamTake[dx+1][dy+1])) {
 				++count;
 				if (Random(count) == 0) {
 					mdx = dx;
@@ -441,7 +441,7 @@ bool Battle::MoveStack(long s)
 			if (bestP > di) {
 				bestP = di;
 				count = 0;
-			} else if (dx > -1 || dy > -1 && bestP == di) {
+			} else if ((dx > -1 || dy > -1) && bestP == di) {
 				++count;
 				if (Random(count) == 0) {
 					mdx = dx;
@@ -457,7 +457,7 @@ bool Battle::MoveStack(long s)
 			if (bestP > di) {
 				bestP = di;
 				count = 0;
-			} else if (dx > -1 || dy > -1 && bestP == di) {
+			} else if ((dx > -1 || dy > -1) && bestP == di) {
 				++count;
 				if (Random(count) == 0) {
 					mdx = dx;
@@ -472,7 +472,7 @@ bool Battle::MoveStack(long s)
 			if (bestP > DamDone[dx+1][dy+1]) {
 				bestP = DamDone[dx+1][dy+1];
 				count = 0;
-			} else if (dx > -1 || dy > -1 && bestP == DamDone[dx+1][dy+1]) {
+			} else if ((dx > -1 || dy > -1) && bestP == DamDone[dx+1][dy+1]) {
 				++count;
 				if (Random(count) == 0) {
 					mdx = dx;
@@ -517,7 +517,7 @@ bool Battle::MoveStack(long s)
 			if (bestP < DamTake[dx+1][dy+1]) {
 				bestP = DamTake[dx+1][dy+1];
 				count = 0;
-			} else if (dx > -1 || dy > -1 && bestP == DamTake[dx+1][dy+1]) {
+			} else if ((dx > -1 || dy > -1) && bestP == DamTake[dx+1][dy+1]) {
 				++count;
 				if (Random(count) == 0) {
 					mdx = dx;
@@ -595,7 +595,7 @@ long Battle::PotentialDamage(const Stack * shoot, const Stack * target, long Ran
 			curSlot = slot;
 
 		if (slot != NULL || mSlots[i].stack == shoot) {
-			if (curSlot->GetComp()->GetType() == CT_WEAPON && (curSlot->GetComp()->GetRange() + shoot->IsBase()?1:0) <= Range) {
+			if (curSlot->GetComp()->GetType() == CT_WEAPON && (curSlot->GetComp()->GetRange() + (shoot->IsBase()?1:0)) <= Range) {
 				if (Gatling && curSlot->GetComp()->GetWeaponType() != WT_GATLING)
 					continue;
 
@@ -605,7 +605,7 @@ long Battle::PotentialDamage(const Stack * shoot, const Stack * target, long Ran
 				case WT_SAPPER:
 				case WT_GATLING:
 					temp *= shoot->mShip->GetCapacitors() * target->mShip->GetDeflection();
-					temp *= 1.0 - 0.1 * double(Range) / (curSlot->GetComp()->GetRange() + shoot->IsBase()?1:0);
+					temp *= 1.0 - 0.1 * double(Range) / (curSlot->GetComp()->GetRange() + (shoot->IsBase()?1:0));
 					if (curSlot->GetComp()->GetWeaponType() == WT_SAPPER)
 						Sapper += max(long(temp), target->bShield - Sapper);
 					else {

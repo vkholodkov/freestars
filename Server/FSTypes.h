@@ -33,6 +33,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #if !defined(FreeStars_FSTypes_h)
 #define FreeStars_FSTypes_h
 
+#include <memory>
+
 namespace FreeStars {
 
 //--------------- FreeStars Types -----------------------

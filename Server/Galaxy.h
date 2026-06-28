@@ -59,8 +59,9 @@ public:
 
     void SetGame(Game *_game) { game = _game; }
 
-	bool ParseNode(const TiXmlNode * node);
+	bool ParseNode(const TiXmlNode * node, bool TrustInput = false);
 	void WriteNode(TiXmlNode * node, const Player * viewer) const;
+  void WriteHistory(TiXmlNode * node, const Player * viewer) const;
 	void WriteXYFile(TiXmlNode * node);
 	/**
 	 * Search for planet at postition.

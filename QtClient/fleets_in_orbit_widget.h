@@ -10,6 +10,7 @@
 
 #include "folding_widget.h"
 #include "cargo_widget.h"
+#include "multi_cargo_widget.h"
 
 #include "FSServer.h"
 
@@ -28,12 +29,14 @@ signals:
 private slots:
     void gotoButtonClicked(bool);
     void cargoButtonClicked(bool);
+    void cargoWidgetClicked();
     void objectActivated(int);
 
 private:
     QWidget *textWidget;
     QComboBox *fleetsComboBox;
-    CargoWidget *fuelWidget, *cargoWidget;
+    CargoWidget *fuelWidget;
+    MultiCargoWidget *cargoWidget;
     const Planet *planet;
     const Player *player;
 };

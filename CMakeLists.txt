@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.16)
 project(FREESTARS)
-find_package(Qt4 REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets )
 
 set(CMAKE_BUILD_TYPE Debug)
 
