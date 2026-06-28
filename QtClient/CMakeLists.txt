@@ -108,15 +108,13 @@ link_directories(${FREESTARS_BINARY_DIR}/tinyxml ${FREESTARS_BINARY_DIR}/Server)
 
 add_definitions(-DTIXML_USE_STL)
 
-#QT4_WRAP_CPP(freestars_HEADERS_MOC ${freestars_HEADERS})
-#QT4_WRAP_UI(freestars_FORMS_HEADERS ${freestars_FORMS})
-#QT4_ADD_RESOURCES(freestars_RESOURCES_RCC ${freestars_RESOURCES})
-#QT4_CREATE_TRANSLATION(${freestars_SOURCES} ${freestars_FORMS_HEADERS} freestars.ts)
-#QT4_ADD_TRANSLATION(messages.qm messages.ts)
-
 qt6_wrap_ui(UI_HEADERS ${freestars_FORMS})
 
-add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS} ${freestars_RESOURCES} ${UI_HEADERS} freestars.qm messages.qm)
+add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS} ${freestars_RESOURCES} ${UI_HEADERS})
+
+qt_add_translations(fs-client-qt
+  SOURCES ${freestars_SOURCES} ${freestars_HEADERS} ${freestars_FORMS}
+)
 
 target_link_libraries(fs-client-qt fsserver MersenneTwister tinyxml Qt6::Core Qt6::Gui Qt6::Widgets)
 
