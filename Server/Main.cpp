@@ -58,7 +58,7 @@ int main (int argc, char * argv[])
 	string HostFile = argv[1];
 	string FileType = HostFile.substr(HostFile.find_last_of('.'));
 
-	std::auto_ptr<Game> game(new Game());
+	std::unique_ptr<Game> game(new Game());
 
 	if (stricmp(FileType.c_str(), ".def") == 0) {
 		cout << "Loading Defination File" << endl;

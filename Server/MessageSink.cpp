@@ -53,7 +53,7 @@ Message *NullMessageSink::AddMessage(const std::string &type)
 {
     deleteAllMessages();
 
-	std::auto_ptr<Message> mess(new Message(type));
+	std::unique_ptr<Message> mess(new Message(type));
 	mMessages.push_back(mess.get());
 	return mess.release();
 }
