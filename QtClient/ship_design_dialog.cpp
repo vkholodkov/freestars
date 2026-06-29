@@ -60,7 +60,7 @@ ShipDesignDialog::ShipDesignDialog(Player *_player, const GraphicsArray *_graphi
     , player(_player)
     , currentDesignMode(SDDDM_SHIPS)
     , currentViewMode(SDDVM_EXISTING)
-    , shipBeingEdited(0)
+    , shipBeingEdited()
     , plateImage(":/images/plate.png")
 {
     setupUi(this);
