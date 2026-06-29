@@ -58,17 +58,17 @@ void HabitationBar::mousePressEvent(QMouseEvent *event)
 
         if(gravityRect.contains(event->pos())) {
             QString text("Gravity");
-            QToolTip::showText(event->globalPos(), text);
+            QToolTip::showText(event->globalPosition().toPoint(), text);
         }
 
         if(tempRect.contains(event->pos())) {
             QString text("Temperature");
-            QToolTip::showText(event->globalPos(), text);
+            QToolTip::showText(event->globalPosition().toPoint(), text);
         }
 
         if(radRect.contains(event->pos())) {
             QString text("Radiation");
-            QToolTip::showText(event->globalPos(), text);
+            QToolTip::showText(event->globalPosition().toPoint(), text);
         }
     }
 }
