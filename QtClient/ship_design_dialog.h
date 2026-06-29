@@ -89,7 +89,7 @@ private:
     Game *game;
     Player *player;
     int currentDesignMode, currentViewMode;
-    std::auto_ptr<Ship> shipBeingEdited;
+    std::unique_ptr<Ship> shipBeingEdited;
     std::vector<QWidget*> slotWidgets;
     static void (ShipDesignDialog::*propertyFiller[])(QFormLayout*);
 };

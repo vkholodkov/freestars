@@ -253,7 +253,7 @@ void AdvancedNewGameWizard::openRace()
         return;
     }
 
-    std::auto_ptr<Race> race(new Race);
+    std::unique_ptr<Race> race(new Race);
 
     if (!race->ParseNode(node, false, *this)) {
         QMessageBox::critical(this, tr("Error"),
@@ -286,7 +286,7 @@ void AdvancedNewGameWizard::editRace()
 
 Message *AdvancedNewGameWizard::AddMessage(const std::string &type)
 {
-    std::auto_ptr<Message> mess(new Message(type));
+    std::unique_ptr<Message> mess(new Message(type));
     messages.push_back(mess.get());
     return mess.release();
 }

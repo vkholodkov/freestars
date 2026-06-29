@@ -396,7 +396,7 @@ void MainWindow::loadPlayerFile(const QString &fileName)
 
     file.close();
 
-    std::auto_ptr<Game> game(new Game);
+    std::unique_ptr<Game> game(new Game);
 
     try {
         std::string filename_ascii(fileName.toUtf8());

@@ -62,7 +62,7 @@ private:
 
     QString strippedName(const QString &fullFileName);
 
-    std::auto_ptr<GraphicsArray> componentPictures;
+    std::unique_ptr<GraphicsArray> componentPictures;
 
     QTabWidget *tabWidget;
     QString curFile;

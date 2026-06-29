@@ -24,7 +24,7 @@ public:
     AdvancedNewGameWizard(QWidget *parent = 0);
     ~AdvancedNewGameWizard();
 
-    std::auto_ptr<VictoryConditions> victoryConditions;
+    std::unique_ptr<VictoryConditions> victoryConditions;
 
 private slots:
     void helpClicked(bool);
@@ -62,7 +62,7 @@ private:
     std::vector<Race*> races;
     std::vector<QLabel*> raceLabels;
 
-    std::auto_ptr<Game> game;
+    std::unique_ptr<Game> game;
     int currentPlayer;
 };
 
