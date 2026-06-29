@@ -4,6 +4,7 @@
 
 #include <set>
 #include <iostream>
+#include <functional>
 
 #include "space_object_sorter.h"
 
@@ -20,7 +21,7 @@ struct space_object_traits {
     unsigned fleet;
 };
 
-struct space_object_sorter : binary_function <const SpaceObject*,const SpaceObject*,bool> {
+struct space_object_sorter : public std::function<bool(const SpaceObject*, const SpaceObject*)> {
     bool operator() (const SpaceObject* x, const SpaceObject* y) const {
         space_object_traits sotx(x);
         space_object_traits soty(y);
