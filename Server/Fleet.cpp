@@ -40,6 +40,8 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #define new DEBUG_NEW
 #endif
 
+using namespace std::placeholders;
+
 namespace FreeStars {
 
 Fleet::Fleet(int id, const CargoHolder &loc) : CargoHolder(loc), mStartPos(loc)
@@ -1314,7 +1316,7 @@ void Fleet::MergeTo(Fleet * to, const Ship * design, long number, long damaged)
 	stack->SetCount(stack->GetCount() - number);
 	stack->SetDamaged(stack->GetDamaged() - damaged);
 	if (stack->GetCount() <= 0)
-		remove_if(mStacks.begin(),mStacks.end(),bind2nd(equal_to<Stack>(),*stack));
+		remove_if(mStacks.begin(),mStacks.end(),bind(equal_to<Stack>(),_1,*stack));
 }
 
 void Fleet::Merge(Stack &stack, long number, long damaged, long Origin)
