@@ -1180,7 +1180,7 @@ void Player::ResetSeen()
 			mBaseDesigns[i]->ResetSeen();
 	}
 
-	mSeenHab.empty();
+	mSeenHab.clear();
 	mSeenHab.insert(mSeenHab.begin(), game->NumberPlayers(), false);
 }
 
