@@ -11,6 +11,7 @@
 #include <QStackedWidget>
 #include <QSignalMapper>
 #include <QDataWidgetMapper>
+#include <QTimer>
 
 #include "FSServer.h"
 #include "MessageSink.h"
@@ -33,6 +34,8 @@ private slots:
     void nextClicked(bool);
     void finishClicked(bool);
 
+    void loadRules();
+
     void selectPlayer(int);
 
     void newRace();
@@ -41,10 +44,13 @@ private slots:
 
 private:
     void pageChanged();
+    void reportError(const QString&);
 
     Message *AddMessage(const std::string &type);
 
 private:
+    QTimer *timer;
+
     QAction *newRaceAction;
     QAction *openRaceAction;
     QAction *editRaceAction;

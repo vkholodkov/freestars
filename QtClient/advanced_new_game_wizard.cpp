@@ -28,6 +28,7 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     , raceLabels(16, (QLabel*)0)
     , game(new Game)
     , currentPlayer(0)
+    , timer(new QTimer(this))
 {
     newRaceAction = new QAction(tr("New..."), this);
     openRaceAction = new QAction(tr("Open..."), this);
@@ -135,6 +136,11 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     connect(newRaceAction, SIGNAL(triggered()), this, SLOT(newRace()));
     connect(openRaceAction, SIGNAL(triggered()), this, SLOT(openRace()));
     connect(editRaceAction, SIGNAL(triggered()), this, SLOT(editRace()));
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(loadRules()));
+
+    timer->setSingleShot(true);
+    timer->start(1);
 }
 
 AdvancedNewGameWizard::~AdvancedNewGameWizard()
@@ -145,6 +151,16 @@ AdvancedNewGameWizard::~AdvancedNewGameWizard()
 
     for(std::vector<Race*>::const_iterator i = races.begin() ; i != races.end() ; i++) {
         delete *i;
+    }
+}
+
+void AdvancedNewGameWizard::loadRules()
+{
+    QString fileName("MyModRules.xml");
+
+    if(!game->LoadRules(fileName.toUtf8().constData(), "", 0.0, false)) {
+        reportError(tr("Cannot load game rules from file %0").arg(fileName));
+        reject();
     }
 }
 
@@ -228,6 +244,10 @@ void AdvancedNewGameWizard::openRace()
                                                      gameDir,
                                                      tr("Race Files (*.r*)"));
 
+    if(fileName.isNull()) {
+        return;
+    }
+
     QFileInfo fi(fileName);
 
     TiXmlDocument doc(fileName.toUtf8().constData());
@@ -242,22 +262,19 @@ void AdvancedNewGameWizard::openRace()
 
     node = doc.FirstChild("RaceDefinition");
     if (!node) {
-        QMessageBox::critical(this, tr("Error"),
-            tr("File %0 contains no race definition").arg(fileName));
+        reportError(tr("File %0 contains no race definition").arg(fileName));
         return;
     }
 
     if (!game->CheckMetaInfo(node, fileName.toUtf8().constData(), RACEFILEVERSION)) {
-        QMessageBox::critical(this, tr("Error"),
-            tr("File %0 cannot be opened in this version of the game").arg(fileName));
+        reportError(tr("File %0 cannot be opened in this version of the game").arg(fileName));
         return;
     }
 
     std::unique_ptr<Race> race(new Race);
 
     if (!race->ParseNode(node, false, *this)) {
-        QMessageBox::critical(this, tr("Error"),
-            tr("Cannot read race information from file %0: invalid file format").arg(fileName));
+        reportError(tr("Cannot read race information from file %0").arg(fileName));
         return;
     }
 
@@ -276,8 +293,25 @@ void AdvancedNewGameWizard::openRace()
 
     races[currentPlayer] = race.release();
     raceLabels[currentPlayer]->setText(tr("The %0 (%1)")
-        .arg(race->GetSingleName().c_str())
+        .arg(races[currentPlayer]->GetSingleName().c_str())
         .arg(fi.fileName()));
+}
+
+void AdvancedNewGameWizard::reportError(const QString &error)
+{
+    QString text(error);
+
+    if(!messages.empty()) {
+        text += "\n\n";
+
+        for(auto message : messages) {
+            text += message->ToString().c_str();
+        }
+    }
+
+    QMessageBox::critical(this, tr("Error"), text);
+
+    messages.clear();
 }
 
 void AdvancedNewGameWizard::editRace()
