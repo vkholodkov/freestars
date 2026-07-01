@@ -180,6 +180,8 @@ public:
 	long GetHabPoints() const;
 	void SetLeftoverPoints(long lop)		{ mLeftoverPoints = lop; }
 
+  long GetLeftoverBuys() const { return mLeftoverBuys; }
+
 protected:
 	double HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> &testHabWidth, deque<long> &testHabStart, deque<long> &iterNum, deque<long> &TFDone, TestPlanet * testPlanet) const;
 	//double HabPointsRecursion(int DesireFactor, int TTCorrFactor, int depth, deque<long> testHabWidth, deque<long> testHabStart, deque<long> iterNum, deque<long> TFDone, Planet * testPlanet) const;

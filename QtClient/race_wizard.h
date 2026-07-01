@@ -48,6 +48,7 @@ private slots:
     void LRTChanged(QAbstractButton*);
 
 private:
+    void createPage1();
     void createPage2();
     void createPage3();
     void createPage5();

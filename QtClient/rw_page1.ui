@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>596</width>
-    <height>425</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="margin" stdset="0">
     <number>0</number>
    </property>
    <item>
@@ -50,10 +50,10 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="raceNameEdit"/>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="pluralRaceNameEdit"/>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_4">
@@ -63,7 +63,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit_3">
+       <widget class="QLineEdit" name="passwordEdit">
         <property name="maximumSize">
          <size>
           <width>150</width>
@@ -177,7 +177,6 @@
           <widget class="QLabel" name="label">
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -187,7 +186,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox"/>
+          <widget class="QComboBox" name="leftoverBuysComboBox"/>
          </item>
          <item>
           <spacer name="verticalSpacer">

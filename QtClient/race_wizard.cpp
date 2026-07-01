@@ -122,11 +122,7 @@ RaceWizard::RaceWizard(Race *_race, bool readOnly, QWidget *parent)
     pagesWidget = new QStackedWidget;
     pagesWidget->setContentsMargins(QMargins(0, 0, 0, 0));
 
-    QWidget *page1Widget = new QWidget;
-    Ui_RaceWizardPage1 page1;
-    page1.setupUi(page1Widget);
-    pagesWidget->addWidget(page1Widget);
-
+    createPage1();
     createPage2();
     createPage3();
 
@@ -171,6 +167,26 @@ RaceWizard::RaceWizard(Race *_race, bool readOnly, QWidget *parent)
     connect(finishButton, SIGNAL(clicked(bool)), this, SLOT(finishClicked(bool)));
 
     pagesWidget->setEnabled(!readOnly);
+}
+
+void RaceWizard::createPage1()
+{
+    QWidget *page1Widget = new QWidget;
+    Ui_RaceWizardPage1 page1;
+    page1.setupUi(page1Widget);
+    pagesWidget->addWidget(page1Widget);
+
+    page1.raceNameEdit->setText(QString(race->GetSingleName().c_str()));
+    page1.pluralRaceNameEdit->setText(QString(race->GetPluralName().c_str()));
+
+    page1.leftoverBuysComboBox->setEditable(false);
+    page1.leftoverBuysComboBox->addItem("");
+    page1.leftoverBuysComboBox->addItem("Minerals");
+    page1.leftoverBuysComboBox->addItem("Mineral Concentration");
+    page1.leftoverBuysComboBox->addItem("Mines");
+    page1.leftoverBuysComboBox->addItem("Factories");
+    page1.leftoverBuysComboBox->addItem("Defenses");
+    page1.leftoverBuysComboBox->setCurrentIndex(race->GetLeftoverBuys());
 }
 
 void RaceWizard::createPage2()
