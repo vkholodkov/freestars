@@ -85,10 +85,12 @@ bool SpaceObject::ParseNode(const TiXmlNode * node, Player * player)
   auto reportYearNode = node->FirstChild("ReportYear");
   if(reportYearNode != NULL) {
     long year = GetLong(reportYearNode);
-    if (year < 0 || year > mGame->GetTurn()) {
-      Message * mess = mGame->AddMessage("Error: Invalid report year");
-      mess->AddLong("Year", year);
-      return false;
+    if(year != -1) {
+      if (year < 0 || year > mGame->GetTurn()) {
+        Message * mess = mGame->AddMessage("Error: Invalid report year");
+        mess->AddLong("Year", year);
+        return false;
+      }
     }
     mReportYear = year;
   }

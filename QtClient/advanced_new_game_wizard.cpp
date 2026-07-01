@@ -193,6 +193,22 @@ void AdvancedNewGameWizard::finishClicked(bool)
 {
     victoryConditionsMapper->submit();
 
+    QString gameDir(game->GetFileLoc().c_str());
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Game Definition File"),
+                                                    gameDir,
+                                                    tr("Game Definition Files (*.def)"));
+
+    if(fileName.isNull()) {
+      return;
+    }
+
+    game->SetFileLocation(fileName.toUtf8().constData());
+
+    game->WriteXYFile();
+    game->WriteHostFile();
+    game->WritePlayerFiles();
+
     accept();
 }
 

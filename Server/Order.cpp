@@ -145,6 +145,28 @@ bool TransportOrder::DoUndo()
 	return true;
 }
 
+void TransportOrder::Replace(const Order *_old) {
+
+  const TransportOrder *o = dynamic_cast<const TransportOrder*>(_old);
+
+  if(o != NULL) {
+    mPop += o->mPop;
+    mFuel += o->mFuel;
+    for (int i = 0; i < Rules::MaxMinType; ++i)
+      mCargo[i] += o->mCargo[i];
+
+    if(mPop == 0 && mFuel == 0) {
+      for (int i = 0; i < Rules::MaxMinType; ++i) {
+        if(mCargo[i] != 0) {
+          return;
+        }
+      }
+      mReplaced = true; // Null order
+    }
+  }
+
+}
+
 TiXmlNode * TransportOrder::WriteNode(TiXmlNode * node) const
 {
 	TiXmlElement * trans = new TiXmlElement("Transfer");

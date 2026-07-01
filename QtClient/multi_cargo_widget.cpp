@@ -69,21 +69,21 @@ void MultiCargoWidget::paintEvent(QPaintEvent *event)
         rb.setLeft(ri.bottomRight().x());
         rb.setWidth(rect.width() * boranium / maxCargo);
      
-        painter.fillRect(ri, Qt::green);
+        painter.fillRect(rb, Qt::green);
 
         QRect rg(rect);
 
         rg.setLeft(rb.bottomRight().x());
         rg.setWidth(rect.width() * germanium / maxCargo);
      
-        painter.fillRect(ri, Qt::yellow);
+        painter.fillRect(rg, Qt::yellow);
 
         QRect rc(rect);
 
         rc.setLeft(rg.bottomRight().x());
         rc.setWidth(rect.width() * colonists / maxCargo);
      
-        painter.fillRect(ri, Qt::yellow);
+        painter.fillRect(rc, Qt::white);
       }
     }
 

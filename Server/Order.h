@@ -46,6 +46,7 @@ public:
 	bool IsUndone() const	{ return mUndone; }
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const = 0;
 	virtual bool DoUndo() = 0;
+  virtual void Replace(const Order*) {}
 
 	/*
 	 * Returns true if if new order replaces current one (e.g. a new order for the same fleet)
@@ -258,11 +259,12 @@ public:
 
 	virtual bool DoUndo();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
-	virtual bool Replaces(const Order *_new) {
-		const TransportOrder *o = dynamic_cast<const TransportOrder*>(_new);
+	virtual bool Replaces(const Order *_old) {
+		const TransportOrder *o = dynamic_cast<const TransportOrder*>(_old);
 		return o != NULL && this->mPlayer == o->mPlayer
 			&& this->mOwned == o->mOwned && this->mOther == o->mOther;
 	}
+  virtual void Replace(const Order*);
 
 private:
 	Player * mPlayer;

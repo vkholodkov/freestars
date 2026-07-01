@@ -264,6 +264,7 @@ void GameView::setDetailedSelection(const Planet *_planet) {
         this, SLOT(selectObject(const SpaceObject*)));
     connect(fleetsInOrbitWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
         this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
+    connect(this, SIGNAL(cargoUpdated()), fleetsInOrbitWidget, SLOT(cargoUpdated()));
 
     /*
      * Planet production widget
@@ -400,6 +401,7 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     
     connect(fleetCargoWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
         this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
+    connect(this, SIGNAL(cargoUpdated()), fleetCargoWidget, SLOT(cargoUpdated()));
 
     /*
      * Fleet composition widget
@@ -634,7 +636,10 @@ void GameView::setRouteDest()
 void GameView::exchangeCargo(const Planet *planet, const Fleet *fleet)
 {
     CargoTransferDialog cargoTransferDialog(const_cast<Planet*>(planet), const_cast<Fleet*>(fleet), player, this);
-    cargoTransferDialog.exec();
+
+    if(cargoTransferDialog.exec() == QDialog::Accepted) {
+      emit cargoUpdated();
+    }
 }
 
 void GameView::splitFleet(const Fleet *_fleet)

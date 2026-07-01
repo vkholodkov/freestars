@@ -12,32 +12,15 @@ FleetCargoWidget::FleetCargoWidget(const Fleet *_fleet, const Player *_player, Q
     : FoldingWidget(tr("Fuel & Cargo"))
     , fleet(_fleet)
     , player(_player)
+    , ui_FleetCargoWidget()
 {
     QWidget *widget = new QWidget;
 
-    Ui_FleetCargoWidget ui_FleetCargoWidget;
     ui_FleetCargoWidget.setupUi(widget);
-
-    ui_FleetCargoWidget.fuelWidget->setChangeable(false);
-    ui_FleetCargoWidget.fuelWidget->setCargoColor(Qt::red);
-    ui_FleetCargoWidget.fuelWidget->setCargo(_fleet->GetFuel());
-    ui_FleetCargoWidget.fuelWidget->setMaxCargo(_fleet->GetFuelCapacity());
-    ui_FleetCargoWidget.fuelWidget->setUnit(tr("mg"));
-
-    ui_FleetCargoWidget.cargoWidget->setCargoHolder(fleet);
-    ui_FleetCargoWidget.cargoWidget->setUnit(tr("KT"));
 
     connect(ui_FleetCargoWidget.cargoWidget, SIGNAL(clicked()), this, SLOT(cargoWidgetClicked()));
 
-    long ironium = _fleet->GetContain(0);
-    long boranium = _fleet->GetContain(1);
-    long germanium = _fleet->GetContain(2);
-    long colonists = _fleet->GetContain(POPULATION);
-
-    ui_FleetCargoWidget.ironiumLabel->setText(tr("%0kT").arg(ironium));
-    ui_FleetCargoWidget.boraniumLabel->setText(tr("%0kT").arg(boranium));
-    ui_FleetCargoWidget.germaniumLabel->setText(tr("%0kT").arg(germanium));
-    ui_FleetCargoWidget.colonistsLabel->setText(tr("%0kT").arg(colonists));
+    cargoUpdated();
 
     this->addWidget(widget);
 }
@@ -53,6 +36,28 @@ void FleetCargoWidget::cargoWidgetClicked()
 
 void FleetCargoWidget::updateLabels()
 {
+}
+
+void FleetCargoWidget::cargoUpdated()
+{
+    ui_FleetCargoWidget.fuelWidget->setChangeable(false);
+    ui_FleetCargoWidget.fuelWidget->setCargoColor(Qt::red);
+    ui_FleetCargoWidget.fuelWidget->setCurrentCargo(fleet->GetFuel());
+    ui_FleetCargoWidget.fuelWidget->setMaxCargo(fleet->GetFuelCapacity());
+    ui_FleetCargoWidget.fuelWidget->setUnit(tr("mg"));
+
+    ui_FleetCargoWidget.cargoWidget->setCargoHolder(fleet);
+    ui_FleetCargoWidget.cargoWidget->setUnit(tr("KT"));
+
+    long ironium = fleet->GetContain(0);
+    long boranium = fleet->GetContain(1);
+    long germanium = fleet->GetContain(2);
+    long colonists = fleet->GetContain(POPULATION) / Rules::PopEQ1kT;
+
+    ui_FleetCargoWidget.ironiumLabel->setText(tr("%0kT").arg(ironium));
+    ui_FleetCargoWidget.boraniumLabel->setText(tr("%0kT").arg(boranium));
+    ui_FleetCargoWidget.germaniumLabel->setText(tr("%0kT").arg(germanium));
+    ui_FleetCargoWidget.colonistsLabel->setText(tr("%0kT").arg(colonists));
 }
 
 };

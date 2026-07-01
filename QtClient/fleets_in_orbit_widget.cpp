@@ -45,6 +45,7 @@ FleetsInOrbitWidget::FleetsInOrbitWidget(const Planet *_planet, const Player *_p
     }
 
     connect(ui_FleetsInOrbitWidget.cargoWidget, SIGNAL(clicked()), this, SLOT(cargoWidgetClicked()));
+    connect(ui_FleetsInOrbitWidget.fuelWidget, SIGNAL(clicked()), this, SLOT(cargoWidgetClicked()));
     connect(ui_FleetsInOrbitWidget.gotoButton, SIGNAL(clicked(bool)), this, SLOT(gotoButtonClicked(bool)));
     connect(ui_FleetsInOrbitWidget.cargoButton, SIGNAL(clicked(bool)), this, SLOT(cargoButtonClicked(bool)));
     connect(ui_FleetsInOrbitWidget.fleetsComboBox, SIGNAL(activated(int)), this, SLOT(objectActivated(int)));
@@ -89,10 +90,15 @@ void FleetsInOrbitWidget::objectActivated(int index)
 
     textWidget->setVisible(true);
     
-    fuelWidget->setCargo(fleet->GetFuel());
+    fuelWidget->setCurrentCargo(fleet->GetFuel());
     fuelWidget->setMaxCargo(fleet->GetFuelCapacity());
 
     cargoWidget->setCargoHolder(fleet);
+}
+
+void FleetsInOrbitWidget::cargoUpdated()
+{
+    objectActivated(fleetsComboBox->currentIndex());
 }
 
 };

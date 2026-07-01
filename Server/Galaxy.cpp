@@ -137,7 +137,7 @@ bool Galaxy::ParseSize(const TiXmlNode * node)
 		return true;
 }
 
-bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput)
+bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput, long ReportYear)
 {
 	if (stricmp(node->Value(), "Galaxy") != 0)
 		return false;
@@ -149,14 +149,17 @@ bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput)
 	for(child1 = node->FirstChildElement("Planet"); child1 ; child1 = child1->NextSiblingElement("Planet")) {
 		Planet * p;
 		p = GetPlanet(GetString(child1, "Name"));
+
 		addit = (p == NULL);
 		if(addit){
 			p = game->ObjectFactory(p);
 			mPlanets.push_back(p);
 		}
 		
-		if(!p->ParseNode(child1, game->GetCreation(), TrustInput))
-			return false;
+    if(p != NULL && (p->GetReportYear() < ReportYear || ReportYear == -1)) {
+      if(!p->ParseNode(child1, game->GetCreation(), TrustInput))
+        return false;
+    }
 		
 		if(addit)
 			game->AddAlsoHere(p);

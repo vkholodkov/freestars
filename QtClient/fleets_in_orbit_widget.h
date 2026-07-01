@@ -22,6 +22,9 @@ class FleetsInOrbitWidget : public FoldingWidget {
 public:
     FleetsInOrbitWidget(const Planet*, const Player*, QWidget *parent = 0);
 
+public slots:
+    void cargoUpdated();
+
 signals:
     void selectObject(const SpaceObject*);
     void exchangeCargo(const Planet*, const Fleet*);

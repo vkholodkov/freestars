@@ -39,6 +39,7 @@ public:
 
 signals:
     void selectionChanged(const SpaceObject*);
+    void cargoUpdated();
 
 public slots:
     void selectObject(const SpaceObject*);

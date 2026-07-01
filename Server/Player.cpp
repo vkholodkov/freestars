@@ -1745,7 +1745,7 @@ bool Player::OpenHistoryFile(const char * file)
     mess->AddItem("Section", "Galaxy");
     return false;
   }
-  if (!game->GetGalaxy()->ParseNode(node))
+  if (!game->GetGalaxy()->ParseNode(node, false, HistoryTurn))
     return false;
 
 	return true;
@@ -1822,6 +1822,7 @@ void Player::AddOrder(Order * o)
 
 		for (i = 0 ; i != mOrders.size(); i++) {
 			if(!o->IsReplaced() && o->Replaces(mOrders[i])) {
+        o->Replace(mOrders[i]);
 				mOrders[i]->SetReplaced();
 			}
 		}

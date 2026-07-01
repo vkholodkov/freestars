@@ -21,7 +21,15 @@ public:
     CargoTransferDialog(CargoHolder*, CargoHolder*, Player*, QWidget *parent = 0);
 
 private slots:
-    //void accept();
+    void sourceIroniumChanged(int, int);
+    void sourceBoraniumChanged(int, int);
+    void sourceGermaniumChanged(int, int);
+    void sourceColonistsChanged(int, int);
+    void destIroniumChanged(int, int);
+    void destBoraniumChanged(int, int);
+    void destGermaniumChanged(int, int);
+    void destColonistsChanged(int, int);
+    void accept();
 
 private:
     Game *game;
