@@ -65,6 +65,7 @@ private:
 
     QDataWidgetMapper *page5DataMapper;
     QAbstractItemModel *page5DataModel;
+    bool readOnly;
 };
 
 };

@@ -114,10 +114,11 @@ void TechFactorWidget::setTechCostFactor(double techCostFactor)
         (techCostFactor <= 0.5 + epsilon)) ? false : true);
 }
 
-RaceWizard::RaceWizard(Race *_race, bool readOnly, QWidget *parent)
+RaceWizard::RaceWizard(Race *_race, bool _readOnly, QWidget *parent)
     : QDialog(parent)
     , page5DataModel(new Page5Model(_race, this))
     , race(_race)
+    , readOnly(_readOnly)
 {
     pagesWidget = new QStackedWidget;
     pagesWidget->setContentsMargins(QMargins(0, 0, 0, 0));
@@ -165,8 +166,6 @@ RaceWizard::RaceWizard(Race *_race, bool readOnly, QWidget *parent)
     connect(backButton, SIGNAL(clicked(bool)), this, SLOT(backClicked(bool)));
     connect(nextButton, SIGNAL(clicked(bool)), this, SLOT(nextClicked(bool)));
     connect(finishButton, SIGNAL(clicked(bool)), this, SLOT(finishClicked(bool)));
-
-    pagesWidget->setEnabled(!readOnly);
 }
 
 void RaceWizard::createPage1()
@@ -177,7 +176,10 @@ void RaceWizard::createPage1()
     pagesWidget->addWidget(page1Widget);
 
     page1.raceNameEdit->setText(QString(race->GetSingleName().c_str()));
+    page1.raceNameEdit->setReadOnly(readOnly);
     page1.pluralRaceNameEdit->setText(QString(race->GetPluralName().c_str()));
+    page1.pluralRaceNameEdit->setReadOnly(readOnly);
+    page1.passwordEdit->setReadOnly(readOnly);
 
     page1.leftoverBuysComboBox->setEditable(false);
     page1.leftoverBuysComboBox->addItem("");
@@ -187,6 +189,7 @@ void RaceWizard::createPage1()
     page1.leftoverBuysComboBox->addItem("Factories");
     page1.leftoverBuysComboBox->addItem("Defenses");
     page1.leftoverBuysComboBox->setCurrentIndex(race->GetLeftoverBuys());
+    page1.leftoverBuysComboBox->setEnabled(!readOnly);
 }
 
 void RaceWizard::createPage2()
@@ -217,12 +220,18 @@ void RaceWizard::createPage2()
 
         if(race->GetPRT() == prt) {
             radioButton->setChecked(true);
+            radioButton->setCheckable(true);
+        }
+        else {
+          radioButton->setCheckable(!readOnly);
         }
 
         buttonGroup->addButton(radioButton, i);
     }
 
-    connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(PRTChanged(int))); 
+    if(!readOnly) {
+      connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(PRTChanged(int))); 
+    }
 }
 
 void RaceWizard::createPage3()
@@ -263,13 +272,17 @@ void RaceWizard::createPage3()
             checkBox->setChecked(true);
         }
 
+        checkBox->setEnabled(!readOnly);
+
         buttonGroup->addButton(checkBox, i);
     }
 
     buttonGroup->setExclusive(false);
 
-    connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
-        this, SLOT(LRTChanged(QAbstractButton*))); 
+    if(!readOnly) {
+      connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+          this, SLOT(LRTChanged(QAbstractButton*))); 
+    }
 }
 
 void RaceWizard::createPage5()
