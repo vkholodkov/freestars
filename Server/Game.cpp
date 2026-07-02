@@ -401,7 +401,7 @@ bool Game::LoadHostFile(const char * hostfile)
 		return false;
 	}
   // Trust input from the host file
-	if (!galaxy->ParseNode(node, true))
+	if (!galaxy->ParseNode(node, true, Turn))
 		return false;
 
 	if (mNumberOfPlayers != mPlayers.size())
@@ -491,7 +491,7 @@ bool Game::LoadPlayerFile(const char * playerfile)
 		mess->AddItem("Section", "Galaxy");
 		return false;
 	}
-	if (!galaxy->ParseNode(node, true))
+	if (!galaxy->ParseNode(node, true, Turn))
 		return false;
 
 	mPlayers[mCurrentPlayer-1]->ParseMessages(ptf->FirstChild("Messages"));

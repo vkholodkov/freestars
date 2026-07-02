@@ -485,6 +485,16 @@ void MainWindow::updateModel() {
 
 void MainWindow::openGameView(Game *game) {
     Player *player = game->GetCurrentPlayer();
+
+    /*
+     * Load game function has side effects (updating the history file)
+     */
+    if(player != NULL) {
+        if(game->GetTurn() > game->GetHistoryTurn()) {
+            player->SaveHistoryFile();
+        }
+    }
+
     GameView *gameView = new GameView(game, player, componentPictures.get());
     tabWidget->addTab(gameView, QString("%0 -- %1")
         .arg(strippedName(curFile))

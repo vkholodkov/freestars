@@ -137,7 +137,8 @@ bool Galaxy::ParseSize(const TiXmlNode * node)
 		return true;
 }
 
-bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput, long ReportYear)
+// TrustInput -> says if partials production quantities are trustworthy, only for host and player files
+bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput, long DatasetYear)
 {
 	if (stricmp(node->Value(), "Galaxy") != 0)
 		return false;
@@ -150,15 +151,21 @@ bool Galaxy::ParseNode(const TiXmlNode * node, bool TrustInput, long ReportYear)
 		Planet * p;
 		p = GetPlanet(GetString(child1, "Name"));
 
+    long ReportYear = GetLong(child1->FirstChild("ReportYear"), -1);
+
 		addit = (p == NULL);
 		if(addit){
 			p = game->ObjectFactory(p);
 			mPlanets.push_back(p);
 		}
-		
-    if(p != NULL && (p->GetReportYear() < ReportYear || ReportYear == -1)) {
-      if(!p->ParseNode(child1, game->GetCreation(), TrustInput))
+	
+    if(addit || DatasetYear != -1 || p->GetReportYear() == -1 || (ReportYear != -1 && ReportYear > p->GetReportYear())) {
+      if(!p->ParseNode(child1, game->GetCreation(), TrustInput)) 
         return false;
+
+      if(DatasetYear != -1) {
+        p->SetReportYear(DatasetYear);
+      }
     }
 		
 		if(addit)

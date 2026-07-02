@@ -53,13 +53,6 @@ bool SpaceObject::ParseNode(const TiXmlNode * node)
 		return false;
 	}
 
-  if(mGame->GetHistoryTurn() != -1) {
-    mReportYear = mGame->GetHistoryTurn();
-  }
-  else {
-    mReportYear = mGame->GetTurn();
-  }
-
 	return ParseNode(node, mGame->NCGetPlayer(num));
 }
 
@@ -91,8 +84,8 @@ bool SpaceObject::ParseNode(const TiXmlNode * node, Player * player)
         mess->AddLong("Year", year);
         return false;
       }
+      mReportYear = year;
     }
-    mReportYear = year;
   }
 
 	return true;
@@ -131,9 +124,9 @@ TiXmlNode * SpaceObject::WriteNode(TiXmlNode * node, const Player * viewer) cons
     seenByViewerNode.release();
   }
 
-  if(viewer != NULL && mReportYear != mGame->GetTurn()) {
+  if(viewer != NULL) {
 		std::unique_ptr<TiXmlElement> reportYearNode(new TiXmlElement("ReportYear"));
-    TiXmlText txt(Long2String(mReportYear));
+    TiXmlText txt(Long2String(mReportYear != -1 ? mReportYear : mGame->GetTurn()));
     reportYearNode->InsertEndChild(txt);
 		node->LinkEndChild(reportYearNode.get());
     reportYearNode.release();

@@ -105,6 +105,7 @@ public:
 	virtual Planet * InOrbit(); ///< Get planet this object is in orbit of, or NULL if none.
 	virtual const Planet * InOrbit() const; ///< Get planet this object is in orbit of, or NULL if none.
 
+  void SetReportYear(long ReportYear) { mReportYear = ReportYear; }
   long GetReportYear() const { return mReportYear; }
 
 protected:

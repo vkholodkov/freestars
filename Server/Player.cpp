@@ -1745,7 +1745,7 @@ bool Player::OpenHistoryFile(const char * file)
     mess->AddItem("Section", "Galaxy");
     return false;
   }
-  if (!game->GetGalaxy()->ParseNode(node, false, HistoryTurn))
+  if (!game->GetGalaxy()->ParseNode(node, false))
     return false;
 
 	return true;
