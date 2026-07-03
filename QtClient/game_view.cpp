@@ -20,6 +20,7 @@
 #include "fleet_cargo_widget.h"
 #include "fleet_composition_widget.h"
 #include "fleet_waypoints_widget.h"
+#include "waypoint_task_widget.h"
 
 #include "cargo_transfer_dialog.h"
 #include "research_dialog.h"
@@ -424,10 +425,24 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     fleetWaypointsWidget->setObjectName("w3_column1");
     verticalFlowLayout->addWidget(fleetWaypointsWidget);
 
-    connect(fleetWaypointsWidget, SIGNAL(selectWaypoint(const Location*)),
-        this, SLOT(selectWaypoint(const Location*)));
+    connect(fleetWaypointsWidget, SIGNAL(selectWayorder(const WayOrder*)),
+        this, SLOT(selectWayorder(const WayOrder*)));
     connect(mapView, SIGNAL(waypointAdded(const Location*)),
         fleetWaypointsWidget, SLOT(wayorderAdded(const Location*)));
+
+    /*
+     * Waypoint Task widget
+     */
+    WaypointTaskWidget *waypointTaskWidget = new WaypointTaskWidget();
+    waypointTaskWidget->setObjectName("w4_column1");
+    verticalFlowLayout->addWidget(waypointTaskWidget);
+
+    connect(fleetWaypointsWidget, SIGNAL(selectWayorder(const WayOrder*)),
+        waypointTaskWidget, SLOT(setWayorder(const WayOrder*)));
+    connect(fleetWaypointsWidget, SIGNAL(clearSelection()),
+        waypointTaskWidget, SLOT(clearWayorder()));
+    connect(waypointTaskWidget, SIGNAL(wayorderChanged(WayOrder*)),
+        fleetWaypointsWidget, SLOT(changeWayorder(WayOrder*)));
 }
 
 void GameView::clearBriefSelection()
@@ -527,6 +542,11 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
     if(ai != actions.end()) {
         emit selectionChanged(ai->second);
     }
+}
+
+void GameView::selectWayorder(const WayOrder *order)
+{
+    this->selectWaypoint(order->GetLocation());
 }
 
 void GameView::selectWaypoint(const Location *loc)

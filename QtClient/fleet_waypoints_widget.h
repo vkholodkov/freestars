@@ -25,7 +25,11 @@ public:
     ~FleetWaypointsWidget();
 
 signals:
-    void selectWaypoint(const Location*);
+    void selectWayorder(const WayOrder*);
+    void clearSelection();
+
+public slots:
+    void changeWayorder(WayOrder*);
 
 private slots:
     void setRepeatOrders(int);

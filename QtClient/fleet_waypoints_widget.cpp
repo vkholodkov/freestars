@@ -142,7 +142,7 @@ void FleetWaypointsWidget::wayorderSelected(int row)
         ui_FleetWaypointsWidget.travelTimeLabel->show();
         ui_FleetWaypointsWidget.travelTimeValueLabel->show();
 
-        emit selectWaypoint(orders[row]->GetLocation());
+        emit selectWayorder(orders[row]);
     }
     else {
       ui_FleetWaypointsWidget.originLabel->hide();
@@ -153,6 +153,19 @@ void FleetWaypointsWidget::wayorderSelected(int row)
       ui_FleetWaypointsWidget.warpFactorValueLabel->hide();
       ui_FleetWaypointsWidget.travelTimeLabel->hide();
       ui_FleetWaypointsWidget.travelTimeValueLabel->hide();
+
+      emit clearSelection();
+    }
+}
+
+void FleetWaypointsWidget::changeWayorder(WayOrder *order)
+{
+    int row = waypointListBox->currentRow();
+
+    if(row > 0 && row < orders.size()) {
+        delete orders[row];
+        orders[row] = order;
+        changeWayorderList();
     }
 }
 

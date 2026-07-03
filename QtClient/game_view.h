@@ -43,7 +43,7 @@ signals:
 
 public slots:
     void selectObject(const SpaceObject*);
-    void selectWaypoint(const Location*);
+    void selectWayorder(const WayOrder*);
     void listObjectsInLocation(const SpaceObject*, const QPoint&);
     void renameObject(const SpaceObject*);
 
@@ -72,6 +72,7 @@ public slots:
     void submitTurn();
 
 private:
+    void selectWaypoint(const Location*);
     void setBriefSelection(const Planet*);
     void setBriefSelection(const Fleet*);
     void setDetailedSelection(const Planet*);
