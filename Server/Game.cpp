@@ -1912,6 +1912,11 @@ void Game::RemoveAlsoHere(SpaceObject * loc)
 	if (deq->size() == 0) {
 		deque<deque<SpaceObject *> *>::iterator i2;
 		i2 = find(mTopObjects.begin(), mTopObjects.end(), deq);
+
+    if(i2 != mTopObjects.end()) {
+      delete *i2;
+    }
+
 		mTopObjects.erase(i2);
 	}
 }
@@ -1920,8 +1925,13 @@ void Game::MoveAlsoHere(SpaceObject * loc)
 {
 	deque<SpaceObject *> * deq = loc->GetAlsoHere();
 
+/*
+ * Disabled: it causeed waypoint 1 tasks not to execute
+ */
+#if 0
 	if (loc->IsWith(*deq->at(0)))
 		return;
+#endif
 
 	RemoveAlsoHere(loc);
 	AddAlsoHere(loc);

@@ -1217,6 +1217,10 @@ bool Player::AddBombingFleets(Bombing * bom, const Player* owner, const long bom
 	unsigned int i;
 	for (i = 0; i < Rules::MaxFleets; ++i)
 	{
+
+    if(mFleets[i] == NULL) {
+        continue;
+    }
 		//See if Fleet has orders to bomb
 		//mFleets[i]->GetFirstOrder()
 		if (mFleets[i]->IsWith(*bom) &&	mFleets[i]->GetBattlePlan()->WillFight(this,owner))

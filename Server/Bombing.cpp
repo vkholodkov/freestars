@@ -53,9 +53,9 @@ void Bombing::SetPlanet(Planet* targetPlanet)
 void Bombing::AddFleets(Game *game)
 {
 	// Find all fleets orbiting the planet that want to Bomb it
-	for (unsigned int j = 0; j < game->NumberPlayers(); ++j )
+	for (unsigned int j = 0; j < game->NumberPlayers(); j++ )
 	{
-		Player* player = game->NCGetPlayer(j);
+		Player* player = game->NCGetPlayer(j+1);
 			
 		if(player->AddBombingFleets(this,mTargetPlanet->GetOwner(),BT_NORMAL))
 			mNormalBombingPlayers.push_back(player);

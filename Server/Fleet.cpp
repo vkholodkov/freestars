@@ -72,6 +72,8 @@ void Fleet::Init()
 	mChasing = NULL;
 	mDistMoved = 0;
 	mFuel = 0;	// unknown
+  mDoneWaypoint = false;
+  mJustArrived = false;
 }
 
 Fleet::~Fleet()
@@ -345,12 +347,18 @@ bool Fleet::Process(FuncType func, bool arg)
 
 void Fleet::CheckWaypoint()
 {
-	if (mOrders.size() >= 2 && *this == *mOrders[1]->GetLocation()) {
-		delete mOrders[0];
-		mOrders.pop_front();
-		mDoneWaypoint = true;
-	} else
-		mDoneWaypoint = false;
+  if(mJustArrived) {
+    mDoneWaypoint = true;
+    mJustArrived = false;
+  }
+  else {
+    if (mOrders.size() >= 2 && *this == *mOrders[1]->GetLocation()) {
+      delete mOrders[0];
+      mOrders.pop_front();
+      mDoneWaypoint = true;
+    } else
+      mDoneWaypoint = false;
+  }
 
 	// set current order location to current location
 	// but, don't reset location if location is a fleet (so you can continue following some one)
@@ -364,8 +372,9 @@ void Fleet::CheckWaypoint()
 			mOrders.push_back(wo);
 		}
 	} else {
-		if (dynamic_cast<Planet *>(mAlsoHere->at(0)) != NULL)
+		if (dynamic_cast<Planet *>(mAlsoHere->at(0)) != NULL) {
 			mOrders[0]->SetLocation(mAlsoHere->at(0), false);
+    }
 		else
 			mOrders[0]->SetLocation(new Location(*this), true);
 	}
@@ -997,6 +1006,7 @@ void Fleet::MoveArrive()
 
 	delete mOrders[0];
 	mOrders.pop_front();
+  mJustArrived = true;
 
 	Wormhole * wh = dynamic_cast<Wormhole *>(wo->NCGetLocation());
 	if (wh != NULL && wh->GetAttached() != NULL) {

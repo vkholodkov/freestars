@@ -29,7 +29,7 @@ WaypointTaskWidget::WaypointTaskWidget(QWidget *parent)
     ui_WaypointTaskWidget.waypointTaskComboBox->addItem(tr("Route"), QVariant(OT_ROUTE));
     ui_WaypointTaskWidget.waypointTaskComboBox->addItem(tr("Transfer Fleet"), QVariant(OT_TRANSFER));
 
-    connect(ui_WaypointTaskWidget.waypointTaskComboBox, SIGNAL(currentIndexChanged(int)),
+    connect(ui_WaypointTaskWidget.waypointTaskComboBox, SIGNAL(activated(int)),
         this, SLOT(waypointTaskChanged(int)));
 
     this->addWidget(widget);
@@ -44,8 +44,8 @@ void WaypointTaskWidget::setWayorder(const WayOrder *order)
     int row = ui_WaypointTaskWidget.waypointTaskComboBox->findData(order->GetType());
 
     if(row >= 0) {
-      ui_WaypointTaskWidget.waypointTaskComboBox->setCurrentIndex(row);
-      currentWayorder = order;
+        ui_WaypointTaskWidget.waypointTaskComboBox->setCurrentIndex(row);
+        currentWayorder = order;
     }
 }
 

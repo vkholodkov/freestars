@@ -179,6 +179,8 @@ void FleetWaypointsWidget::wayorderDeleted()
         delete waypointListBox->takeItem(row);
 
         changeWayorderList();
+
+        emit clearSelection();
     }
 }
 

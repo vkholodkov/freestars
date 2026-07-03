@@ -281,6 +281,7 @@ private:
 	double mPX;	///< current location while in flight
 	double mPY;	///< current location while in flight
 	bool mDoneWaypoint;	///< true if we've arrived at our destination and are ready to do waypoint 1 tasks
+	bool mJustArrived;	///< true if we've just have arrived at our destination and must ignore waypoint checks
 
 	deque<WayOrder *> mOrders;
 	bool mRepeatOrders;
