@@ -34,6 +34,9 @@ private slots:
     void waypointTaskChanged(int);
 
 private:
+    void setTransportOrder(const WayOrderTransport*);
+    void updateState();
+
     Ui_WaypointTaskWidget ui_WaypointTaskWidget;
     const WayOrder *currentWayorder;
 };
