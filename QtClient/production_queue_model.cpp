@@ -305,6 +305,24 @@ bool ProductionQueueModel::addOrderFromTemplate(int position, const ProdOrder *o
     return insertOrderFromTemplate(position, orderTemplate, amount);
 }
 
+bool ProductionQueueModel::removeOrder(int position, int amount)
+{
+    if(position < 0 || position >= rowCount()) {
+      return false;
+    }
+
+    auto order = production_queue.at(position);
+
+    if(order->GetAmount() > amount) {
+      order->SetAmount(order->GetAmount() - amount);
+      emit dataChanged(index(position, 0), index(position, columnCount()));
+      return true;
+    }
+    else {
+      return removeRows(position, 1);
+    }
+}
+
 bool ProductionQueueModel::insertOrderFromTemplate(int position, const ProdOrder *orderTemplate, int amount)
 {
     beginInsertRows(QModelIndex(), position, position);

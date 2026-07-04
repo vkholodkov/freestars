@@ -34,6 +34,7 @@ public:
     virtual bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild);
 
     bool addOrderFromTemplate(int position, const ProdOrder*, int amount);
+    bool removeOrder(int position, int amount);
     long getCompletionYears(int position) const;
     long getCompletionPct(int position) const;
 

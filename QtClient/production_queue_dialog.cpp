@@ -172,6 +172,7 @@ void ProductionQueueDialog::itemUp()
   if(m->hasSelection() && m->currentIndex().row() > 0) {
     productionQueueModel->moveRow(QModelIndex(), m->currentIndex().row(),
       QModelIndex(), m->currentIndex().row() - 1);
+    updateState();
   }
 }
 
@@ -182,6 +183,7 @@ void ProductionQueueDialog::itemDown()
   if(m->hasSelection() && m->currentIndex().row() < productionQueueModel->rowCount()) {
     productionQueueModel->moveRow(QModelIndex(), m->currentIndex().row(),
       QModelIndex(), m->currentIndex().row() + 2);
+    updateState();
   }
 }
 
@@ -212,10 +214,10 @@ void ProductionQueueDialog::remove()
   auto m = actualOrdersView->selectionModel();
 
   if(m->hasSelection()) {
-    productionQueueModel->removeRows(m->currentIndex().row(), 1);
+    int amount = QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ? 10 : 1;
+    productionQueueModel->removeOrder(m->currentIndex().row(), amount);
+    updateState();
   }
-
-  updateState();
 }
 
 void ProductionQueueDialog::clear()
