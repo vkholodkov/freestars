@@ -40,6 +40,8 @@ public:
 signals:
     void selectionChanged(const SpaceObject*);
     void cargoUpdated();
+    void researchSettingsChanged();
+    void productionQueueChanged(const Planet*);
 
 public slots:
     void selectObject(const SpaceObject*);

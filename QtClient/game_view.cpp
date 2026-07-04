@@ -6,6 +6,7 @@
 #include <QSplitter>
 #include <QScrollArea>
 #include <QStandardItemModel>
+#include <QMessageBox>
 
 #include "game_view.h"
 
@@ -278,6 +279,12 @@ void GameView::setDetailedSelection(const Planet *_planet) {
         this, SLOT(changeProductionQueue(const Planet*)));
     connect(planetProductionWidget, SIGNAL(clearProductionQueue(const Planet*)),
         this, SLOT(clearProductionQueue(const Planet*)));
+    connect(this, &GameView::productionQueueChanged,
+        planetProductionWidget, [_planet,this](const Planet *planet) {
+      if(_planet == planet) {
+        planetProductionWidget->productionQueueChanged();
+      }
+    });
 
     /*
      * Planet widget
@@ -313,7 +320,7 @@ void GameView::setDetailedSelection(const Planet *_planet) {
     ui_PlanetStatusWidget.setupUi(planetStatusWidget);
 
     ui_PlanetStatusWidget.populationLabel->setText(QString::number(_planet->GetDisplayPop()));
-    ui_PlanetStatusWidget.resourcesLabel->setText(tr("%0 of %1").arg(_planet->GetResources()).arg(_planet->GetResources()));
+    ui_PlanetStatusWidget.resourcesLabel->setText(tr("%0 of %1").arg(_planet->GetProductionResources()).arg(_planet->GetResources()));
 
     if(_planet->GetScanner()) {
         ui_PlanetStatusWidget.scannerTypeLabel->setText(tr("yes"));
@@ -329,6 +336,18 @@ void GameView::setDetailedSelection(const Planet *_planet) {
     ui_PlanetStatusWidget.defencesCoverageLabel->setText(tr("none"));
 
     w12->addWidget(planetStatusWidget);
+
+    connect(this, &GameView::researchSettingsChanged,
+        planetStatusWidget, [_planet,this]()
+    {
+        ui_PlanetStatusWidget.resourcesLabel->setText(tr("%0 of %1").arg(_planet->GetProductionResources()).arg(_planet->GetResources()));
+    });
+    connect(this, &GameView::productionQueueChanged,
+        planetProductionWidget, [_planet,this](const Planet *planet) {
+      if(_planet == planet) {
+        ui_PlanetStatusWidget.resourcesLabel->setText(tr("%0 of %1").arg(_planet->GetProductionResources()).arg(_planet->GetResources()));
+      }
+    });
 
     /*
      * Starbase view
@@ -639,13 +658,20 @@ void GameView::changeProductionQueue(const Planet *planet)
     ProductionQueueDialog productionQueueDialog(const_cast<Planet*>(planet), this);
 
     if(productionQueueDialog.exec() == QDialog::Accepted) {
-      planetProductionWidget->productionQueueChanged();
+      emit productionQueueChanged(planet);
     }
 }
 
 void GameView::clearProductionQueue(const Planet *planet)
 {
-    std::cout << "GameView::clearProductionQueue " << planet << std::endl;
+    if(QMessageBox::question(this, tr("Clear Planet Production Queue"), tr("Are you sure " \
+      "want to remove all orders from the production queue of this planet." \
+      ""), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+      std::deque<ProdOrder*> empty;
+      const_cast<Planet*>(planet)->SetProduction(empty);
+      emit productionQueueChanged(planet);
+    }
 }
 
 void GameView::setRouteDest()
@@ -686,7 +712,10 @@ void GameView::shipDesignDialog()
 void GameView::researchDialog()
 {
     ResearchDialog researchDialog(player, this);
-    researchDialog.exec();
+
+    if(researchDialog.exec() == QDialog::Accepted) {
+      emit researchSettingsChanged();
+    }
 }
 
 void GameView::battlePlansDialog()

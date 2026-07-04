@@ -893,6 +893,19 @@ long Planet::GetResources() const
 	return Res;
 }
 
+long Planet::GetProductionResources() const {
+
+  auto owner = NCGetOwner();
+
+	if (owner != NULL && mPayTax) {
+    long resources = GetResources();
+		long tax = long(resources * owner->GetResearchTax() + .5);
+		return resources - tax;
+	}
+  else
+    return GetResources();
+}
+
 long Planet::PopGrowth() const
 {
 	if (GetOwner() == NULL)

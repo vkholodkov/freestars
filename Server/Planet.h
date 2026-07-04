@@ -81,6 +81,7 @@ public:
 	static const string SGetName(Planet * p)	{ return p->GetName(); }
 	static const string SGetName(const Planet * p)	{ return p->GetName(); }
 	long GetResources() const;
+	long GetProductionResources() const; // Total resources minus reasearch tax
 	virtual long GetCargoCapacity() const		{ return -1; }
 	void Invade(Player * invader, long amount);
 	void ResolveInvasion();
