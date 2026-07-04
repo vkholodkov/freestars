@@ -49,6 +49,13 @@ ProdOrder::ProdOrder(long type, long amount)
 	init();
 }
 
+ProdOrder::ProdOrder(const ProdOrder &orig)
+: Type(orig.Type), Amount(orig.Amount)
+, Partial(orig.Partial)
+{
+	init();
+}
+
 ProdOrder::~ProdOrder()
 {
 }
@@ -223,33 +230,12 @@ void ProdOrder::CheckPartials(Planet * planet, const TiXmlNode * node, bool Trus
 	deque<ProdOrder *>::iterator iter;
 	for (iter = planet->mProductionQ.begin(); iter != planet->mProductionQ.end(); ++iter)
 	{
-		if (typeid(*iter) == typeid(this) && Type == (*iter)->Type)
+		if (typeid(**iter) == typeid(*this) && Type == (*iter)->Type && Amount == (*iter)->Amount)
 		{
 			if(Partial == (*iter)->Partial)
 			{
 				break; // have a match
 			}
-				/*
-			// Check Resources
-			if (Partial[RESOURCES] != (*iter)->Partial[RESOURCES])
-				continue;	// not equal stop now
-
-			// Check Crew
-			if (Partial[POPULATION] != (*iter)->Partial[POPULATION])
-				continue;	// not equal stop now
-
-
-			// Check Minerals
-			for (int i = 0; i < Rules::MaxMinType; ++i)
-			{
-				if (Partial[i] == (*iter)->Partial[i])
-					continue; // not equal stop now
-			}
-
-
-			if (i > Rules::MaxMinType)
-			// if we didn't find a problem, this is a match
-			break;*/
 		}
 	}
 

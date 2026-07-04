@@ -95,7 +95,7 @@ private:
 class POBase : public ProdOrder {
 public:
 	POBase(long ship) : ProdOrder(ship, 1) {}
-	POBase(const POBase & orig) : ProdOrder(orig.Type, orig.Amount) {}
+	POBase(const POBase & orig) : ProdOrder(orig) {}
 	~POBase();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
@@ -110,7 +110,7 @@ public:
  */
 class POPlanetary : public ProdOrder {
 public:
-	POPlanetary(const POPlanetary & orig) : ProdOrder(orig.Type, orig.Amount) {}
+	POPlanetary(const POPlanetary & orig) : ProdOrder(orig) {}
 	POPlanetary(long type, long num) : ProdOrder(type, num) {}
 	~POPlanetary();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
@@ -145,7 +145,7 @@ public:
 class POPacket : public POPlanetary {
 public:
 	POPacket(long type, long num) : POPlanetary(type + POP_MIXEDPACKET + 1, num) {}
-	POPacket(const POPacket & orig) : POPlanetary(orig.Type, orig.Amount) {}
+	POPacket(const POPacket & orig) : POPlanetary(orig) {}
 	~POPacket();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 	static bool CheckPacket(Planet * planet);
@@ -162,7 +162,7 @@ public:
 class POShip : public ProdOrder {
 public:
 	POShip(long ship, long num) : ProdOrder(ship, num) {}
-	POShip(const POShip & orig) : ProdOrder(orig.Type, orig.Amount) {}
+	POShip(const POShip & orig) : ProdOrder(orig) {}
 	~POShip();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
@@ -179,7 +179,7 @@ public:
 class POTerraform : public ProdOrder {
 public:
 	POTerraform(long type, long num) : ProdOrder(type, num), mResCost(0) { assert(type == POP_MINTERRA || type == POP_MAXTERRA || type == POP_TERRAFORM); }
-	POTerraform(const POTerraform & orig) : ProdOrder(orig.Type, orig.Amount), mResCost(orig.mResCost) {}
+	POTerraform(const POTerraform & orig) : ProdOrder(orig), mResCost(orig.mResCost) {}
 	virtual ~POTerraform();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
