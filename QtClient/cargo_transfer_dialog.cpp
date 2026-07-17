@@ -151,7 +151,7 @@ void CargoTransferDialog::destIroniumChanged(long newDestIronium)
 {
   // Check destination cargo holder capacity
   if(newDestIronium + getDestBoranium() + getDestGermanium() + getDestColonists() > dest->GetCargoCapacity()) {
-    newDestIronium = dest->GetCargoCapacity() - getDestIronium() - getDestBoranium() - getDestGermanium() - getDestColonists();
+    return;
   }
 
   // Check available cargo
@@ -164,7 +164,7 @@ void CargoTransferDialog::destIroniumChanged(long newDestIronium)
 
   if(typeid(*source) == typeid(Fleet)) {
     // Check source cargo holder capacity
-    if(newSourceIronium + getSourceBoranium() + getSourceGermanium() + getSourceColonists() >= source->GetCargoCapacity()) {
+    if(newSourceIronium + getSourceBoranium() + getSourceGermanium() + getSourceColonists() > source->GetCargoCapacity()) {
       // Unload not possible
       return;
     }
@@ -180,7 +180,7 @@ void CargoTransferDialog::destBoraniumChanged(long newDestBoranium)
 {
   // Check destination cargo holder capacity
   if(getDestIronium() + newDestBoranium + getDestGermanium() + getDestColonists() > dest->GetCargoCapacity()) {
-    newDestBoranium = dest->GetCargoCapacity() - getDestIronium() - getDestGermanium() - getDestColonists();
+    return;
   }
 
   // Check available cargo
@@ -209,7 +209,7 @@ void CargoTransferDialog::destGermaniumChanged(long newDestGermanium)
 {
   // Check destination cargo holder capacity
   if(getDestIronium() + getDestBoranium() + newDestGermanium + getDestColonists() >= dest->GetCargoCapacity()) {
-    newDestGermanium = dest->GetCargoCapacity() - getDestIronium() - getDestBoranium() - getDestColonists();
+    return;
   }
 
   // Check available cargo
@@ -238,12 +238,13 @@ void CargoTransferDialog::destColonistsChanged(long newDestColonists)
 {
   // Check destination cargo holder capacity
   if(getDestIronium() + getDestBoranium() + getDestGermanium() + newDestColonists > dest->GetCargoCapacity()) {
-    newDestColonists = dest->GetCargoCapacity() - getDestIronium() - getDestBoranium() - getDestGermanium();
+    return;
   }
 
   // Check available cargo
   if(newDestColonists - dest->GetContain(POPULATION) / Rules::PopEQ1kT > source->GetContain(POPULATION) / Rules::PopEQ1kT) {
     newDestColonists = dest->GetContain(POPULATION) / Rules::PopEQ1kT + source->GetContain(POPULATION) / Rules::PopEQ1kT;
+    return;
   }
 
   long transfer = newDestColonists - dest->GetContain(POPULATION) / Rules::PopEQ1kT;

@@ -1076,23 +1076,34 @@ void Player::TransferCargo(CargoHolder * owned, CargoHolder * other, long pop, l
 		pop = -pop;
 		other->TransferCargo(owned, POPULATION, &pop, this);
 		pop = -pop;
-	} else
+	}
+  else if(pop > 0) { 
 		owned->TransferCargo(other, POPULATION, &pop, this);
+  }
 
 	if (fuel < 0) {
 		fuel = -fuel;
 		other->TransferCargo(owned, FUEL, &fuel, this);
 		fuel = -fuel;
-	} else
+	}
+  else if(fuel > 0) {
 		owned->TransferCargo(other, FUEL, &fuel, this);
+  }
 
+  // First unload
 	for (int i = 0; i < Rules::MaxMinType; ++i) {
 		if (cargo[i] < 0) {
 			cargo[i] = -cargo[i];
 			other->TransferCargo(owned, i, &cargo[i], this);
 			cargo[i] = -cargo[i];
-		} else
+		}
+	}
+
+  // Then load
+	for (int i = 0; i < Rules::MaxMinType; ++i) {
+    if(cargo[i] > 0) {
 			owned->TransferCargo(other, i, &cargo[i], this);
+    }
 	}
 
 	if (write && mWriteXFile)
