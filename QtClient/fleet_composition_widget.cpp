@@ -8,31 +8,19 @@
 
 namespace FreeStars {
 
-FleetCompositionWidget::FleetCompositionWidget(const Fleet *_fleet, const Player *_player, QWidget *parent)
+FleetCompositionWidget::FleetCompositionWidget(const Player *_player, QWidget *parent)
     : FoldingWidget(tr("Fleet Composition"))
-    , fleet(_fleet)
     , player(_player)
 {
     QWidget *widget = new QWidget;
 
-    Ui_FleetCompositionWidget ui_FleetCompositionWidget;
     ui_FleetCompositionWidget.setupUi(widget);
 
-    fleetCompositionModel = new FleetCompositionModel(_fleet, _player);
-    auto m = ui_FleetCompositionWidget.fleetCompositionView->model();
-    ui_FleetCompositionWidget.fleetCompositionView->setModel(fleetCompositionModel);
-    delete m;
+    this->setFleet(nullptr);
 
     ui_FleetCompositionWidget.fleetCompositionView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui_FleetCompositionWidget.fleetCompositionView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     ui_FleetCompositionWidget.fleetCompositionView->resizeColumnsToContents();
-
-    long cloaked = _fleet->GetCloak(_player, true);
-
-    if(cloaked) {
-        ui_FleetCompositionWidget.pctCloakedLabel->setText(tr("%0%")
-            .arg(cloaked));
-    }
 
     connect(ui_FleetCompositionWidget.splitButton, SIGNAL(clicked(bool)),
         this, SLOT(splitButtonClicked(bool)));
@@ -44,19 +32,53 @@ FleetCompositionWidget::FleetCompositionWidget(const Fleet *_fleet, const Player
     this->addWidget(widget);
 }
 
+void FleetCompositionWidget::setFleet(const Fleet *_fleet)
+{
+    // Switch model
+    std::unique_ptr<FleetCompositionModel> fleetCompositionModel(new FleetCompositionModel(_fleet, player));
+    auto m = ui_FleetCompositionWidget.fleetCompositionView->model();
+    ui_FleetCompositionWidget.fleetCompositionView->setModel(fleetCompositionModel.get());
+    fleetCompositionModel.release();
+    delete m;
+
+    if(_fleet != nullptr) {
+      long cloaked = _fleet->GetCloak(player, true);
+
+      if(cloaked) {
+          ui_FleetCompositionWidget.pctCloakedLabel->setText(tr("%0%")
+              .arg(cloaked));
+      }
+
+      ui_FleetCompositionWidget.splitButton->setEnabled(_fleet->GetStacks() > 1);
+      ui_FleetCompositionWidget.splitAllButton->setEnabled(_fleet->GetStacks() > 1);
+    }
+}
+
 void FleetCompositionWidget::splitButtonClicked(bool)
 {
-    emit splitFleet(fleet);
+    auto model = dynamic_cast<FleetCompositionModel*>(ui_FleetCompositionWidget.fleetCompositionView->model());
+
+    if(model != nullptr) {
+      emit splitFleet(model->getFleet());
+    }
 }
 
 void FleetCompositionWidget::splitAllButtonClicked(bool)
 {
-    emit splitAllFleet(fleet);
+    auto model = dynamic_cast<FleetCompositionModel*>(ui_FleetCompositionWidget.fleetCompositionView->model());
+
+    if(model != nullptr) {
+      emit splitAllFleet(model->getFleet());
+    }
 }
 
 void FleetCompositionWidget::mergeButtonClicked(bool)
 {
-    emit mergeFleet(fleet);
+    auto model = dynamic_cast<FleetCompositionModel*>(ui_FleetCompositionWidget.fleetCompositionView->model());
+
+    if(model != nullptr) {
+      emit mergeFleet(model->getFleet());
+    }
 }
 
 };

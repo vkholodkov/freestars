@@ -12,6 +12,8 @@
 #include "cargo_widget.h"
 #include "fleet_composition_model.h"
 
+#include "ui_fleet_composition_widget.h"
+
 #include "FSServer.h"
 
 namespace FreeStars {
@@ -20,12 +22,15 @@ class FleetCompositionWidget : public FoldingWidget {
     Q_OBJECT
 
 public:
-    FleetCompositionWidget(const Fleet*, const Player*, QWidget *parent = 0);
+    FleetCompositionWidget(const Player*, QWidget *parent = 0);
 
 signals:
     void splitFleet(const Fleet*);
     void splitAllFleet(const Fleet*);
     void mergeFleet(const Fleet*);
+
+public slots:
+    void setFleet(const Fleet*);
 
 private slots:
     void splitButtonClicked(bool);
@@ -33,8 +38,7 @@ private slots:
     void mergeButtonClicked(bool);
 
 private:
-    FleetCompositionModel *fleetCompositionModel;
-    const Fleet *fleet;
+    Ui_FleetCompositionWidget ui_FleetCompositionWidget;
     const Player *player;
 };
 

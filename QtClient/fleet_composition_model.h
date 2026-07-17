@@ -27,6 +27,8 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
+    const Fleet *getFleet() const { return fleet; }
+
 private:
     const Fleet *fleet;
     const Player *player;

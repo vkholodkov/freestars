@@ -426,7 +426,7 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     /*
      * Fleet composition widget
      */
-    FleetCompositionWidget *fleetCompositionWidget = new FleetCompositionWidget(_fleet, player);
+    FleetCompositionWidget *fleetCompositionWidget = new FleetCompositionWidget(player);
     fleetCompositionWidget->setObjectName("w2_column2");
     verticalFlowLayout->addWidget(fleetCompositionWidget);
     
@@ -436,6 +436,8 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
         this, SLOT(splitAllFleet(const Fleet*)));
     connect(fleetCompositionWidget, SIGNAL(mergeFleet(const Fleet*)),
         this, SLOT(mergeFleet(const Fleet*)));
+
+    fleetCompositionWidget->setFleet(_fleet);
 
     /*
      * Fleet waypoints widget

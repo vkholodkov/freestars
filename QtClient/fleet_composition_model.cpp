@@ -21,7 +21,7 @@ FleetCompositionModel::~FleetCompositionModel()
 int FleetCompositionModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return fleet->GetStacks();
+    return fleet != nullptr ? fleet->GetStacks() : 0;
 }
 
 int FleetCompositionModel::columnCount(const QModelIndex &parent) const
@@ -39,10 +39,10 @@ QVariant FleetCompositionModel::data(const QModelIndex &index, int role) const
         return QVariant((index.column() == 0 ? Qt::AlignLeft : Qt::AlignRight) | Qt::AlignVCenter);
     }
 
-    if (index.row() >= fleet->GetStacks() || index.row() < 0)
+    if (fleet != nullptr && index.row() >= fleet->GetStacks() || index.row() < 0)
         return QVariant();
 
-    if (role == Qt::DisplayRole) {
+    if (role == Qt::DisplayRole && fleet != nullptr) {
         const Stack *stack = fleet->GetStack(index.row());
 
         if (index.column() == 0) {
