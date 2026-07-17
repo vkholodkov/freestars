@@ -121,7 +121,12 @@ void CargoWidget::mouseMoveEvent(QMouseEvent *e)
 {
   if(m_mousein) {
     if(m_changeable) {
-      if(e->pos().x() >= contentsRect().topLeft().x() && e->pos().x() < contentsRect().bottomRight().x()) {
+      if(e->pos().x() < contentsRect().topLeft().x()) {
+        if(m_cargo != 0) {
+          emit changed(0);
+        }
+      }
+      else if(e->pos().x() >= contentsRect().topLeft().x() && e->pos().x() < contentsRect().bottomRight().x()) {
         auto newCargo = e->pos().x() * m_maxCargo / contentsRect().width();
 
         if(m_cargo != newCargo) {
