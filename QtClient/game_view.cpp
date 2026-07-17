@@ -28,6 +28,7 @@
 #include "production_queue_dialog.h"
 #include "ship_design_dialog.h"
 #include "race_wizard.h"
+#include "merge_fleets_dialog.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -702,7 +703,11 @@ void GameView::splitAllFleet(const Fleet *_fleet)
 
 void GameView::mergeFleet(const Fleet *_fleet)
 {
-    std::cout << "GameView::mergeFleet fleet=" << _fleet << std::endl;
+    MergeFleetsDialog mergeFleetsDialog(_fleet, this);
+
+    if(mergeFleetsDialog.exec() == QDialog::Accepted) {
+      emit fleetCompositionChanged();
+    }
 }
 
 void GameView::shipDesignDialog()

@@ -45,6 +45,7 @@ SET(freestars_SOURCES
     order_template_list_model.cpp
     cargo_transfer_dialog.cpp
     waypoint_task_widget.cpp
+    merge_fleets_dialog.cpp
 )
 
 SET(freestars_HEADERS
@@ -72,6 +73,7 @@ SET(freestars_HEADERS
     ship_avatar_widget.h
     ship_describer.h
     waypoint_task_widget.h
+    merge_fleets_dialog.h
 )
 
 SET(freestars_FORMS
@@ -103,6 +105,7 @@ SET(freestars_FORMS
     production_queue_dialog.ui
     cargo_transfer_dialog.ui
     waypoint_task_widget.ui
+    merge_fleets_dialog.ui
 )
 
 SET(freestars_RESOURCES application.qrc)

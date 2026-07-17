@@ -40,6 +40,7 @@ public:
 signals:
     void selectionChanged(const SpaceObject*);
     void cargoUpdated();
+    void fleetCompositionChanged();
     void researchSettingsChanged();
     void productionQueueChanged(const Planet*);
 
