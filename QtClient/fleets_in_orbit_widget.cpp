@@ -90,7 +90,7 @@ void FleetsInOrbitWidget::objectActivated(int index)
 
     textWidget->setVisible(true);
     
-    fuelWidget->setCurrentCargo(fleet->GetFuel());
+    fuelWidget->setCargo(fleet->GetFuel());
     fuelWidget->setMaxCargo(fleet->GetFuelCapacity());
 
     cargoWidget->setCargoHolder(fleet);

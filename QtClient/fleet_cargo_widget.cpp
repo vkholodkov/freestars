@@ -42,7 +42,7 @@ void FleetCargoWidget::cargoUpdated()
 {
     ui_FleetCargoWidget.fuelWidget->setChangeable(false);
     ui_FleetCargoWidget.fuelWidget->setCargoColor(Qt::red);
-    ui_FleetCargoWidget.fuelWidget->setCurrentCargo(fleet->GetFuel());
+    ui_FleetCargoWidget.fuelWidget->setCargo(fleet->GetFuel());
     ui_FleetCargoWidget.fuelWidget->setMaxCargo(fleet->GetFuelCapacity());
     ui_FleetCargoWidget.fuelWidget->setUnit(tr("mg"));
 

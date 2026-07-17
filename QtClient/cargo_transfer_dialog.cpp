@@ -12,6 +12,9 @@ CargoTransferDialog::CargoTransferDialog(CargoHolder *_source, CargoHolder *_des
     , source(_source)
     , dest(_dest)
     , player(_player)
+    , transferCargo(Rules::MaxMinType, 0)
+    , transferPop(0)
+    , transferFuel(0)
 {
   setupUi(this);
 
@@ -22,7 +25,7 @@ CargoTransferDialog::CargoTransferDialog(CargoHolder *_source, CargoHolder *_des
     sourceFuelWidget->setChangeable(true);
     sourceFuelWidget->setCargoColor(Qt::red);
     sourceFuelWidget->setUnit(tr("mg"));
-    sourceFuelWidget->setCurrentCargo(dynamic_cast<Fleet*>(source)->GetFuel());
+    sourceFuelWidget->setCargo(dynamic_cast<Fleet*>(source)->GetFuel());
     sourceFuelWidget->setMaxCargo(dynamic_cast<Fleet*>(source)->GetFuelCapacity());
     sourceFuelWidget->show();
   }
@@ -42,32 +45,36 @@ CargoTransferDialog::CargoTransferDialog(CargoHolder *_source, CargoHolder *_des
   }
 
   sourceIroniumWidget->setChangeable(true);
+  sourceIroniumWidget->setShowMaxCargo(typeid(*source) == typeid(Fleet));
   sourceIroniumWidget->setCargoColor(Qt::blue);
-  sourceIroniumWidget->setCurrentCargo(source->GetContain(0));
+  sourceIroniumWidget->setCargo(source->GetContain(0));
   sourceIroniumWidget->setUnit(tr("kT"));
 
-  connect(sourceIroniumWidget, SIGNAL(changed(int, int)), this, SLOT(sourceIroniumChanged(int, int)));
+  connect(sourceIroniumWidget, SIGNAL(changed(long)), this, SLOT(sourceIroniumChanged(long)));
 
   sourceBoraniumWidget->setChangeable(true);
+  sourceBoraniumWidget->setShowMaxCargo(typeid(*source) == typeid(Fleet));
   sourceBoraniumWidget->setCargoColor(Qt::green);
-  sourceBoraniumWidget->setCurrentCargo(source->GetContain(1));
+  sourceBoraniumWidget->setCargo(source->GetContain(1));
   sourceBoraniumWidget->setUnit(tr("kT"));
 
-  connect(sourceBoraniumWidget, SIGNAL(changed(int, int)), this, SLOT(sourceBoraniumChanged(int, int)));
+  connect(sourceBoraniumWidget, SIGNAL(changed(long)), this, SLOT(sourceBoraniumChanged(long)));
 
   sourceGermaniumWidget->setChangeable(true);
+  sourceGermaniumWidget->setShowMaxCargo(typeid(*source) == typeid(Fleet));
   sourceGermaniumWidget->setCargoColor(Qt::yellow);
-  sourceGermaniumWidget->setCurrentCargo(source->GetContain(2));
+  sourceGermaniumWidget->setCargo(source->GetContain(2));
   sourceGermaniumWidget->setUnit(tr("kT"));
 
-  connect(sourceGermaniumWidget, SIGNAL(changed(int, int)), this, SLOT(sourceGermaniumChanged(int, int)));
+  connect(sourceGermaniumWidget, SIGNAL(changed(long)), this, SLOT(sourceGermaniumChanged(long)));
 
   sourceColonistsWidget->setChangeable(true);
+  sourceColonistsWidget->setShowMaxCargo(typeid(*source) == typeid(Fleet));
   sourceColonistsWidget->setCargoColor(Qt::blue);
-  sourceColonistsWidget->setCurrentCargo(source->GetContain(POPULATION) / Rules::PopEQ1kT);
+  sourceColonistsWidget->setCargo(source->GetContain(POPULATION) / Rules::PopEQ1kT);
   sourceColonistsWidget->setUnit(tr("kT"));
 
-  connect(sourceColonistsWidget, SIGNAL(changed(int, int)), this, SLOT(sourceColonistsChanged(int, int)));
+  connect(sourceColonistsWidget, SIGNAL(changed(long)), this, SLOT(sourceColonistsChanged(long)));
 
   // Destination
   destNameLabel->setText(dest->GetName(player).c_str());
@@ -76,7 +83,7 @@ CargoTransferDialog::CargoTransferDialog(CargoHolder *_source, CargoHolder *_des
     destFuelWidget->setChangeable(true);
     destFuelWidget->setCargoColor(Qt::red);
     destFuelWidget->setUnit(tr("mg"));
-    destFuelWidget->setCurrentCargo(dynamic_cast<Fleet*>(dest)->GetFuel());
+    destFuelWidget->setCargo(dynamic_cast<Fleet*>(dest)->GetFuel());
     destFuelWidget->setMaxCargo(dynamic_cast<Fleet*>(dest)->GetFuelCapacity());
     destFuelWidget->show();
   }
@@ -88,101 +95,185 @@ CargoTransferDialog::CargoTransferDialog(CargoHolder *_source, CargoHolder *_des
   destCargoHoldWidget->setCargoHolder(dest);
 
   destIroniumWidget->setChangeable(true);
+  destIroniumWidget->setShowMaxCargo(typeid(*dest) == typeid(Fleet));
   destIroniumWidget->setCargoColor(Qt::blue);
   destIroniumWidget->setUnit(tr("kT"));
-  destIroniumWidget->setCurrentCargo(dest->GetContain(0));
+  destIroniumWidget->setCargo(dest->GetContain(0));
   destIroniumWidget->setMaxCargo(dest->GetCargoCapacity());
 
-  connect(destIroniumWidget, SIGNAL(changed(int, int)), this, SLOT(destIroniumChanged(int, int)));
+  connect(destIroniumWidget, SIGNAL(changed(long)), this, SLOT(destIroniumChanged(long)));
 
   destBoraniumWidget->setChangeable(true);
+  destBoraniumWidget->setShowMaxCargo(typeid(*dest) == typeid(Fleet));
   destBoraniumWidget->setCargoColor(Qt::green);
   destBoraniumWidget->setUnit(tr("kT"));
-  destBoraniumWidget->setCurrentCargo(dest->GetContain(1));
+  destBoraniumWidget->setCargo(dest->GetContain(1));
   destBoraniumWidget->setMaxCargo(dest->GetCargoCapacity());
 
-  connect(destBoraniumWidget, SIGNAL(changed(int, int)), this, SLOT(destBoraniumChanged(int, int)));
+  connect(destBoraniumWidget, SIGNAL(changed(long)), this, SLOT(destBoraniumChanged(long)));
 
   destGermaniumWidget->setChangeable(true);
+  destGermaniumWidget->setShowMaxCargo(typeid(*dest) == typeid(Fleet));
   destGermaniumWidget->setCargoColor(Qt::yellow);
   destGermaniumWidget->setUnit(tr("kT"));
-  destGermaniumWidget->setCurrentCargo(dest->GetContain(2));
+  destGermaniumWidget->setCargo(dest->GetContain(2));
   destGermaniumWidget->setMaxCargo(dest->GetCargoCapacity());
 
-  connect(destGermaniumWidget, SIGNAL(changed(int, int)), this, SLOT(destGermaniumChanged(int, int)));
+  connect(destGermaniumWidget, SIGNAL(changed(long)), this, SLOT(destGermaniumChanged(long)));
 
   destColonistsWidget->setChangeable(true);
+  destColonistsWidget->setShowMaxCargo(typeid(*dest) == typeid(Fleet));
   destColonistsWidget->setCargoColor(Qt::white);
   destColonistsWidget->setUnit(tr("kT"));
-  destColonistsWidget->setCurrentCargo(dest->GetContain(POPULATION) / Rules::PopEQ1kT);
+  destColonistsWidget->setCargo(dest->GetContain(POPULATION) / Rules::PopEQ1kT);
   destColonistsWidget->setMaxCargo(dest->GetCargoCapacity());
 
-  connect(destColonistsWidget, SIGNAL(changed(int, int)), this, SLOT(destColonistsChanged(int, int)));
-
-  sourceIroniumWidget->setMaxAvailableCargo(dest->GetContain(0));
-  destIroniumWidget->setMaxAvailableCargo(source->GetContain(0));
-
-  sourceBoraniumWidget->setMaxAvailableCargo(dest->GetContain(1));
-  destBoraniumWidget->setMaxAvailableCargo(source->GetContain(1));
-
-  sourceGermaniumWidget->setMaxAvailableCargo(dest->GetContain(2));
-  destGermaniumWidget->setMaxAvailableCargo(source->GetContain(2));
-
-  sourceColonistsWidget->setMaxAvailableCargo(dest->GetContain(POPULATION) / Rules::PopEQ1kT);
-  destColonistsWidget->setMaxAvailableCargo(source->GetContain(POPULATION) / Rules::PopEQ1kT);
+  connect(destColonistsWidget, SIGNAL(changed(long)), this, SLOT(destColonistsChanged(long)));
 }
 
-void CargoTransferDialog::sourceIroniumChanged(int _old, int _new)
+void CargoTransferDialog::sourceIroniumChanged(long newSourceIronium)
 {
-  destIroniumWidget->setNewCargo(destIroniumWidget->currentCargo() + _old - _new);
 }
 
-void CargoTransferDialog::sourceBoraniumChanged(int _old, int _new)
+void CargoTransferDialog::sourceBoraniumChanged(long _new)
 {
-  destBoraniumWidget->setNewCargo(destBoraniumWidget->currentCargo() + _old - _new);
 }
 
-void CargoTransferDialog::sourceGermaniumChanged(int _old, int _new)
+void CargoTransferDialog::sourceGermaniumChanged(long _new)
 {
-  destGermaniumWidget->setNewCargo(destGermaniumWidget->currentCargo() + _old - _new);
 }
 
-void CargoTransferDialog::sourceColonistsChanged(int _old, int _new)
+void CargoTransferDialog::sourceColonistsChanged(long _new)
 {
-  destColonistsWidget->setNewCargo(destColonistsWidget->currentCargo() + _old - _new);
 }
 
-void CargoTransferDialog::destIroniumChanged(int _old, int _new)
+void CargoTransferDialog::destIroniumChanged(long newDestIronium)
 {
-  sourceIroniumWidget->setNewCargo(sourceIroniumWidget->currentCargo() + _old - _new);
+  // Check destination cargo holder capacity
+  if(newDestIronium + getDestBoranium() + getDestGermanium() + getDestColonists() > dest->GetCargoCapacity()) {
+    // Load not possible
+    return;
+  }
+
+  // Check available cargo
+  if(newDestIronium - dest->GetContain(0) >= getSourceIronium()) {
+    // Not enough cargo
+    return;
+  }
+
+  long transfer = newDestIronium - dest->GetContain(0);
+  long newSourceIronium = source->GetContain(0) - transfer; 
+
+  if(typeid(*source) == typeid(Fleet)) {
+    // Check source cargo holder capacity
+    if(newSourceIronium + getSourceBoranium() + getSourceGermanium() + getSourceColonists() >= source->GetCargoCapacity()) {
+      // Unload not possible
+      return;
+    }
+  }
+
+  sourceIroniumWidget->setCargo(newSourceIronium);
+  destIroniumWidget->setCargo(newDestIronium);
+
+  transferCargo[0] = transfer;
 }
 
-void CargoTransferDialog::destBoraniumChanged(int _old, int _new)
+void CargoTransferDialog::destBoraniumChanged(long newDestBoranium)
 {
-  sourceBoraniumWidget->setNewCargo(sourceBoraniumWidget->currentCargo() + _old - _new);
+  // Check destination cargo holder capacity
+  if(getDestIronium() + newDestBoranium + getDestGermanium() + getDestColonists() >= dest->GetCargoCapacity()) {
+    // Load not possible
+    return;
+  }
+
+  // Check available cargo
+  if(newDestBoranium - dest->GetContain(1) >= getSourceBoranium()) {
+    // Not enough cargo
+    return;
+  }
+
+  long transfer = newDestBoranium - dest->GetContain(1);
+  long newSourceBoranium = source->GetContain(1) - transfer; 
+
+  if(typeid(*source) == typeid(Fleet)) {
+    // Check source cargo holder capacity
+    if(getSourceIronium() + newSourceBoranium + getSourceGermanium() + getSourceColonists() >= source->GetCargoCapacity()) {
+      // Unload not possible
+      return;
+    }
+  }
+
+  sourceBoraniumWidget->setCargo(newSourceBoranium);
+  destBoraniumWidget->setCargo(newDestBoranium);
+
+  transferCargo[1] = transfer;
 }
 
-void CargoTransferDialog::destGermaniumChanged(int _old, int _new)
+void CargoTransferDialog::destGermaniumChanged(long newDestGermanium)
 {
-  sourceGermaniumWidget->setNewCargo(sourceGermaniumWidget->currentCargo() + _old - _new);
+  // Check destination cargo holder capacity
+  if(getDestIronium() + getDestBoranium() + newDestGermanium + getDestColonists() >= dest->GetCargoCapacity()) {
+    // Load not possible
+    return;
+  }
+
+  // Check available cargo
+  if(newDestGermanium - dest->GetContain(2) >= getSourceGermanium()) {
+    // Not enough cargo
+    return;
+  }
+
+  long transfer = newDestGermanium - dest->GetContain(2);
+  long newSourceGermanium = source->GetContain(2) - transfer; 
+
+  if(typeid(*source) == typeid(Fleet)) {
+    // Check source cargo holder capacity
+    if(getSourceIronium() + getSourceBoranium() + newSourceGermanium + getSourceColonists() >= source->GetCargoCapacity()) {
+      // Unload not possible
+      return;
+    }
+  }
+
+  sourceGermaniumWidget->setCargo(newSourceGermanium);
+  destGermaniumWidget->setCargo(newDestGermanium);
+
+  transferCargo[2] = transfer;
 }
 
-void CargoTransferDialog::destColonistsChanged(int _old, int _new)
+void CargoTransferDialog::destColonistsChanged(long newDestColonists)
 {
-  sourceColonistsWidget->setNewCargo(sourceColonistsWidget->currentCargo() + _old - _new);
+  // Check destination cargo holder capacity
+  if(getDestIronium() + getDestBoranium() + getDestGermanium() + newDestColonists >= dest->GetCargoCapacity()) {
+    // Load not possible
+    return;
+  }
+
+  // Check available cargo
+  if(newDestColonists - dest->GetContain(POPULATION) / Rules::PopEQ1kT >= getSourceColonists()) {
+    // Not enough cargo
+    return;
+  }
+
+  long transfer = newDestColonists - dest->GetContain(POPULATION) / Rules::PopEQ1kT;
+  long newSourceColonists = source->GetContain(POPULATION) / Rules::PopEQ1kT - transfer; 
+
+  if(typeid(*source) == typeid(Fleet)) {
+    // Check source cargo holder capacity
+    if(getSourceIronium() + getSourceBoranium() + getSourceGermanium() + newSourceColonists >= source->GetCargoCapacity()) {
+      // Unload not possible
+      return;
+    }
+  }
+
+  sourceColonistsWidget->setCargo(newSourceColonists);
+  destColonistsWidget->setCargo(newDestColonists);
+
+  transferPop = transfer * Rules::PopEQ1kT;
 }
 
 void CargoTransferDialog::accept()
 {
-    deque<long> cargo;
-
-    long pop = (destColonistsWidget->newCargo() - destColonistsWidget->currentCargo()) * Rules::PopEQ1kT;
-
-    cargo.push_back(destIroniumWidget->newCargo() - destIroniumWidget->currentCargo());
-    cargo.push_back(destBoraniumWidget->newCargo() - destBoraniumWidget->currentCargo());
-    cargo.push_back(destGermaniumWidget->newCargo() - destGermaniumWidget->currentCargo());
-
-    player->TransferCargo(source, dest, pop, 0, cargo);
+    player->TransferCargo(source, dest, transferPop, 0, transferCargo);
 
     QDialog::accept();
 }
