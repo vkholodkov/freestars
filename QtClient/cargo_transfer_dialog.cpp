@@ -151,8 +151,7 @@ void CargoTransferDialog::destIroniumChanged(long newDestIronium)
 {
   // Check destination cargo holder capacity
   if(newDestIronium + getDestBoranium() + getDestGermanium() + getDestColonists() > dest->GetCargoCapacity()) {
-    // Load not possible
-    return;
+    newDestIronium = dest->GetCargoCapacity() - getDestIronium() - getDestBoranium() - getDestGermanium() - getDestColonists();
   }
 
   // Check available cargo
