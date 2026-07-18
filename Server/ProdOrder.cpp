@@ -416,7 +416,8 @@ bool ProdOrder::DoProduce(const Cost & cost, Planet * planet, long * resources, 
 	}
 
 	if (!Auto)	Amount = maxbuild;
-	Built(planet, lBuilt);	// Actually build them
+  if(lBuilt > 0)
+    Built(planet, lBuilt);	// Actually build them
 	*AutoAlchemy = false;	// always turn off auto-alchemy
 	return(!Auto && Amount == 0);		// if we're done, delete it
 }
