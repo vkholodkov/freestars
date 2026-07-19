@@ -49,6 +49,9 @@ class Hull;
 class RacialTrait;
 class TestPlanet;
 
+const long LOP_MIN = 0;
+const long LOP_MAX = 50;
+
 const long LOPB_MINERALS		= 1;
 const long LOPB_CONCENTRATIONS	= 2;
 const long LOPB_MINES			= 3;

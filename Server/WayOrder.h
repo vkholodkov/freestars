@@ -81,7 +81,7 @@ public:
 
 	WayOrder * Copy() const;
 
-  static bool HasArguments(OrderType ot) { return ot >= OT_MERGE; }
+  static bool HasArguments(OrderType ot) { return ot >= OT_LAYMINE && ot <= OT_TRANSPORT; }
 
 protected:
 	WayOrder(const WayOrder & copy);

@@ -27,21 +27,27 @@ void MessageFormatter::VisitLocation(const std::string &desc, const Location *lo
     const Planet *p = dynamic_cast<const Planet*>(loc);
 
     if(p != NULL) {
-        result = result.replace("%{planet}", QString(p->GetName(player).c_str()));
+        result = result.arg(p->GetName(player).c_str());
         return;
     }
 
     const Fleet *f = dynamic_cast<const Fleet*>(loc);
 
     if(f != NULL) {
-        result = result.replace("%{fleet}", QString(f->GetName(player).c_str()));
+        result = result.arg(f->GetName(player).c_str());
         return;
     }
 
-    result = result.replace("${location}", QString("(%0, %1)").arg(loc->GetPosX()).arg(loc->GetPosY()));
+    result = result.arg(QString("(%0, %1)").arg(loc->GetPosX()).arg(loc->GetPosY()));
 }
 
 void MessageFormatter::VisitPlayer(const std::string &desc, const Player *other) const {
+    if(desc == "Owner") {
+        result = result.arg(other->GetPluralName().c_str());
+    }
+    else {
+        result = result.arg(other->GetSingleName().c_str());
+    }
 }
 
 void MessageFormatter::VisitNumber(const std::string &desc, long l) const {

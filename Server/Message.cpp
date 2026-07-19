@@ -499,31 +499,37 @@ void Message::ApplyVisitor(MessageVisitor &visitor) const {
 		const MessLoc * ml = dynamic_cast<const MessLoc *>(*i);
 		if(ml != NULL) {
             visitor.VisitLocation(ml->mDesc, ml->mLoc);
+            continue;
 		}
 
 		MessPlayer * mp = dynamic_cast<MessPlayer *>(*i);
 		if(mp != NULL) {
             visitor.VisitPlayer(mp->mDesc, mp->mPlayer);
+            continue;
 		}
 
 		MessNumber * mn = dynamic_cast<MessNumber *>(*i);
 		if(mn != NULL) {
             visitor.VisitNumber(mn->mDesc, mn->mNumber);
+            continue;
 		}
 
 		MessFloat * mf = dynamic_cast<MessFloat *>(*i);
 		if(mf != NULL) {
             visitor.VisitFloat(mf->mDesc, mf->mNumber);
+            continue;
 		}
 
 		MessString * ms = dynamic_cast<MessString *>(*i);
 		if(ms != NULL) {
             visitor.VisitString(ms->mDesc, ms->mStr);
+            continue;
 		}
 
 		MessXMLNode * mx = dynamic_cast<MessXMLNode *>(*i);
 		if(mx != NULL) {
             visitor.VisitXMLNode(mx->mDesc, mx->mNode);
+            continue;
 		}
 	}
 }

@@ -749,6 +749,11 @@ void ShipDesignDialog::addNewDesign()
 {
     Ship *ship = shipBeingEdited.get();
 
+    if(!ship->IsValidDesign()) {
+        QMessageBox::critical(this, tr("Error"), tr("Invalid ship design"));
+        return;
+    }
+
     QString name(shipNameEdit->text());
 
     if(chooseDesignBox->findText(name) != -1) {

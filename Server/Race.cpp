@@ -649,7 +649,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 		} else if (stricmp(child1->Value(), "StartMinerals") == 0) {
 			mLeftoverBuys = LOPB_MINERALS;
 			mLeftoverPoints = GetLong(child1);
-			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
+			if (mLeftoverPoints < LOP_MIN || mLeftoverPoints > LOP_MAX) {
 				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartMinerals", mLeftoverPoints);
@@ -658,7 +658,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 		} else if (stricmp(child1->Value(), "StartConcentrations") == 0) {
 			mLeftoverBuys = LOPB_CONCENTRATIONS;
 			mLeftoverPoints = GetLong(child1);
-			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
+			if (mLeftoverPoints < LOP_MIN || mLeftoverPoints > LOP_MAX) {
 				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartConcentrations", mLeftoverPoints);
@@ -667,7 +667,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 		} else if (stricmp(child1->Value(), "StartMines") == 0) {
 			mLeftoverBuys = LOPB_MINES;
 			mLeftoverPoints = GetLong(child1);
-			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
+			if (mLeftoverPoints < LOP_MIN || mLeftoverPoints > LOP_MAX) {
 				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartMines", mLeftoverPoints);
@@ -676,7 +676,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 		} else if (stricmp(child1->Value(), "StartFactories") == 0) {
 			mLeftoverBuys = LOPB_FACTORIES;
 			mLeftoverPoints = GetLong(child1);
-			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
+			if (mLeftoverPoints < LOP_MIN || mLeftoverPoints > LOP_MAX) {
 				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartFactories", mLeftoverPoints);
@@ -685,7 +685,7 @@ bool Race::ParseNode(const TiXmlNode * node, bool other, MessageSink& messageSin
 		} else if (stricmp(child1->Value(), "StartDefenses") == 0) {
 			mLeftoverBuys = LOPB_DEFENSES;
 			mLeftoverPoints = GetLong(child1);
-			if (mLeftoverPoints < 0 || mLeftoverPoints > 50) {//magic number
+			if (mLeftoverPoints < LOP_MIN || mLeftoverPoints > LOP_MAX) {
 				Message * mess = messageSink.AddMessage("Error: Invalid racial setting");
 				mess->AddItem("Race", mSingularName);
 				mess->AddLong("StartDefenses", mLeftoverPoints);

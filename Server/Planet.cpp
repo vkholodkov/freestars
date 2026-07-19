@@ -1546,6 +1546,11 @@ void Planet::RemoteTerraform(Fleet * fleet, bool bomb)
       mess->AddLong("End Hab", endHab);
     }
   }
+  else if(mOwner == fleet->GetOwner()) {
+    Message * mess = fleet->NCGetOwner()->AddMessage("Remote Terraform cannot improve hab", this);
+    mess->AddItem("Terraforming fleet", fleet);
+    mess->AddLong("Current Hab", startHab);
+  }
 }
 
 void Planet::SweepMines()

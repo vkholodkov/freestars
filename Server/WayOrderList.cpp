@@ -275,7 +275,13 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Game *game
 
 					wo = wot;
 					wo->mOrder = OT_TRANSPORT;
-				}
+        }
+        else {
+            if(orders.empty()) {
+                wo = new WayOrder(loc, fmo);
+                wo->mOrder = OT_NONE;
+            }
+        }
 			} else {
 				Message * mess = player->AddMessage("Warning: Unknown type");
 				mess->AddItem("Waypoint order", child2->Value());

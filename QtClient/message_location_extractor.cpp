@@ -24,7 +24,9 @@ void MessageLocationExtractor::VisitMessage(const std::string &type) const {
 }
 
 void MessageLocationExtractor::VisitLocation(const std::string &desc, const Location *loc) const {
-    f(loc);
+    if(desc == "") {
+        f(loc);
+    }
 }
 
 void MessageLocationExtractor::VisitPlayer(const std::string &desc, const Player *player) const {

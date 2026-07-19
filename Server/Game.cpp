@@ -630,7 +630,7 @@ bool Game::LoadDefFile(const char * deffile)
 		points = p->GetAdvantagePoints(*this);
 		if (points < 0)
 			return false;
-		p->SetLeftoverPoints(points / 3);
+		p->SetLeftoverPoints(min(points / 3, LOP_MAX));
 	}
 
 	mNumberOfPlayers = mPlayers.size();

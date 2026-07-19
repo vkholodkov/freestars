@@ -621,6 +621,7 @@ void Fleet::Scrap(bool colonize)
 	TechType TechGot = TECH_NONE;
 	Salvage * salvage = NULL;
 	Planet * planet = InOrbit();
+  long minerals = 0;
 
 	//Tech first:
 	//Is ship in orbit with base
@@ -634,13 +635,12 @@ void Fleet::Scrap(bool colonize)
 	// calc minerals
 	if (planet) {
 		double percent = Rules::ScrapRecover(planet, colonize);
-		long tempMins = 0;
 		for (int i = 0; i < Rules::MaxMinType; ++i)
 		{
 			long temp = GetContain(i);
 			temp += long(GetCost()[i] * percent + .5);
 			planet->AdjustAmounts(i, temp);
-			tempMins += temp;
+			minerals += temp;
 		}
 
 		if (GetOwner() == planet->GetOwner()) {
@@ -671,7 +671,7 @@ void Fleet::Scrap(bool colonize)
 	string str2;
 	// send message to the fleet owner
 	// - note that both the fleet owner and the planet owner get a message, even if they are the same player
-//	if (!planet || planet->GetOwner() != GetOwner())	// add this line to eliminate a (mostly) duplicate message
+	if (!planet || planet->GetOwner() != GetOwner())	// add this line to eliminate a (mostly) duplicate message
 	{
 		// This is not the same as classic Stars!, that passes the fleet as part of the
 		// message and if you reuse the fleet, it points at the new fleet - I didn't think that was important to preserve - EK
@@ -680,9 +680,11 @@ void Fleet::Scrap(bool colonize)
 		if (colonize) {
 			mess = NCGetOwner()->AddMessage("Colonize attempt", planet);
 			mess->AddItem("Fleet name", GetName(GetOwner()));
+			mess->AddLong("Minerals gain", minerals);
 		} else if (planet) {
 			mess = NCGetOwner()->AddMessage("Scrap fleet at planet", planet);
 			mess->AddItem("Fleet name", GetName(GetOwner()));
+			mess->AddLong("Minerals gain", minerals);
 			mess->AddLong("UR resource gain", URGain);
 		} else {
 			mess = NCGetOwner()->AddMessage("Scrap fleet in space", salvage);
@@ -703,6 +705,7 @@ void Fleet::Scrap(bool colonize)
 		Message * mess;
 		mess = planet->NCGetOwner()->AddMessage("Fleet scrapped at planet", planet);
 		mess->AddItem("Fleet name", str2);
+    mess->AddLong("Minerals gain", minerals);
 		mess->AddLong("UR resource gain", URGain);
 		if (TechGot >= 0) {
 			mess->AddItem("Tech field gained", Rules::GetTechName(TechGot));

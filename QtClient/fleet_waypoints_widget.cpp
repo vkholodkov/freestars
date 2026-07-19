@@ -177,7 +177,7 @@ void FleetWaypointsWidget::changeWayorder(WayOrder *order)
 {
     int row = waypointListBox->currentRow();
 
-    if(row > 0 && row < orders.size()) {
+    if(row >= 0 && row < orders.size()) {
         delete orders[row];
         orders[row] = order;
         changeWayorderList();
