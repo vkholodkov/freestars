@@ -84,6 +84,11 @@ Fleet::~Fleet()
 		delete mOrders[i];
 }
 
+void Fleet::VisitStacks(function<void(const Stack&)> f) const
+{
+  std::for_each(mStacks.begin(), mStacks.end(), [=](const Stack &s) { f(s); });
+}
+
 void Fleet::ResetDefaults()
 {
 	// set all Calculated Values to defaults
@@ -1000,7 +1005,7 @@ void Fleet::MoveArrive()
 	}
 
 	if (mRepeatOrders) {
-		WayOrder * wonew = new WayOrder(*wo);
+		WayOrder * wonew = wo->Copy();
 		mOrders.push_back(wonew);
 	}
 
@@ -1158,11 +1163,9 @@ void Fleet::Refuel(const Planet * p)
 
 double Fleet::GetFuelUsage(long speed) const
 {
-	double MinUsage = -1;
-	double MinUsageDone = 0;
-	long MinUsageCapacity = 0;
-	double Result = 0;
-	long CargoLeft = GetCargoMass();
+	double Result = 0; // Resulting fuel usage
+	long CargoLeft = GetCargoMass(); // Leftover cargo for which usage has not been added yet
+  deque<const Stack*> leftovers;
 
 	// first calc everything where we know it's cargo
 	deque<Stack>::const_iterator iter;
@@ -1178,37 +1181,32 @@ double Fleet::GetFuelUsage(long speed) const
 					iter->GetCount() *
 					(iter->GetDesign()->GetMass() + iter->GetDesign()->GetCargoCapacity()) *
 					GetOwner()->FuelFactor();
-			CargoLeft -= iter->GetDesign()->GetCargoCapacity() * iter->GetCount();
+			if (CargoLeft > 0)
+        CargoLeft -= min(CargoLeft, iter->GetDesign()->GetCargoCapacity() * iter->GetCount());
 		} else {
 			// potentially partially full ships, calc with empty load, add fuel for cargo later
 			Result += iter->GetDesign()->GetFuelUsage(speed) *
 					iter->GetCount() *
 					iter->GetDesign()->GetMass() *
 					GetOwner()->FuelFactor();
+      leftovers.push_back(&*iter);
 		}
 	}
 
 	// pay for any left over cargo
-	while (CargoLeft > 0) {
-		for (iter = mStacks.begin(); iter != mStacks.end(); ++iter) {
-			if (iter->GetDesign()->GetFreeSpeed() <= speed)
-				;	// already done
-			else if (iter->GetDesign()->GetCargoCapacity() == 0)
-				;	// can't carry cargo, fuel for hull already done
-			else {
-				double usage = iter->GetDesign()->GetFuelUsage(speed);
-				if (usage > MinUsageDone && (MinUsage == -1 || usage < MinUsage)) {
-					MinUsage = usage;
-					MinUsageCapacity = iter->GetDesign()->GetCargoCapacity() * iter->GetCount();
-				}
-			}
-		}
+  sort(leftovers.begin(), leftovers.end(), [&](const Stack *a, const Stack *b) {
+    return a->GetDesign()->GetFuelUsage(speed) < b->GetDesign()->GetFuelUsage(speed);
+  });
 
-		Result += MinUsage * MinUsageCapacity * GetOwner()->FuelFactor();
-		CargoLeft -= min(CargoLeft, MinUsageCapacity);
-		MinUsageDone = MinUsage;
-		MinUsage = -1;
-	}
+  while (CargoLeft > 0 && !leftovers.empty()) {
+    const Stack *l = leftovers.front();
+    double usage = l->GetDesign()->GetFuelUsage(speed);
+    auto capacity = l->GetDesign()->GetCargoCapacity() * l->GetCount();
+
+    Result += usage * capacity * GetOwner()->FuelFactor();
+    CargoLeft -= min(CargoLeft, capacity);
+    leftovers.pop_front();
+  }
 
 	return Result / 200.0;
 }
@@ -1447,6 +1445,13 @@ void Fleet::SetBattlePlan(long bp)
 		NCGetOwner()->AddOrder(new TypedOrder<long>(&mBattlePlan, AddLong, "BattlePlan"));
 
 	mBattlePlan = bp;
+}
+
+void Fleet::CopyOrdersFrom(const Fleet *other)
+{
+  for_each(other->mOrders.begin(), other->mOrders.end(), [=](const WayOrder *wo) {
+    mOrders.push_back(wo->Copy());
+  });
 }
 
 void Fleet::SetStartOrders(Planet * planet)

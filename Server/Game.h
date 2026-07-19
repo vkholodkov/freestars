@@ -45,6 +45,8 @@ class RacialTrait;
 class Creation;
 class MineField;
 
+typedef function<void (const deque<SpaceObject*>&)> ConstTopObjectVisitor;
+
 /**
  * The game object.
  */
@@ -133,6 +135,15 @@ public:
 	void DetonateMineField(const MineField * mf);
 	SpaceObject * GetPatrolTarget(const Fleet * persuer, int range) const;
 
+  VictoryConditions *GetVictoryConditions() const { return VC.get(); };
+  void VisitTopObjects(ConstTopObjectVisitor visitor) const {
+    for_each(mTopObjects.begin(), mTopObjects.end(), [&](const deque<SpaceObject*> *list) {
+        if(list != nullptr) {
+            visitor(*list);
+        }
+    });
+  }
+
 	virtual Component * ObjectFactory(const Component *);
 	virtual Player * ObjectFactory(const Player *, int PlayerNumber);
 	virtual Race * ObjectFactory(const Race *);
@@ -172,7 +183,7 @@ protected:
 
 	Galaxy *galaxy;
 	Creation * mCreation;
-    VictoryConditions *VC;
+  unique_ptr<VictoryConditions> VC;
 };
 
 // turn phases

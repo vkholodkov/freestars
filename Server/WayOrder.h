@@ -68,9 +68,8 @@ enum OrderType
 class WayOrder {
 public:
 	WayOrder(Location * loc, bool ForMeOnly = false) : mLoc(loc), mForMeOnly(ForMeOnly), mSpeed(0), mOrder(OT_NONE) {}
-	WayOrder(const WayOrder & copy);
 	virtual ~WayOrder();
-	TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 
 	OrderType GetType() const	{ return mOrder; }
 	void SetType(OrderType ot)	{ mOrder = ot; }
@@ -82,7 +81,11 @@ public:
 
 	WayOrder * Copy() const;
 
+  static bool HasArguments(OrderType ot) { return ot >= OT_MERGE; }
+
 protected:
+	WayOrder(const WayOrder & copy);
+
 	Location * mLoc;
 	bool mForMeOnly;	// true if mLoc is For Me Only, and I need to delete it when done.
 	long mSpeed;		// -1 to gate
@@ -100,7 +103,7 @@ public:
 	WayOrderNumber(long number, Location * loc, bool ForMeOnly = false) : WayOrder(loc, ForMeOnly), mNumber(number) {}
 	WayOrderNumber(const WayOrderNumber & copy) : WayOrder(copy), mNumber(copy.mNumber) {}
 	virtual ~WayOrderNumber();
-	TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 	long GetNumber() const	{ return mNumber; }
 
 protected:
@@ -116,7 +119,7 @@ public:
 	WayOrderPatrol(long speed, long range, Location * loc, bool ForMeOnly = false) : WayOrder(loc, ForMeOnly), mPatrolSpeed(speed), mRange(range) {}
 	WayOrderPatrol(const WayOrderPatrol & copy) : WayOrder(copy), mPatrolSpeed(copy.mPatrolSpeed), mRange(copy.mRange) {}
 	virtual ~WayOrderPatrol();
-	TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
 	long GetPatrolSpeed() const		{ return mPatrolSpeed; }
 	long GetPatrolRange() const		{ return mRange; }
 	
@@ -135,9 +138,10 @@ public:
 	WayOrderTransport(const WayOrderTransport & copy);
 	virtual ~WayOrderTransport();
 	bool ParseNode(const TiXmlNode * node, Player * player);
-	TiXmlNode * WriteNode(TiXmlNode * node) const;
-	TransferType GetAction(int i) const	{ return actions[i]; }
-	long GetValue(int i) const			{ return values[i]; }
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	TransferType GetAction(int i) const	{ return actions[i-FUEL]; }
+	void SetAction(int i, TransferType action) { actions[i-FUEL] = action; }
+	long GetValue(int i) const			{ return values[i-FUEL]; }
 
 protected:
 	deque<TransferType> actions;

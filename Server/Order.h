@@ -318,5 +318,32 @@ private:
 	Player * mPlayer;
 	long mSlot;
 };
+
+/**
+ * Split order.
+ * @ingroup Server
+ */
+class SplitMergeOrder : public Order {
+public:
+	SplitMergeOrder(Player * p, Fleet * from, Fleet * to, const Ship * design, long number, long damaged)
+		: Order(), mPlayer(p), mFrom(from), mTo(to), mDesign(design), mNumber(number), mDamaged(damaged) {}
+
+	virtual bool DoUndo();
+	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;
+	virtual bool Replaces(const Order *_old) {
+		const SplitMergeOrder *o = dynamic_cast<const SplitMergeOrder*>(_old);
+		return o != NULL && this->mPlayer == o->mPlayer
+			&& this->mFrom == o->mFrom && this->mTo == o->mTo
+      && this->mDesign == o->mDesign && this->mNumber == o->mNumber
+      && this->mDamaged == o->mDamaged;
+	}
+  virtual void Replace(const Order*);
+
+private:
+	Player * mPlayer;
+	Fleet * mFrom, * mTo;
+  const Ship * mDesign;
+	long mNumber, mDamaged;
+};
 }
 #endif // !defined(FreeStars_Order_h)

@@ -145,7 +145,13 @@ void ResearchDialog::setResearchField(QAbstractButton *button)
         estTimeLabel->setText(tr("Never"));
     }
 
-    lastYearResourcesLabel->setText(tr("N/A"));
+    long progress = 0;
+
+    for(long researchField = 0 ; researchField < Rules::MaxTechType ; researchField++) {
+        progress += player->TechProgress(researchField);
+    }
+
+    lastYearResourcesLabel->setText(progress > 0 ? tr("%0").arg(progress) : tr("N/A"));
 }
 
 void ResearchDialog::setResearchTax(int tax)

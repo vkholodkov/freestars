@@ -26,15 +26,7 @@ FleetWaypointsWidget::FleetWaypointsWidget(Fleet *_fleet, const Player *_player,
 
     for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
         waypointListBox->addItem(getLocationName((*o)->GetLocation()));
-        this->orders.push_back(new WayOrder(**o));
-    }
-
-    if(orders.size()) {
-      waypointListBox->setCurrentRow(0);
-      wayorderSelected(0);
-    }
-    else {
-      wayorderSelected(-1);
+        this->orders.push_back((*o)->Copy());
     }
 
     waypointListBox->installEventFilter(this);
@@ -53,6 +45,16 @@ FleetWaypointsWidget::~FleetWaypointsWidget()
 {
     for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
         delete *o;
+    }
+}
+
+void FleetWaypointsWidget::updateInitlalSelection()
+{
+    if(orders.size()) {
+      waypointListBox->setCurrentRow(0);
+    }
+    else {
+      wayorderSelected(-1);
     }
 }
 
@@ -80,6 +82,17 @@ void FleetWaypointsWidget::wayorderAdded(const Location *location)
     int row = waypointListBox->currentRow();
 
     if(row >= 0 && row < orders.size()) {
+
+        if(*orders[row]->GetLocation() == *location) {
+            return;
+        }
+
+        if(row < orders.size()-1) {
+            if(*orders[row+1]->GetLocation() == *location) {
+                return;
+            }
+        }
+
         waypointListBox->insertItem(row + 1, getLocationName(location));
         waypointListBox->setCurrentRow(row + 1);
 
@@ -98,6 +111,7 @@ void FleetWaypointsWidget::wayorderAdded(const Location *location)
 
 void FleetWaypointsWidget::wayorderSelected(int row)
 {
+    std::cout << "FleetWaypointsWidget::wayorderSelected " << row << std::endl;
     if(row >= 0 && row < orders.size()) {
         auto order = orders[row];
         auto speed = order->GetSpeed();
@@ -142,6 +156,7 @@ void FleetWaypointsWidget::wayorderSelected(int row)
         ui_FleetWaypointsWidget.travelTimeLabel->show();
         ui_FleetWaypointsWidget.travelTimeValueLabel->show();
 
+        std::cout << "FleetWaypointsWidget::selectWayorder " << row << std::endl;
         emit selectWayorder(orders[row]);
     }
     else {
@@ -190,7 +205,7 @@ void FleetWaypointsWidget::changeWayorderList()
     orderList.SetFleet(fleet->GetID());
 
     for(std::deque<WayOrder*>::const_iterator o = orders.begin() ; o != orders.end() ; o++) {
-        orderList.GetOrders().push_back(new WayOrder(**o));
+        orderList.GetOrders().push_back((*o)->Copy());
     }
 
     fleet->ChangeWaypoints(orderList);

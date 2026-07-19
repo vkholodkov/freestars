@@ -28,7 +28,6 @@ public:
     GameView(Game*, Player*, const GraphicsArray*);
     ~GameView();
 
-    void setupMessages();
     void displayMessage(const Message&);
 
     const Game *getGame() const { return game; }
@@ -49,9 +48,6 @@ public slots:
     void selectWayorder(const WayOrder*);
     void listObjectsInLocation(const SpaceObject*, const QPoint&);
     void renameObject(const SpaceObject*);
-
-    void nextMessage();
-    void prevMessage();
 
     void nextObject();
     void prevObject();
@@ -89,14 +85,12 @@ private:
     const GraphicsArray *graphicsArray;
     std::vector<Message*> messages;
     PlanetProductionWidget *planetProductionWidget;
-    Ui_MessageWidget ui_MessageWidget;
     Ui_StatusSelector ui_StatusSelector;
     Ui_MineralsOnHandWidget ui_MineralsOnHandWidget;
     Ui_PlanetStatusWidget ui_PlanetStatusWidget;
     MapView *mapView;
     QScrollArea *mapScroller;
     QLayout *verticalFlowLayout;
-    unsigned currentMessage;
     unsigned currentObject;
     const SpaceObject *currentSelection;
     std::vector<const SpaceObject*> currentStack;

@@ -887,7 +887,14 @@ void Player::ParseOrders(const TiXmlNode * orders)
 				int number = GetLong(child->FirstChild("Number"));
 				int damaged = GetLong(child->FirstChild("Damaged"));
 				ffrom->MergeTo(fto, design, number, damaged);
+
+        if (mWriteXFile)
+          AddOrder(new SplitMergeOrder(this, ffrom, fto, design, number, damaged));
 			}
+
+      if(fto->GetOrders().empty()) {
+        fto->CopyOrdersFrom(ffrom);
+      }
 
 			if (ffrom->IsEmpty()) {
 				DeleteFleet(ffrom);
@@ -896,6 +903,9 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			if (fto->IsEmpty()) {
 				DeleteFleet(fto);
 			}
+      else {
+        game->AddAlsoHere(fto);
+      }
 		} else if (stricmp(node->Value(), "Transfer") == 0) {
 			child = node->FirstChild("Owned");
 			CargoHolder * owned = ParseTransport(child, NULL);
@@ -1072,25 +1082,20 @@ CargoHolder * Player::ParseTransport(const TiXmlNode * node, const CargoHolder *
 
 void Player::TransferCargo(CargoHolder * owned, CargoHolder * other, long pop, long fuel, deque<long> & cargo, bool write/*= true*/)
 {
+
+  // First unload
 	if (pop < 0) {
 		pop = -pop;
 		other->TransferCargo(owned, POPULATION, &pop, this);
 		pop = -pop;
 	}
-  else if(pop > 0) { 
-		owned->TransferCargo(other, POPULATION, &pop, this);
-  }
 
 	if (fuel < 0) {
 		fuel = -fuel;
 		other->TransferCargo(owned, FUEL, &fuel, this);
 		fuel = -fuel;
 	}
-  else if(fuel > 0) {
-		owned->TransferCargo(other, FUEL, &fuel, this);
-  }
 
-  // First unload
 	for (int i = 0; i < Rules::MaxMinType; ++i) {
 		if (cargo[i] < 0) {
 			cargo[i] = -cargo[i];
@@ -1100,6 +1105,14 @@ void Player::TransferCargo(CargoHolder * owned, CargoHolder * other, long pop, l
 	}
 
   // Then load
+  if(pop > 0) { 
+		owned->TransferCargo(other, POPULATION, &pop, this);
+  }
+
+  if(fuel > 0) {
+		owned->TransferCargo(other, FUEL, &fuel, this);
+  }
+
 	for (int i = 0; i < Rules::MaxMinType; ++i) {
     if(cargo[i] > 0) {
 			owned->TransferCargo(other, i, &cargo[i], this);
@@ -1108,6 +1121,41 @@ void Player::TransferCargo(CargoHolder * owned, CargoHolder * other, long pop, l
 
 	if (write && mWriteXFile)
 		AddOrder(new TransportOrder(this, owned, other, pop, fuel, cargo));
+}
+
+void Player::SplitAll(Fleet *fleet)
+{
+  for(int j = 0 ; j != fleet->GetStacks() ; j++) {
+
+    Stack *s = fleet->GetStack(j);
+    int count = s->GetCount();
+
+    for(int k = j == 0 ? 1 : 0 ; k < count ; k++) { 
+
+      long newID = -1;
+      for (long i = 0; i < Rules::MaxFleets; ++i) {
+        if (mFleets[i] == NULL) {
+          newID = i;
+          break;
+        }
+      }
+
+      if(newID == -1) {
+        return;
+      }
+
+      mFleets[newID] = new Fleet(newID+1, *fleet);
+      fleet->MergeTo(mFleets[newID], s->GetDesign(), 1, s->GetDamaged() > 0 ? 1 : 0);
+      mFleets[newID]->CopyOrdersFrom(fleet);
+      game->AddAlsoHere(mFleets[newID]);
+
+      if (mWriteXFile)
+        AddOrder(new SplitMergeOrder(this, fleet, mFleets[newID], s->GetDesign(), 1, s->GetDamaged() > 0 ? 1 : 0));
+    }
+	}
+
+#if 0
+#endif
 }
 
 long Player::ForEachFleet(Fleet::FuncType func, bool arg)
@@ -1158,6 +1206,7 @@ void Player::BuildShips(Planet * planet, long Type, long number)
 
 	mess->AddItem("Ship name", GetShipDesign(Type)->GetName());
 	mess->AddLong("Number built", number);
+	mess->AddItem("Planet", planet);
 
 	mShipDesigns[Type-1]->IncrementBuilt(number);
 }

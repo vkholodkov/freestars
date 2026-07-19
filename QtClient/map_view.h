@@ -86,8 +86,9 @@ private:
     void valuePlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void populationPlanetDrawer(QPainter&, const Planet*, const QPoint&);
     void noInfoPlanetDrawer(QPainter&, const Planet*, const QPoint&);
+    void fleetDrawer(QPainter&, const Fleet*, const QPoint&);
     void collectTracks(std::list<track_t>&);
-    void collectScanAreas(std::list<scan_area_t>&);
+    void collectScanAreas(std::list<scan_area_t>&, bool penetrating = false);
 
 private:
     static void (MapView::*planetDrawers[])(QPainter&, const Planet*, const QPoint&);

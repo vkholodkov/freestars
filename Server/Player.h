@@ -53,6 +53,8 @@ class ProductionOrder;
 class MultipleOrder;
 class Game;
 
+static const unsigned long BASE_DESIGN_NONE = -1;
+
 /**
  * Player.
  * @ingroup Server
@@ -76,6 +78,7 @@ public:
 	void ParseOrders(const TiXmlNode * node);
 	CargoHolder * ParseTransport(const TiXmlNode * node, const CargoHolder * owned);
 	void TransferCargo(CargoHolder * from, CargoHolder * to, long pop, long fuel, deque<long> & cargo, bool write = true);
+  void SplitAll(Fleet*);
 	void ParseMessages(const TiXmlNode * node);
 	void ResetSeen();
 	void SetSeenDesign(long p, long design, bool base);

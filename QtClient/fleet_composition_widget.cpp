@@ -49,8 +49,8 @@ void FleetCompositionWidget::setFleet(const Fleet *_fleet)
               .arg(cloaked));
       }
 
-      ui_FleetCompositionWidget.splitButton->setEnabled(_fleet->GetStacks() > 1);
-      ui_FleetCompositionWidget.splitAllButton->setEnabled(_fleet->GetStacks() > 1);
+      ui_FleetCompositionWidget.splitButton->setEnabled(_fleet->GetStacks() > 1 || _fleet->GetStack(0)->GetCount() > 1);
+      ui_FleetCompositionWidget.splitAllButton->setEnabled(_fleet->GetStacks() > 1 || _fleet->GetStack(0)->GetCount() > 1);
     }
 }
 

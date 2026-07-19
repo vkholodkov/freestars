@@ -118,5 +118,8 @@ protected:
 	void GoingAwayNotifyChasers(); ///< Inform chasers that this SpaceObject is going away.
   long mReportYear;
 };
+
+typedef function<void (const SpaceObject*)> ConstSpaceObjectVisitor;
+
 }
 #endif // !defined(FreeStars_SpaceObject_h)

@@ -24,6 +24,8 @@ public:
     FleetWaypointsWidget(Fleet*, const Player*, QWidget *parent = 0);
     ~FleetWaypointsWidget();
 
+    void updateInitlalSelection();
+
 signals:
     void selectWayorder(const WayOrder*);
     void clearSelection();

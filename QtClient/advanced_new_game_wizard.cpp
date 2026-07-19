@@ -69,7 +69,7 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
         playerButtonsMapper->setMapping(b, i);
         raceLabels[i] = raceLabel;
 
-        connect(b, SIGNAL(clicked(bool)), playerButtonsMapper, SLOT(map()));
+        connect(b, SIGNAL(clicked()), playerButtonsMapper, SLOT(map()));
     }
 
     page2->setLayout(page2Layout);
@@ -100,7 +100,7 @@ AdvancedNewGameWizard::AdvancedNewGameWizard(QWidget *parent)
     victoryConditionsMapper->addMapping(page3.capShipsBox, 6);
     victoryConditionsMapper->addMapping(page3.highScoreAtBox, 7);
     victoryConditionsMapper->addMapping(page3.countBox, 8);
-    victoryConditionsMapper->addMapping(page3.starsBox, 9);
+    victoryConditionsMapper->addMapping(page3.startBox, 9);
 
     QWidget *buttonsPane = new QWidget;
 
@@ -197,10 +197,14 @@ void AdvancedNewGameWizard::finishClicked(bool)
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Game Definition File"),
                                                     gameDir,
-                                                    tr("Game Definition Files (*.def)"));
+                                                    tr("Game Host Files (*.hst)"));
 
     if(fileName.isNull()) {
       return;
+    }
+
+    if(!fileName.endsWith(".hst")) {
+        fileName.append(".hst");
     }
 
     game->SetFileLocation(fileName.toUtf8().constData());

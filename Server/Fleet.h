@@ -34,6 +34,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 #include <string>
 #include <deque>
+#include <functional>
 using namespace std;
 
 #include "Rules.h"
@@ -192,8 +193,10 @@ public:
 	int GetStacks() const	{ return mStacks.size(); }
 	const Stack * GetStack(int i) const	{ return &mStacks[i]; }
 	Stack * GetStack(int i)				{ return &mStacks[i]; }
+  void VisitStacks(function<void(const Stack&)>) const;
 	const deque<WayOrder *> & GetOrders() const		{ return mOrders; }
 	deque<WayOrder *> & GetOrders() { return mOrders; }
+  void CopyOrdersFrom(const Fleet*);
 	const WayOrder* GetFirstOrder() { return mOrders[0]; }
 	void SetStartOrders(Planet * planet);
 	void SetNextRoute(Planet * planet);

@@ -31,10 +31,10 @@ OrderTemplateListModel::OrderTemplateListModel(const Planet *_planet, QObject *p
   }
   else {
     for(auto n = 0 ; n != Rules::GetConstant("MaxBaseDesigns") ; n++) {
-      auto baseDesign = owner->GetBaseDesign(n + 1);
+      auto baseDesign = owner->GetBaseDesign(n);
 
       if(baseDesign) {
-        order_template_list.push_back(new POBase(n + 1));
+        order_template_list.push_back(new POBase(n));
       }
     }
   }

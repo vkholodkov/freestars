@@ -10,7 +10,6 @@
 
 #include "game_view.h"
 
-#include "message_formatter.h"
 #include "folding_widget.h"
 #include "vertical_flow_layout.h"
 #include "space_object_sorter.h"
@@ -29,6 +28,7 @@
 #include "ship_design_dialog.h"
 #include "race_wizard.h"
 #include "merge_fleets_dialog.h"
+#include "message_widget.h"
 
 #include "ui_planet_widget.h"
 #include "ui_starbase_widget.h"
@@ -46,7 +46,6 @@ GameView::GameView(Game *_game, Player *_player, const GraphicsArray *_graphicsA
     , mapView(0)
     , mapScroller(0)
     , verticalFlowLayout(0)
-    , currentMessage(0)
     , currentSelection(0)
 {
     mapView = new MapView(game->GetGalaxy(), game, _player);
@@ -64,8 +63,7 @@ GameView::GameView(Game *_game, Player *_player, const GraphicsArray *_graphicsA
     verticalFlowLayout = new VerticalFlowLayout(3, 3, 2);
     container->setLayout(verticalFlowLayout);
 
-    QWidget *messageWidget = new QWidget;
-    ui_MessageWidget.setupUi(messageWidget);
+    auto messageWidget = new MessageWidget(_player, this);
 
     QWidget *statusSelector = new QWidget;
     ui_StatusSelector.setupUi(statusSelector);
@@ -86,7 +84,7 @@ GameView::GameView(Game *_game, Player *_player, const GraphicsArray *_graphicsA
     this->setStretchFactor(0, 1);
     this->setStretchFactor(1, 1);
 
-    setupMessages();
+    messageWidget->setupMessages(player->GetMessages());
 
     unsigned num_planets = game->GetGalaxy()->GetPlanetCount();
 
@@ -104,28 +102,12 @@ GameView::GameView(Game *_game, Player *_player, const GraphicsArray *_graphicsA
     connect(mapView, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
     connect(mapView, SIGNAL(listObjectsInLocation(const SpaceObject*, const QPoint&)),
         this, SLOT(listObjectsInLocation(const SpaceObject*, const QPoint&)));
+    connect(messageWidget, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
 }
 
 GameView::~GameView()
 {
     delete game;
-}
-
-void GameView::setupMessages() {
-    const deque<Message *> &_messages = player->GetMessages();
-
-    messages.reserve(_messages.size());
-
-    for(deque<Message *>::const_iterator i = _messages.begin() ; i != _messages.end() ; i++) {
-        messages.push_back(*i);
-    }
-
-    connect(ui_MessageWidget.nextButton, SIGNAL(clicked()), this, SLOT(nextMessage()));
-    connect(ui_MessageWidget.prevButton, SIGNAL(clicked()), this, SLOT(prevMessage()));
-
-    currentMessage = 0;
-
-    displayMessage(*messages[currentMessage]);
 }
 
 void GameView::setBriefSelection(const Planet *_planet) {
@@ -160,8 +142,9 @@ void GameView::setBriefSelection(const Planet *_planet) {
         }
 
         if(seen & SEEN_PLANETPOP) {
-            ui_PlanetReport.popLabel->setText(tr("Population: %0")
-                .arg(_planet->GetDisplayPop()));
+            auto text = _planet->GetPopulation() > 0 ? tr("Population: %0")
+                .arg(_planet->GetDisplayPop()) : tr("Uninhabited");
+            ui_PlanetReport.popLabel->setText(text);
         }
 
         if(seen & SEEN_PLANETHAB) {
@@ -230,13 +213,17 @@ void GameView::setBriefSelection(const Fleet *_fleet) {
     QWidget *newPage = new QWidget;
     Ui_FleetReport ui_FleetReport;
     ui_FleetReport.setupUi(newPage);
-#if 0
-    const Stack *stack = _fleet->GetStack(0);
-    const Ship *ship = stack->GetDesign();
 
-    ui_FleetReport.shipAvatarWidget->setGraphicsArray(graphicsArray);
-    ui_FleetReport.shipAvatarWidget->setHullName(ship->GetHull()->GetName().c_str());
+    if(_fleet->GetStacks() > 0) {
+        const Stack *stack = _fleet->GetStack(0);
+        const Ship *ship = stack->GetDesign();
+
+        ui_FleetReport.shipAvatarWidget->setGraphicsArray(graphicsArray);
+#if 0
+        ui_FleetReport.shipAvatarWidget->setHullName(ship->GetHull()->GetName().c_str());
 #endif
+    }
+
     statusBed->addWidget(newPage);
 
     currentSelection = _fleet;
@@ -423,6 +410,7 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
     connect(fleetCargoWidget, SIGNAL(exchangeCargo(const Planet*, const Fleet*)),
         this, SLOT(exchangeCargo(const Planet*, const Fleet*)));
     connect(this, SIGNAL(cargoUpdated()), fleetCargoWidget, SLOT(cargoUpdated()));
+    connect(this, SIGNAL(fleetCompositionChanged()), fleetCargoWidget, SLOT(cargoUpdated()));
 
     /*
      * Fleet composition widget
@@ -439,6 +427,10 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
         this, SLOT(mergeFleet(const Fleet*)));
 
     fleetCompositionWidget->setFleet(_fleet);
+
+    connect(this, &GameView::fleetCompositionChanged, fleetCompositionWidget, [=]() {
+        fleetCompositionWidget->setFleet(_fleet);
+    });
 
     /*
      * Fleet waypoints widget
@@ -465,6 +457,8 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
         waypointTaskWidget, SLOT(clearWayorder()));
     connect(waypointTaskWidget, SIGNAL(wayorderChanged(WayOrder*)),
         fleetWaypointsWidget, SLOT(changeWayorder(WayOrder*)));
+
+    fleetWaypointsWidget->updateInitlalSelection();
 }
 
 void GameView::clearBriefSelection()
@@ -600,36 +594,6 @@ void GameView::renameObject(const SpaceObject *o)
     std::cout << "GameView::renameObject o=" << o << std::endl;
 }
 
-void GameView::displayMessage(const Message &_message) {
-    MessageFormatter messageFormatter(player);
-    _message.ApplyVisitor(messageFormatter);
-    ui_MessageWidget.messagePane->setText(messageFormatter.toString());    
-    ui_MessageWidget.titleLabel->setText(tr("Year %0   Messages: %1 of %2")
-        .arg(game->GetTurn())
-        .arg(currentMessage + 1)
-        .arg(messages.size()));
-    
-    ui_MessageWidget.nextButton->setEnabled(currentMessage < messages.size()-1);
-    ui_MessageWidget.gotoButton->setEnabled(false);
-    ui_MessageWidget.prevButton->setEnabled(currentMessage > 0);
-}
-
-void GameView::nextMessage()
-{
-    if(currentMessage < messages.size()-1) {
-        currentMessage++;
-        displayMessage(*messages[currentMessage]);
-    }
-}
-
-void GameView::prevMessage()
-{
-    if(currentMessage > 0) {
-        currentMessage--;
-        displayMessage(*messages[currentMessage]);
-    }
-}
-
 void GameView::nextObject()
 {
     if(currentSelection != NULL) {
@@ -668,12 +632,12 @@ void GameView::changeProductionQueue(const Planet *planet)
 void GameView::clearProductionQueue(const Planet *planet)
 {
     if(QMessageBox::question(this, tr("Clear Planet Production Queue"), tr("Are you sure " \
-      "want to remove all orders from the production queue of this planet." \
+      "want to delete everything in this planet's production?" \
       ""), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-      std::deque<ProdOrder*> empty;
-      const_cast<Planet*>(planet)->SetProduction(empty);
-      emit productionQueueChanged(planet);
+        std::deque<ProdOrder*> empty;
+        const_cast<Planet*>(planet)->SetProduction(empty);
+        emit productionQueueChanged(planet);
     }
 }
 
@@ -696,9 +660,10 @@ void GameView::splitFleet(const Fleet *_fleet)
     std::cout << "GameView::splitFleet fleet=" << _fleet << std::endl;
 }
 
-void GameView::splitAllFleet(const Fleet *_fleet)
+void GameView::splitAllFleet(const Fleet *fleet)
 {
-    std::cout << "GameView::splitAllFleet fleet=" << _fleet << std::endl;
+    player->SplitAll(const_cast<Fleet*>(fleet));
+    emit fleetCompositionChanged();
 }
 
 void GameView::mergeFleet(const Fleet *_fleet)

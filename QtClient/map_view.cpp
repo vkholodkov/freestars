@@ -57,6 +57,14 @@ static const char * cross_xpm[] = {
 "                ",
 "                "};
 
+bool IsPlanet(SpaceObject *o) {
+    return dynamic_cast<Planet*>(o) != nullptr;
+}
+
+bool IsFleet(SpaceObject *o) {
+    return dynamic_cast<Fleet*>(o) != nullptr;
+}
+
 MapView::MapView(const Galaxy *_galaxy, const Game *_game, const Player *_player, QWidget *parent)
     : QWidget(parent)
     , arrow_up(QPixmap(arrow_up_xpm), 8, 0)
@@ -140,26 +148,26 @@ const SpaceObject *MapView::findSelection(const QPoint &selectionPos) const {
     double min_distance = std::numeric_limits<double>::max();
     const SpaceObject *selection = NULL;
 
-    unsigned num_planets = galaxy->GetPlanetCount();
+    game->VisitTopObjects([&](const deque<SpaceObject*> &list) {
+        if(!list.empty()) {
+            auto so = list.front();
 
-    for(unsigned n = 1 ; n <= num_planets ; n++) {
-        const Planet *planet = galaxy->GetPlanet(n);
+            QPoint pos(galaxyToScreen(QPoint(so->GetPosX(), so->GetPosY())));
 
-        QPoint pos(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())));
+            double dx = abs(selectionPos.x() - pos.x());
+            double dy = abs(selectionPos.y() - pos.y());
 
-        double dx = abs(selectionPos.x() - pos.x());
-        double dy = abs(selectionPos.y() - pos.y());
+            double distance = ::sqrt(dx * dx + dy * dy);
 
-        double distance = ::sqrt(dx * dx + dy * dy);
-
-        if(distance < min_distance) {
-            min_distance = distance;
-            selection = planet;
+            if(distance < min_distance) {
+                min_distance = distance;
+                selection = so;
+            }
         }
-    }
+    });
 
     if(min_distance > 20) {
-        selection = NULL;
+        selection = nullptr;
     }
 
     return selection;
@@ -185,15 +193,22 @@ void MapView::paintEvent(QPaintEvent *event)
     painter.fillRect(rect, Qt::black);
 
     std::list<track_t> tracks;
-    std::list<scan_area_t> scan_areas;
+    std::list<scan_area_t> scan_areas, pen_scan_areas;
 
     collectTracks(tracks);
     collectScanAreas(scan_areas);
+    collectScanAreas(pen_scan_areas, true);
 
     for (std::list<scan_area_t>::const_iterator i = scan_areas.begin(); i != scan_areas.end(); i++) {
         QPainterPath path;
         path.addEllipse(i->first, i->second / 10, i->second / 10);
         painter.fillPath(path, QBrush(QColor(143, 29,12)));
+    }
+
+    for (auto sa : pen_scan_areas) {
+        QPainterPath path;
+        path.addEllipse(sa.first, sa.second / 10, sa.second / 10);
+        painter.fillPath(path, QBrush(QColor(76, 76, 0)));
     }
 
     painter.setPen(Qt::blue);
@@ -206,15 +221,30 @@ void MapView::paintEvent(QPaintEvent *event)
         drawArrow(painter, galaxyToScreen(QPoint(selection->GetPosX(), selection->GetPosY())));
     }
 
-    unsigned num_planets = galaxy->GetPlanetCount();
+    /*
+     * Draw objects
+     */
+    game->VisitTopObjects([&](const deque<SpaceObject*> &list) {
+      auto pi = std::find_if(list.begin(), list.end(), IsPlanet);
+      if(pi != list.end()) {
+          const Planet *planet = dynamic_cast<const Planet*>(*pi);
 
-    for(unsigned n = 1 ; n <= num_planets ; n++) {
-        const Planet *planet = galaxy->GetPlanet(n);
+          QPoint pos(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())));
 
-        QPoint pos(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())));
+          (this->*planetDrawers[mapMode])(painter, planet, pos);
+          return;
+      }
 
-        (this->*planetDrawers[mapMode])(painter, planet, pos);
-    }
+      auto fi = std::find_if(list.begin(), list.end(), IsFleet);
+      if(fi != list.end()) {
+          for(auto so : list) {
+              const Fleet *fleet = dynamic_cast<const Fleet*>(*fi);
+              if(fleet != nullptr) {
+                  fleetDrawer(painter, fleet, galaxyToScreen(QPoint(fleet->GetPosX(), fleet->GetPosY())));
+              }
+          }
+      }
+    });    
 }
 
 void MapView::normalPlanetDrawer(QPainter &painter, const Planet *planet, const QPoint &pos)
@@ -342,6 +372,22 @@ void MapView::noInfoPlanetDrawer(QPainter &painter, const Planet*, const QPoint 
     drawDot(painter, pos, Qt::gray);
 }
 
+void MapView::fleetDrawer(QPainter &painter, const Fleet *fleet, const QPoint &pos)
+{
+    bool owned = fleet->GetOwner() == player;
+
+    QPainterPath path;
+
+    path.moveTo(0, 2);
+    path.lineTo(5, -3);
+    path.lineTo(-5, -3);
+    path.lineTo(0, 2);
+
+    path.translate(pos);
+
+    painter.fillPath(path, QBrush(owned ? Qt::blue : Qt::red));
+}
+
 void MapView::drawDot(QPainter &painter, const QPoint &pos, const QColor &color)
 {
     painter.setPen(color);
@@ -400,7 +446,7 @@ void MapView::mousePressEvent(QMouseEvent *e)
             }
         }
         else {
-            const SpaceObject *newSelection = findSelection(e->pos());
+            const Location *newSelection = findSelection(e->pos());
 
             if(newSelection != NULL) {
                 emit waypointAdded(newSelection);
@@ -474,36 +520,28 @@ void MapView::collectTracks(std::list<track_t> &orders)
 {
     std::set<order_t> order_set;
 
-    unsigned num_planets = galaxy->GetPlanetCount();
+    game->VisitTopObjects([&](const deque<SpaceObject*> &list) {
+        for(auto so : list) {
+            const Fleet *fleet = dynamic_cast<const Fleet*>(so);
 
-    for (unsigned n = 1; n <= num_planets; n++) {
-        const Planet *planet = galaxy->GetPlanet(n);
+            if (fleet != nullptr && (fleet->SeenBy(player) & SEEN_ORDERS)) {
+                const std::deque<WayOrder *> &orders = fleet->GetOrders();
 
-        const std::deque<SpaceObject *> *alsoHere = planet->GetAlsoHere();
+                std::deque<QPoint> points;
 
-        if (alsoHere != NULL) {
-            for (std::deque<SpaceObject *>::const_iterator i = alsoHere->begin(); i != alsoHere->end() ; i++) {
-                const Fleet *fleet = dynamic_cast<const Fleet*>(*i);
+                for (std::deque<WayOrder*>::const_iterator oi = orders.begin(); oi != orders.end(); oi++) {
+                    points.push_back(galaxyToScreen(QPoint((*oi)->GetLocation()->GetPosX(), (*oi)->GetLocation()->GetPosY())));
 
-                if (fleet != NULL && (fleet->SeenBy(player) & SEEN_ORDERS)) {
-                    const std::deque<WayOrder *> &orders = fleet->GetOrders();
-
-                    std::deque<QPoint> points;
-
-                    for (std::deque<WayOrder*>::const_iterator oi = orders.begin(); oi != orders.end(); oi++) {
-                        points.push_back(galaxyToScreen(QPoint((*oi)->GetLocation()->GetPosX(), (*oi)->GetLocation()->GetPosY())));
-
-                        if (points.size() == 2) {
-                            order_set.insert(std::make_pair(
-                                std::make_pair(points[0].x(), points[0].y()),
-                                std::make_pair(points[1].x(), points[1].y())));
-                            points.pop_front();
-                        }
+                    if (points.size() == 2) {
+                        order_set.insert(std::make_pair(
+                            std::make_pair(points[0].x(), points[0].y()),
+                            std::make_pair(points[1].x(), points[1].y())));
+                        points.pop_front();
                     }
                 }
             }
         }
-    }
+    });
 
     for (std::set<order_t>::const_iterator i = order_set.begin(); i != order_set.end(); i++) {
         orders.push_back(std::make_pair(QPoint(i->first.first, i->first.second),
@@ -511,22 +549,42 @@ void MapView::collectTracks(std::list<track_t> &orders)
     }
 }
 
-void MapView::collectScanAreas(std::list<scan_area_t> &scan_areas)
+void MapView::collectScanAreas(std::list<scan_area_t> &scan_areas, bool penetrating)
 {
-    unsigned num_planets = galaxy->GetPlanetCount();
+    game->VisitTopObjects([&](const deque<SpaceObject*> &list) {
 
-    for (unsigned n = 1; n <= num_planets; n++) {
-        const Planet *planet = galaxy->GetPlanet(n);
+        long scanRange = 0;
 
-        if (planet->SeenBy(player) & SEEN_INSTALLATIONS) {
-            long scanRange = planet->GetScanSpace();
+        for(auto so : list) {
+            const Planet *planet = dynamic_cast<const Planet*>(so);
 
-            if (scanRange > 0) {
-                scan_areas.push_back(std::make_pair(galaxyToScreen(QPoint(planet->GetPosX(), planet->GetPosY())),
-                    galaxyToScreen(scanRange)));
+            if (planet != nullptr && planet->SeenBy(player) & SEEN_INSTALLATIONS) {
+
+                auto range = penetrating ? planet->GetScanPenetrating() : planet->GetScanSpace();
+
+                if(range > scanRange) {
+                    scanRange = range;
+                }
+            }
+
+            const Fleet *fleet = dynamic_cast<const Fleet*>(so);
+
+            if (fleet != nullptr && fleet->GetOwner() == player) {
+
+                auto range = penetrating ? fleet->GetScanPenetrating() : fleet->GetScanSpace();
+
+                if(range > scanRange) {
+                    scanRange = range;
+                }
             }
         }
-    }
+
+        if(!list.empty() && scanRange > 0) {
+            auto top = list.front();
+            scan_areas.push_back(std::make_pair(galaxyToScreen(QPoint(top->GetPosX(), top->GetPosY())),
+                galaxyToScreen(scanRange)));
+        }
+    });
 }
 
 };

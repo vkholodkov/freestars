@@ -233,4 +233,29 @@ TiXmlNode * BaseDesignOrder::WriteNode(TiXmlNode * node) const
 	return sdnode;
 }
 
+bool SplitMergeOrder::DoUndo()
+{
+	return true;
+}
+
+void SplitMergeOrder::Replace(const Order *_old) {
+}
+
+TiXmlNode * SplitMergeOrder::WriteNode(TiXmlNode * node) const
+{
+	TiXmlElement * splitMerge = new TiXmlElement("SplitMerge");
+  AddLong(splitMerge, "FromFleet", mFrom->GetID());
+  AddLong(splitMerge, "ToFleet", mTo->GetID());
+
+	TiXmlElement * ship = new TiXmlElement("Ship");
+  AddLong(ship, "Design", mPlayer->GetShipNumber(mDesign) + 1);
+  AddLong(ship, "Number", mNumber);
+  AddLong(ship, "Damaged", mDamaged);
+	splitMerge->LinkEndChild(ship);
+
+	node->LinkEndChild(splitMerge);
+
+	return splitMerge;
+}
+
 }

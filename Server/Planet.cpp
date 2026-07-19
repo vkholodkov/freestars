@@ -54,7 +54,7 @@ void Planet::Init()
 	mArtifactType = ARTI_NONE;
 	mArtifactAmount = 0;
 	mScrapRes = 0;
-	mBaseDesign = -1;
+	mBaseDesign = BASE_DESIGN_NONE;
 	mFactories = 0;
 	mMines = 0;
 	mDefenses = 0;
@@ -189,11 +189,11 @@ bool Planet::ParseNode(const TiXmlNode * node, Creation *creation, bool TrustInp
 		} else if ((mHomeWorld || bSecond) && creation != NULL) {
 			mBaseDesign = -2;	// special value to allow placement later
 		} else
-			mBaseDesign = -1;
+			mBaseDesign = BASE_DESIGN_NONE;
 
 		mBaseDamage = GetLong(node->FirstChild("BaseDamage"));
 		if (	mBaseDamage < 0 ||
-				(mBaseDesign == -1 && mBaseDamage != 0) ||
+				(mBaseDesign == BASE_DESIGN_NONE && mBaseDamage != 0) ||
 				(mBaseDamage > 0 && mBaseDamage > GetBaseDesign()->GetArmor(GetOwner()))
 			)
 		{
@@ -608,7 +608,7 @@ void Planet::Kill()
 	DeleteProdQ();
 	mPopulation = 0;
 	mScrapRes = 0;
-	mBaseDesign = -1;
+	mBaseDesign = BASE_DESIGN_NONE;
 	mScanner = false;
 	mDefenses = 0;
 	mRouteTo = NULL;
@@ -944,6 +944,11 @@ void Planet::DoProduction()
 	mBuiltMines = 0;
 	mBuiltDefenses = 0;
 	mBuiltAlchemy = 0;
+
+  if(resources == 0) {
+    // Nothing can be produced
+    return;
+  }
 
 	// Add UR resources
 	resources += (mScrapRes * resources) / (mScrapRes + resources);

@@ -46,6 +46,8 @@ SET(freestars_SOURCES
     cargo_transfer_dialog.cpp
     waypoint_task_widget.cpp
     merge_fleets_dialog.cpp
+    message_location_extractor.cpp
+    message_widget.cpp
 )
 
 SET(freestars_HEADERS
@@ -74,6 +76,8 @@ SET(freestars_HEADERS
     ship_describer.h
     waypoint_task_widget.h
     merge_fleets_dialog.h
+    message_location_extractor.h
+    message_widget.h
 )
 
 SET(freestars_FORMS
@@ -119,6 +123,7 @@ qt6_wrap_ui(UI_HEADERS ${freestars_FORMS})
 add_executable(fs-client-qt ${freestars_SOURCES} ${freestars_HEADERS} ${freestars_RESOURCES} ${UI_HEADERS})
 
 qt_add_translations(fs-client-qt
+  TS_FILES messages.ts
   SOURCES ${freestars_SOURCES} ${freestars_HEADERS} ${freestars_FORMS}
 )
 

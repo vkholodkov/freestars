@@ -37,7 +37,7 @@ Wormhole::Wormhole(Game *game)
     : SpaceObject(game)
 {
 	Init();
-	game->GetGalaxy()->GetWormholeID();
+	mID = game->GetGalaxy()->GetWormholeID();
 }
 
 Wormhole::Wormhole(const Wormhole &hole)

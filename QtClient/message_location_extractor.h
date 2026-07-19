@@ -1,20 +1,21 @@
 /*
- * Copyright (C) 2014 Valery Kholodkov
+ * Copyright (C) 2026 Valery Kholodkov
  */
 
-#ifndef _MESSAGE_COMPILER_H_
-#define _MESSAGE_COMPILER_H_
+#ifndef _MESSAGE_LOCATION_EXTRACTOR_H_
+#define _MESSAGE_LOCATION_EXTRACTOR_H_
 
+#include <functional>
 #include <QString>
 
 #include "FSServer.h"
 
 namespace FreeStars {
 
-class MessageFormatter : public QObject, public MessageVisitor {
+class MessageLocationExtractor : public MessageVisitor {
 public:
-    MessageFormatter(const Player*);
-    virtual ~MessageFormatter();
+    MessageLocationExtractor(const Player*, std::function<void (const Location*)>);
+    virtual ~MessageLocationExtractor();
 
     virtual void VisitMessage(const string &) const;
     virtual void VisitLocation(const string&, const Location*) const;
@@ -24,11 +25,9 @@ public:
     virtual void VisitString(const string&, const string&) const;
     virtual void VisitXMLNode(const string&, const TiXmlNode*) const;
 
-    const QString &toString() const { return result; };
-
-public:
-    mutable QString result;
+private:
     const Player *player;
+    std::function<void (const Location*)> f;
 };
 
 };

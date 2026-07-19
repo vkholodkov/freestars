@@ -123,7 +123,7 @@ deque<ProdOrder *> ProdOrder::ParseNode(const TiXmlNode * node, Planet * planet,
 				mess->AddLong("", type);
 				continue;
 			}
-			po = new POBase(type);
+			po = new POBase(type-1);
 			po->CheckPartials(planet, child, TrustPartials);
 		} else if (stricmp(child->Value(), "Factories") == 0) {
 			num = GetLong(child->FirstChild("Number"));
@@ -620,7 +620,7 @@ POBase::~POBase()
 TiXmlNode * POBase::WriteNode(TiXmlNode * node) const
 {
 	TiXmlElement POB("Base");
-	AddLong(&POB, "Design", Type);
+	AddLong(&POB, "Design", Type+1);
 	ProdOrder::WriteNode(&POB);
 	node->InsertEndChild(POB);
 
@@ -642,7 +642,7 @@ Cost POBase::GetCost(const Planet *planet) const
 	const Player * owner = planet->GetOwner();
 
 	// check for invalid designs
-	if (!owner->GetShipDesign(Type) || !owner->GetShipDesign(Type)->IsValidDesign(owner)) {
+	if (!owner->GetBaseDesign(Type) || !owner->GetBaseDesign(Type)->IsValidDesign(owner)) {
 		return Cost();
 	}
 
@@ -663,7 +663,7 @@ bool POBase::Produce(Planet * planet, long * resources, bool * AutoAlchemy)
 		return true;
 
 	// check for invalid designs
-	if (!owner->GetShipDesign(Type) || !owner->GetShipDesign(Type)->IsValidDesign(owner)) {
+	if (!owner->GetBaseDesign(Type) || !owner->GetBaseDesign(Type)->IsValidDesign(owner)) {
 		Message * mess = planet->NCGetOwner()->AddMessage("Error: Invalid Production type", planet);
 		mess->AddLong("Base", Type);
 		return true;
@@ -682,7 +682,7 @@ void POBase::Built(Planet * planet, long number)
 	assert(number == 1);
 	planet->SetBaseNumber(Type);
 	Message * mess = planet->NCGetOwner()->AddMessage("Base built", planet);
-	mess->AddLong("BaseDesign", Type);
+	mess->AddLong("BaseDesign", Type+1);
 }
 
 

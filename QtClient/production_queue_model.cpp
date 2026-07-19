@@ -45,15 +45,11 @@ void ProductionQueueModel::setProductionQueue(const deque<ProdOrder*> &_producti
       i++;
     }
 
-    std::cout << "update " << 0 << " " << i << std::endl;
-
     emit dataChanged(index(0, 0), index(i - 1, columnCount() - 1));
   }
 
   if(production_queue.size() < _production_queue.size()) {
     beginInsertRows(QModelIndex(), i, _production_queue.size() - 1);
-
-    std::cout << "insert " << i << " " << _production_queue.size() << std::endl;
 
     while(i != _production_queue.size()) {
       production_queue.push_back(_production_queue[i]->Copy());
@@ -63,8 +59,6 @@ void ProductionQueueModel::setProductionQueue(const deque<ProdOrder*> &_producti
     endInsertRows();
   }
   else if(production_queue.size() > _production_queue.size()) {
-
-    std::cout << "remove " << i << " " << production_queue.size() << std::endl;
 
     beginRemoveRows(QModelIndex(), i, production_queue.size() - 1);
 

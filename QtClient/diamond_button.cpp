@@ -12,8 +12,8 @@
 namespace FreeStars {
 
 DiamondButton::DiamondButton(QWidget *parent)
-    : QAbstractButton(parent)
-    , pressed(false)
+    : QWidget(parent)
+    , m_mousein(false)
 {
     setCursor(Qt::PointingHandCursor);
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -47,6 +47,30 @@ void DiamondButton::drawDiamond(QPainter &painter, const QRect &rect, const QCol
     path.lineTo(rect.left(), center.y());
 
     painter.fillPath(path, QBrush(color));
+}
+
+void DiamondButton::mousePressEvent(QMouseEvent *e)
+{
+    if(e->button() == Qt::RightButton) {
+      if(contentsRect().contains(e->pos())) {
+        m_mousein = true;
+      }
+    }
+
+    QWidget::mousePressEvent(e);
+}
+
+void DiamondButton::mouseReleaseEvent(QMouseEvent *e)
+{
+    if(e->button() == Qt::RightButton) {
+      m_mousein = false;
+      
+      if(contentsRect().contains(e->pos())) {
+        emit clicked();
+      }
+    }
+
+    QWidget::mouseReleaseEvent(e);
 }
 
 };

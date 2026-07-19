@@ -34,7 +34,7 @@ OrderDescription orderDescriptions[] = {
 string POBaseHumanReadableName(const POBase *po, const Planet *planet)
 {
 	const Player * owner = planet->GetOwner();
-  auto baseDesign = owner->GetShipDesign(po->GetType());
+  auto baseDesign = owner->GetBaseDesign(po->GetType());
 
 	// check for invalid designs
 	if (!baseDesign || !baseDesign->IsValidDesign(owner)) {

@@ -48,7 +48,7 @@ Game::Game()
 
 	mTurnPhase = 0;
 	mCreation = NULL;
-    VC = NULL;
+    VC.reset(new VictoryConditions);
 	mNumberOfPlayers = 0;
 	mWHMin = 0;
 	mWHMax = 0;
@@ -63,7 +63,6 @@ Game::Game()
 Game::~Game()
 {
 	delete mCreation;
-    delete VC;
 
 	deque<Component *>::iterator i1;
 	for (i1 = mComponents.begin(); i1 != mComponents.end(); ++i1)
@@ -222,7 +221,7 @@ bool Game::LoadCreation(const TiXmlNode * options)
 
 	child1 = options->FirstChild("VictoryConditions");
 	if (child1) {
-        VC = new VictoryConditions;
+        VC.reset(new VictoryConditions);
         VC->Parse(child1);
 	}
 

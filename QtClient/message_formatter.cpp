@@ -41,11 +41,24 @@ void MessageFormatter::VisitLocation(const std::string &desc, const Location *lo
     result = result.replace("${location}", QString("(%0, %1)").arg(loc->GetPosX()).arg(loc->GetPosY()));
 }
 
-void MessageFormatter::VisitPlayer(const std::string &desc, const Player *player) const {
+void MessageFormatter::VisitPlayer(const std::string &desc, const Player *other) const {
 }
 
 void MessageFormatter::VisitNumber(const std::string &desc, long l) const {
-    result = result.arg(l);
+
+    if(desc == "BaseDesign") {
+        auto design = player->GetBaseDesign(l-1);
+
+        if(design != nullptr) {
+            result = result.arg(design->GetName().c_str());
+        }
+        else {
+            result = result.arg(QObject::tr("starbase of unknown type"));
+        }
+    }
+    else {
+        result = result.arg(l);
+    }
 }
 
 void MessageFormatter::VisitFloat(const std::string &desc, double d) const {

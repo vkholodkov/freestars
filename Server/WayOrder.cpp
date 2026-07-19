@@ -239,14 +239,15 @@ TiXmlNode * WayOrderPatrol::WriteNode(TiXmlNode * node) const
 WayOrderTransport::WayOrderTransport(Location * loc, bool ForMeOnly /*= false*/)
 : WayOrder(loc, ForMeOnly)
 {
+  mOrder = OT_TRANSFER;
 	actions.insert(actions.begin(), Rules::MaxMinType-FUEL, TRANSFER_NOORDER);
 	values.insert(values.begin(), Rules::MaxMinType-FUEL, 0L);
 }
 
 WayOrderTransport::WayOrderTransport(const WayOrderTransport & copy) : WayOrder(copy)
+  , actions(copy.actions)
+  , values(copy.values)
 {
-	actions.insert(actions.begin(), copy.actions.begin(), copy.actions.begin());
-	values.insert(values.begin(), copy.values.begin(), copy.values.begin());
 }
 
 WayOrderTransport::~WayOrderTransport()

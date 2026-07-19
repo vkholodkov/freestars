@@ -32,6 +32,8 @@ public slots:
 
 private slots:
     void waypointTaskChanged(int);
+    void cargoTypeChanged(int);
+    void actionChanged(int);
 
 private:
     void setTransportOrder(const WayOrderTransport*);

@@ -9,19 +9,26 @@
 
 namespace FreeStars {
 
-class DiamondButton : public QAbstractButton {
+class DiamondButton : public QWidget {
+    Q_OBJECT
 public:
     DiamondButton(QWidget *parent = 0);
 
     QSize sizeHint() const;
 
+signals:
+    void clicked();
+    void help();
+
 protected:
     void paintEvent(QPaintEvent*);
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
 
 private:
     static void drawDiamond(QPainter&, const QRect&, const QColor&);
 
-    bool pressed;
+    bool m_mousein;
 };
 
 };
