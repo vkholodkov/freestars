@@ -62,6 +62,11 @@ void MessageFormatter::VisitNumber(const std::string &desc, long l) const {
             result = result.arg(QObject::tr("starbase of unknown type"));
         }
     }
+    else if(desc == "UR resource gain") {
+        if(l > 0) {
+            result.append(QObject::tr(" Ultimate Recycling allowed you to recover %0 resources from this fleet.").arg(l));
+        }
+    }
     else {
         result = result.arg(l);
     }

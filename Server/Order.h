@@ -327,6 +327,8 @@ class SplitMergeOrder : public Order {
 public:
 	SplitMergeOrder(Player * p, Fleet * from, Fleet * to, const Ship * design, long number, long damaged)
 		: Order(), mPlayer(p), mFrom(from), mTo(to), mDesign(design), mNumber(number), mDamaged(damaged) {}
+	SplitMergeOrder(Player * p, Fleet * from, Fleet * to)
+		: Order(), mPlayer(p), mFrom(from), mTo(to), mDesign(nullptr), mNumber(0), mDamaged(0) {}
 
 	virtual bool DoUndo();
 	virtual TiXmlNode * WriteNode(TiXmlNode * node) const;

@@ -44,7 +44,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget"/>
+           <widget class="QTableView" name="fleetTableView"/>
           </item>
          </layout>
         </item>

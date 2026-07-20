@@ -247,11 +247,13 @@ TiXmlNode * SplitMergeOrder::WriteNode(TiXmlNode * node) const
   AddLong(splitMerge, "FromFleet", mFrom->GetID());
   AddLong(splitMerge, "ToFleet", mTo->GetID());
 
-	TiXmlElement * ship = new TiXmlElement("Ship");
-  AddLong(ship, "Design", mPlayer->GetShipNumber(mDesign) + 1);
-  AddLong(ship, "Number", mNumber);
-  AddLong(ship, "Damaged", mDamaged);
-	splitMerge->LinkEndChild(ship);
+  if(mDesign != nullptr) {
+      TiXmlElement * ship = new TiXmlElement("Ship");
+      AddLong(ship, "Design", mPlayer->GetShipNumber(mDesign) + 1);
+      AddLong(ship, "Number", mNumber);
+      AddLong(ship, "Damaged", mDamaged);
+      splitMerge->LinkEndChild(ship);
+  }
 
 	node->LinkEndChild(splitMerge);
 

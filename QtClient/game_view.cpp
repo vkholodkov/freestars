@@ -543,8 +543,10 @@ void GameView::listObjectsInLocation(const SpaceObject *o, const QPoint &pos)
         auto *f = dynamic_cast<const Fleet*>(*i);
 
         if(f != NULL) {
-            QAction *action = menu.addAction(QString(f->GetName(player).c_str()));
-            actions.insert(std::make_pair(action, *i));
+            if(!f->IsEmpty()) {
+                QAction *action = menu.addAction(QString(f->GetName(player).c_str()));
+                actions.insert(std::make_pair(action, *i));
+            }
             continue;
         }
 
@@ -668,7 +670,7 @@ void GameView::splitAllFleet(const Fleet *fleet)
 
 void GameView::mergeFleet(const Fleet *_fleet)
 {
-    MergeFleetsDialog mergeFleetsDialog(_fleet, this);
+    MergeFleetsDialog mergeFleetsDialog(_fleet, player, this);
 
     if(mergeFleetsDialog.exec() == QDialog::Accepted) {
       emit fleetCompositionChanged();

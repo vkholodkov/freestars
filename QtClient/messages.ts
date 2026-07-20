@@ -5,11 +5,11 @@
         <name>FreeStarsMessages</name>
         <message>
             <source>Scrap fleet at planet</source>
-            <translation type="unfinished">%1 has been dismantled and %3kT of minerals has been deposited on %0</translation>
+            <translation type="unfinished">%1 has been dismantled and %3kT of minerals has been deposited on %0.</translation>
         </message>
         <message>
             <source>Fleet scrapped at planet</source>
-            <translation type="unfinished">%1 has been dismantled and %3kT of minerals has been deposited on %0</translation>
+            <translation type="unfinished">%1 has been dismantled and %3kT of minerals has been deposited on %0.</translation>
         </message>
         <message>
             <source>Gain tech level</source>

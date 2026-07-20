@@ -1221,8 +1221,9 @@ void Fleet::MergeTo(Fleet * to)
 	deque<Stack>::iterator iter;
 	for (iter = mStacks.begin(); iter != mStacks.end(); ++iter) {
 		to->Merge(*iter, iter->GetCount(), iter->GetDamaged(), mID);
-		mStacks.erase(iter);
 	}
+
+  mStacks.clear();
 
 	// move cargo and fuel
 	for (int i = FUEL; i < Rules::MaxMinType; ++i) {

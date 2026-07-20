@@ -48,6 +48,7 @@ SET(freestars_SOURCES
     merge_fleets_dialog.cpp
     message_location_extractor.cpp
     message_widget.cpp
+    merge_fleets_model.cpp
 )
 
 SET(freestars_HEADERS
@@ -78,6 +79,7 @@ SET(freestars_HEADERS
     merge_fleets_dialog.h
     message_location_extractor.h
     message_widget.h
+    merge_fleets_model.h
 )
 
 SET(freestars_FORMS

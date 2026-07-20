@@ -79,6 +79,7 @@ public:
 	CargoHolder * ParseTransport(const TiXmlNode * node, const CargoHolder * owned);
 	void TransferCargo(CargoHolder * from, CargoHolder * to, long pop, long fuel, deque<long> & cargo, bool write = true);
   void SplitAll(Fleet*);
+  void MergeFromTo(Fleet*, Fleet*);
 	void ParseMessages(const TiXmlNode * node);
 	void ResetSeen();
 	void SetSeenDesign(long p, long design, bool base);

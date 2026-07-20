@@ -904,6 +904,7 @@ void Player::ParseOrders(const TiXmlNode * orders)
 				DeleteFleet(fto);
 			}
       else {
+        game->RemoveAlsoHere(fto);
         game->AddAlsoHere(fto);
       }
 		} else if (stricmp(node->Value(), "Transfer") == 0) {
@@ -1153,9 +1154,14 @@ void Player::SplitAll(Fleet *fleet)
         AddOrder(new SplitMergeOrder(this, fleet, mFleets[newID], s->GetDesign(), 1, s->GetDamaged() > 0 ? 1 : 0));
     }
 	}
+}
 
-#if 0
-#endif
+void Player::MergeFromTo(Fleet *fleet, Fleet *to)
+{
+    fleet->MergeTo(to);
+
+    if (mWriteXFile)
+      AddOrder(new SplitMergeOrder(this, fleet, to));
 }
 
 long Player::ForEachFleet(Fleet::FuncType func, bool arg)

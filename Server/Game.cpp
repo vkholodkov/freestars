@@ -1905,7 +1905,16 @@ void Game::RemoveAlsoHere(SpaceObject * loc)
 	deque<SpaceObject *>::iterator i;
 	deque<SpaceObject *> * deq = loc->GetAlsoHere();
 
+  if(deq == nullptr) {
+    return;
+  }
+
 	i = find(deq->begin(), deq->end(), loc);
+
+  if(i == deq->end()) {
+    return;
+  }
+
 	deq->erase(i);
 
 	if (deq->size() == 0) {
