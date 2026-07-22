@@ -54,6 +54,7 @@ class MultipleOrder;
 class Game;
 
 static const unsigned long BASE_DESIGN_NONE = -1;
+static const unsigned long BASE_DESIGN_PLACEHOLDER = -2;
 
 /**
  * Player.
@@ -123,15 +124,19 @@ public:
 	const Ship * GetShipDesign(unsigned long n) const;
 	const Ship * GetBaseDesign(unsigned long n) const;
 	void SetShipDesign(unsigned long, Ship*);
+	void DeleteShipDesign(unsigned long num) { SetShipDesign(num, nullptr); }
 	void SetBaseDesign(unsigned long, Ship*);
+	void DeleteBaseDesign(unsigned long num) { SetBaseDesign(num, nullptr); }
 	unsigned long GetBaseDesignNumber(const Ship * design) const
-		{ return find(mBaseDesigns.begin(), mBaseDesigns.end(), design) - mBaseDesigns.begin(); }
+		{ return find(mBaseDesigns.begin(), mBaseDesigns.end(), design) - mBaseDesigns.begin() + 1; }
 	long GetShipNumber(const Ship * design) const
-		{ return find(mShipDesigns.begin(), mShipDesigns.end(), design) - mShipDesigns.begin(); }
+		{ return find(mShipDesigns.begin(), mShipDesigns.end(), design) - mShipDesigns.begin() + 1; }
 	Ship * GetExistingDesign(const Ship * check) const;
 	Ship * GetExistingBaseDesign(const Ship * check) const;
 	long GetFreeShipDesignSlot() const;
 	long GetFreeBaseDesignSlot() const;
+  long GetActiveShips(const Ship*) const;
+  long GetActiveBases(const Ship*) const;
 
 	void DeleteFleet(Fleet * gone);
 	unsigned long GetID() const						{ return mID; }
@@ -174,7 +179,7 @@ public:
 	void PlaceHW(Planet * planet);
 	void PlaceSW(Planet * second, Planet * homeworld);
 
-	void IncrementBaseBuilt(long base)	{ mBaseDesigns[base]->IncrementBuilt(1); }
+	void IncrementBaseBuilt(long base)	{ mBaseDesigns[base-1]->IncrementBuilt(1); }
 	void LoadFleets();
 	void LoadMinefields();
 
@@ -209,6 +214,9 @@ public:
 
 	double GetPossibleMines(deque<MineField *> *pm, const Fleet * f, double dist) const;
 
+  void VisitFleets(ConstFleetVisitor) const;
+  void VisitOwnPlanets(ConstPlanetVisitor) const;
+
 	virtual Fleet * FleetFactory();
 	virtual BattlePlan * BattlePlanFactory();
 	virtual MineField * MineFieldFactory();
@@ -230,6 +238,7 @@ private:
 	deque<ProdOrder *> mDefaultQ;
 	bool mDefaultPayTax;
 	deque<Fleet *> mFleets;
+  list<Fleet*> mGoneFleets;
 	deque<Ship *> mShipDesigns;
 	deque<Ship *> mBaseDesigns;
 	deque<long> mRelations;

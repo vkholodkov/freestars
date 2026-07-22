@@ -71,4 +71,17 @@ bool Hull::CheckSlots()
 	return true;
 }
 
+bool Hull::IsUpgrade(const Hull *other) const
+{
+  if((this->GetHullType() & HC_COL) != 0 && (other->GetHullType() & HC_MINICOL) != 0) {
+      return true;
+  }
+
+  if((this->GetHullType() & HC_BIGBASE) != 0 && (other->GetHullType() & HC_SMALLBASE) != 0) {
+      return true;
+  }
+
+  return false;
+}
+
 }

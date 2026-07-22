@@ -356,17 +356,14 @@ double Rules::ScrapRecover(const Planet * planet, bool colonize)
 	return percent;
 }
 
-long Rules::ScrapResource(const Planet * planet)
+double Rules::ScrapResource(const Planet * planet)
 {
-	long percent;
-	if (!planet || !planet->GetOwner()->UltimateRecycle())
-		percent = 0;
+	if (!planet || !planet->HasOwner() || !planet->GetOwner()->UltimateRecycle())
+		return 0.0;
 	else if (planet->GetBaseNumber() >= 0)
-		percent = 7000;
+		return 0.7;
 	else
-		percent = 3500;
-
-	return percent;
+		return 0.35;
 }
 
 TechType Rules::TechInvasion(Player * invader, const Player * owner)

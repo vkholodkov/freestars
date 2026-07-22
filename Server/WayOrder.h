@@ -142,6 +142,14 @@ public:
 	TransferType GetAction(int i) const	{ return actions[i-FUEL]; }
 	void SetAction(int i, TransferType action) { actions[i-FUEL] = action; }
 	long GetValue(int i) const			{ return values[i-FUEL]; }
+	void SetValue(int i, long value) { values[i-FUEL] = value; }
+
+  static bool HasValue(TransferType action) {
+    return action == TRANSFER_LOADAMT || action == TRANSFER_UNLOADAMT
+      || action == TRANSFER_FILLPER || action == TRANSFER_WAITPER
+      || action == TRANSFER_AMOUNTTO || action == TRANSFER_DESTTO
+      || action == TRANSFER_SETTOPER;
+  }
 
 protected:
 	deque<TransferType> actions;

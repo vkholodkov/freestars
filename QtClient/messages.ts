@@ -16,6 +16,10 @@
             <translation type="unfinished">Your scientists have completed research into Tech Level %1 for %0. They will continue their efforts in the %2 field.</translation>
         </message>
         <message>
+            <source>Artifact discovery</source>
+            <translation type="unfinished">While settling on %0 your colonists have discovered a strange artifact that boosted your research in %1 by %0 resources.</translation>
+        </message>
+        <message>
             <source>Base built</source>
             <translation type="unfinished">%0 has built a new %1</translation>
         </message>
@@ -65,6 +69,10 @@
         </message>
         <message>
             <source>World invasion</source>
+            <translation type="unfinished">Your colony on %0 has been attacked by %2. A total of %3 ground troops descended to the surface of the planet.</translation>
+        </message>
+        <message>
+            <source>Take planet</source>
             <translation type="unfinished">Your colonists are now in control of %0</translation>
         </message>
         <message>

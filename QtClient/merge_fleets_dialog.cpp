@@ -37,6 +37,7 @@ MergeFleetsDialog::MergeFleetsDialog(const Fleet *_fleet, Player *_player, QWidg
 
 MergeFleetsDialog::~MergeFleetsDialog()
 {
+    delete mergeFleetsModel;
 }
 
 void MergeFleetsDialog::fleetSelectionChanged(const QItemSelection&, const QItemSelection&)

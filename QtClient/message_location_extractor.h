@@ -25,9 +25,12 @@ public:
     virtual void VisitString(const string&, const string&) const;
     virtual void VisitXMLNode(const string&, const TiXmlNode*) const;
 
+    bool IsResearch() const { return mIsResearch; }
+
 private:
     const Player *player;
     std::function<void (const Location*)> f;
+    mutable bool mIsResearch;
 };
 
 };

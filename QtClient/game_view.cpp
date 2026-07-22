@@ -103,6 +103,7 @@ GameView::GameView(Game *_game, Player *_player, const GraphicsArray *_graphicsA
     connect(mapView, SIGNAL(listObjectsInLocation(const SpaceObject*, const QPoint&)),
         this, SLOT(listObjectsInLocation(const SpaceObject*, const QPoint&)));
     connect(messageWidget, SIGNAL(selectionChanged(const SpaceObject*)), this, SLOT(selectObject(const SpaceObject*)));
+    connect(messageWidget, SIGNAL(openResearchDialog()), this, SLOT(researchDialog()));
 }
 
 GameView::~GameView()
@@ -455,8 +456,10 @@ void GameView::setDetailedSelection(const Fleet *_fleet) {
         waypointTaskWidget, SLOT(setWayorder(const WayOrder*)));
     connect(fleetWaypointsWidget, SIGNAL(clearSelection()),
         waypointTaskWidget, SLOT(clearWayorder()));
-    connect(waypointTaskWidget, SIGNAL(wayorderChanged(WayOrder*)),
-        fleetWaypointsWidget, SLOT(changeWayorder(WayOrder*)));
+    connect(waypointTaskWidget, SIGNAL(waypointTaskChanged(OrderType)),
+        fleetWaypointsWidget, SLOT(setWaypointTask(OrderType)));
+    connect(waypointTaskWidget, SIGNAL(waypointTaskTransport(std::vector<TransferType>, std::vector<long>)),
+        fleetWaypointsWidget, SLOT(setWaypointTaskTransport(std::vector<TransferType>, std::vector<long>)));
 
     fleetWaypointsWidget->updateInitlalSelection();
 }

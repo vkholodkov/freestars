@@ -66,12 +66,23 @@ void MessageWidget::displayMessage(const Message &_message) {
     });
 
     _message.ApplyVisitor(messageLocationExtractor);
+
+    isResearch = messageLocationExtractor.IsResearch();
+
+    if(isResearch) {
+        gotoButton->setEnabled(true);
+    }
 }
 
 void MessageWidget::gotoClicked()
 {
     if(context != NULL) {
         emit selectionChanged(context);
+    }
+    else {
+        if(isResearch) {
+            emit openResearchDialog();
+        }
     }
 }
 

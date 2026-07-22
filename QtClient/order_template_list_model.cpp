@@ -18,24 +18,23 @@ OrderTemplateListModel::OrderTemplateListModel(const Planet *_planet, QObject *p
 {
   auto owner = planet->GetOwner();
 
-  const Ship *base = planet->GetBaseDesign();
+  const Ship *existingBaseDesign = planet->GetBaseDesign();
 
-  if(base != NULL) {
-    for(auto n = 0 ; n != Rules::GetConstant("MaxShipDesigns") ; n++) {
-      auto shipDesign = owner->GetShipDesign(n + 1);
+  if(existingBaseDesign != NULL) {
+    for(auto n = 1 ; n <= Rules::GetConstant("MaxShipDesigns") ; n++) {
+      auto shipDesign = owner->GetShipDesign(n);
 
       if(shipDesign) {
-        order_template_list.push_back(new POShip(n + 1, 1));
+        order_template_list.push_back(new POShip(n, 1));
       }
     }
   }
-  else {
-    for(auto n = 0 ; n != Rules::GetConstant("MaxBaseDesigns") ; n++) {
-      auto baseDesign = owner->GetBaseDesign(n);
 
-      if(baseDesign) {
-        order_template_list.push_back(new POBase(n));
-      }
+  for(auto n = 1 ; n <= Rules::GetConstant("MaxBaseDesigns") ; n++) {
+    auto baseDesign = owner->GetBaseDesign(n);
+
+    if(baseDesign != nullptr && (existingBaseDesign == nullptr || baseDesign != existingBaseDesign)) {
+      order_template_list.push_back(new POBase(n));
     }
   }
 
@@ -60,7 +59,7 @@ OrderTemplateListModel::OrderTemplateListModel(const Planet *_planet, QObject *p
 
   order_template_list.push_back(new POAuto(POP_ALCHEMY, 1));
 
-  if(base != NULL && base->GetDriverSpeed() > 0) {
+  if(existingBaseDesign != NULL && existingBaseDesign->GetDriverSpeed() > 0) {
     order_template_list.push_back(new POPacket(-1, 1));
     order_template_list.push_back(new POPacket(0, 1));
     order_template_list.push_back(new POPacket(1, 1));

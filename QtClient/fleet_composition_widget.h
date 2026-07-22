@@ -23,6 +23,7 @@ class FleetCompositionWidget : public FoldingWidget {
 
 public:
     FleetCompositionWidget(const Player*, QWidget *parent = 0);
+    ~FleetCompositionWidget();
 
 signals:
     void splitFleet(const Fleet*);

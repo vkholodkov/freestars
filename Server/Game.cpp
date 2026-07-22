@@ -690,7 +690,7 @@ void Game::PlacePlayers()
 	// for all left over home worlds
 	Planet * hw;
 	while ((hw = this->GetCreation()->GetNextHW()) != NULL) {
-		hw->SetBaseNumber(-1);
+		hw->SetBaseNumber(BASE_DESIGN_NONE);
 	}
 }
 
@@ -2011,6 +2011,15 @@ SpaceObject * Game::GetPatrolTarget(const Fleet * persuer, int range) const
 
 	return Result;
 }
+
+void Game::VisitTopObjects(ConstTopObjectVisitor visitor) const {
+  for_each(mTopObjects.begin(), mTopObjects.end(), [&](const deque<SpaceObject*> *list) {
+      if(list != nullptr) {
+          visitor(*list);
+      }
+  });
+}
+
 
 Component * Game::ObjectFactory(const Component *)
 {

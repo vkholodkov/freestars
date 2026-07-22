@@ -10,37 +10,10 @@
 
 namespace FreeStars {
 
-/*
-QString cargoTypes[] = {
-  QObject::tr("Fuel")
-};
-
-class CargoTypeModel : public QAbstractListModel
-{
-public:
-   CargoTypeModel(QObject *parent = 0, const WayOrderTransport *_order = 0) : QAbstractListModel(parent), order(_order) {}
-
-   int rowCount(const QModelIndex &parent = QModelIndex()) const { return TRANSFER_DROPNLOAD+1; }
-   QVariant data(const QModelIndex &index, int role) const {
-      if (!index.isValid())
-          return QVariant();
-
-      if (role == Qt::TextColorRole)
-         return QColor(QColor::colorNames().at(index.row()));
-
-      if (role == Qt::DisplayRole)
-          return QString("Item %1").arg(index.row() + 1);
-      else
-          return QVariant();
-   }
-
-  const WayOrderTransport *order;
-};
-*/
-
 WaypointTaskWidget::WaypointTaskWidget(QWidget *parent)
     : FoldingWidget(tr("Waypoint Task"))
-    , currentWayorder()
+    , actions(Rules::MaxMinType-FUEL, TRANSFER_NOORDER)
+    , values(Rules::MaxMinType-FUEL, 0L)
 {
     QWidget *widget = new QWidget;
 
@@ -58,6 +31,9 @@ WaypointTaskWidget::WaypointTaskWidget(QWidget *parent)
     ui_WaypointTaskWidget.waypointTaskComboBox->addItem(tr("Route"), QVariant(OT_ROUTE));
     ui_WaypointTaskWidget.waypointTaskComboBox->addItem(tr("Transfer Fleet"), QVariant(OT_TRANSFER));
 
+    connect(ui_WaypointTaskWidget.waypointTaskComboBox, SIGNAL(activated(int)),
+        this, SLOT(waypointTaskActivated(int)));
+
     ui_WaypointTaskWidget.cargoTypeComboBox->addItem(tr("Fuel"), QVariant((int)FUEL));
     for(int i = 0 ; i != Rules::MaxMinType ; i++) {
         ui_WaypointTaskWidget.cargoTypeComboBox->addItem(Rules::GetCargoName(i).c_str(), QVariant(i));
@@ -65,7 +41,7 @@ WaypointTaskWidget::WaypointTaskWidget(QWidget *parent)
     ui_WaypointTaskWidget.cargoTypeComboBox->addItem(tr("Colonists"), QVariant((int)POPULATION));
 
     connect(ui_WaypointTaskWidget.cargoTypeComboBox, SIGNAL(activated(int)),
-        this, SLOT(cargoTypeChanged(int)));
+        this, SLOT(cargoTypeActivated(int)));
 
     ui_WaypointTaskWidget.actionComboBox->addItem(tr("No Order"), QVariant((int)TRANSFER_NOORDER));
     ui_WaypointTaskWidget.actionComboBox->addItem(tr("Load all available"), QVariant((int)TRANSFER_LOADALL));
@@ -81,14 +57,14 @@ WaypointTaskWidget::WaypointTaskWidget(QWidget *parent)
     ui_WaypointTaskWidget.actionComboBox->addItem(tr("Drop and Load"), QVariant((int)TRANSFER_DROPNLOAD));
 
     connect(ui_WaypointTaskWidget.actionComboBox, SIGNAL(activated(int)),
-        this, SLOT(actionChanged(int)));
+        this, SLOT(actionActivated(int)));
 
-    updateState();
-
-    connect(ui_WaypointTaskWidget.waypointTaskComboBox, SIGNAL(activated(int)),
-        this, SLOT(waypointTaskChanged(int)));
+    connect(ui_WaypointTaskWidget.valueEdit, SIGNAL(textChanged(const QString&)),
+        this, SLOT(valueChanged(const QString&)));
 
     this->addWidget(widget);
+
+    updateState();
 }
 
 WaypointTaskWidget::~WaypointTaskWidget()
@@ -97,12 +73,10 @@ WaypointTaskWidget::~WaypointTaskWidget()
 
 void WaypointTaskWidget::setWayorder(const WayOrder *order)
 {
-    std::cout << "WaypointTaskWidget::setWayorder" << std::endl;
     int row = ui_WaypointTaskWidget.waypointTaskComboBox->findData(order->GetType());
 
     if(row >= 0) {
         ui_WaypointTaskWidget.waypointTaskComboBox->setCurrentIndex(row);
-        currentWayorder = order;
 
         if(typeid(*order) == typeid(WayOrderTransport)) {
             setTransportOrder(dynamic_cast<const WayOrderTransport*>(order));
@@ -115,17 +89,10 @@ void WaypointTaskWidget::setWayorder(const WayOrder *order)
 
 void WaypointTaskWidget::clearWayorder()
 {
-    currentWayorder = nullptr;
     updateState();
 }
 
 void WaypointTaskWidget::updateState() {
-
-    if(currentWayorder == nullptr) {
-        ui_WaypointTaskWidget.stackedWidget->setCurrentWidget(ui_WaypointTaskWidget.blankPage);
-        ui_WaypointTaskWidget.waypointTaskComboBox->setEnabled(false);
-        return;
-    }
 
     ui_WaypointTaskWidget.waypointTaskComboBox->setEnabled(true);
 
@@ -146,6 +113,13 @@ void WaypointTaskWidget::updateState() {
             ui_WaypointTaskWidget.stackedWidget->setCurrentWidget(ui_WaypointTaskWidget.remoteMinePage);
             break;
         case OT_TRANSPORT:
+
+            for(int i = FUEL ; i != Rules::MaxMinType ; i++) {
+                auto action = actions[i-FUEL];
+                int index = ui_WaypointTaskWidget.cargoTypeComboBox->findData(i);
+                ui_WaypointTaskWidget.cargoTypeComboBox->setItemData(index, action != TRANSFER_NOORDER ? QBrush(Qt::darkGreen) : QVariant(), Qt::ForegroundRole);
+            }
+
             ui_WaypointTaskWidget.stackedWidget->setCurrentWidget(ui_WaypointTaskWidget.transportPage);
             break;
         default:
@@ -154,17 +128,15 @@ void WaypointTaskWidget::updateState() {
     }
 }
 
-void WaypointTaskWidget::waypointTaskChanged(int row)
+void WaypointTaskWidget::waypointTaskActivated(int row)
 {
     auto data = ui_WaypointTaskWidget.waypointTaskComboBox->itemData(row); 
 
     if(data.isValid()) {
-        int type = data.toInt();
+        OrderType type = (OrderType)data.toInt();
 
-        if(!WayOrder::HasArguments((enum OrderType)type)) {
-            std::unique_ptr<WayOrder> newOrder(currentWayorder->Copy());
-            newOrder->SetType((enum OrderType)type);
-            emit wayorderChanged(newOrder.release());
+        if(!WayOrder::HasArguments(type)) {
+            emit waypointTaskChanged(type);
         }
     }
 
@@ -173,52 +145,38 @@ void WaypointTaskWidget::waypointTaskChanged(int row)
 
 void WaypointTaskWidget::setTransportOrder(const WayOrderTransport *order)
 {
-    auto cargoTypeData = ui_WaypointTaskWidget.cargoTypeComboBox->currentData(); 
-
-    if(!cargoTypeData.isValid()) {
-        return;
+    // Copy actions and values
+    for(int i = FUEL ; i != Rules::MaxMinType ; i++) {
+        actions[i-FUEL] = order->GetAction(i);
+        values[i-FUEL] = order->GetValue(i);
     }
 
-    auto cargoType = cargoTypeData.toInt();
+    const CargoType cargoType = FUEL;
 
-    auto action = order->GetAction(cargoType);
+    // Reset the form to FUEL cargo type
+    int row = ui_WaypointTaskWidget.cargoTypeComboBox->findData(QVariant((int)cargoType));
+    
+    if(row >= 0) {
+        ui_WaypointTaskWidget.cargoTypeComboBox->setCurrentIndex(row);
+        auto action = actions[cargoType-FUEL];
+        int index = ui_WaypointTaskWidget.actionComboBox->findData(action);
+        ui_WaypointTaskWidget.actionComboBox->setCurrentIndex(index);
 
-    std::cout << "setTransportOrder cargoType=" << cargoType << " action=" << action << std::endl;
-
-    int index = ui_WaypointTaskWidget.actionComboBox->findData(action);
-
-    std::cout << "setTransportOrder index=" << index << std::endl;
-
-    ui_WaypointTaskWidget.actionComboBox->setCurrentIndex(index);
-
-    for(int i = FUEL ; i != Rules::MaxMinType ; i++) {
-        auto action = order->GetAction(i);
-        int index = ui_WaypointTaskWidget.cargoTypeComboBox->findData(i);
-        ui_WaypointTaskWidget.cargoTypeComboBox->setItemData(index, action != TRANSFER_NOORDER ? QBrush(Qt::green) : QVariant(), Qt::ForegroundRole);
+        if(WayOrderTransport::HasValue(action)) {
+          ui_WaypointTaskWidget.valueEdit->setEnabled(true);
+          ui_WaypointTaskWidget.valueEdit->setText(tr("%0").arg(values[cargoType-FUEL]));
+        }
+        else {
+          ui_WaypointTaskWidget.valueEdit->setEnabled(false);
+          ui_WaypointTaskWidget.valueEdit->setText("");
+        }
     }
 
     updateState();
 }
 
-void WaypointTaskWidget::cargoTypeChanged(int row)
+void WaypointTaskWidget::cargoTypeActivated(int row)
 {
-    std::cout << "WaypointTaskWidget::cargoTypeChanged " << row  << std::endl;
-    if(typeid(*currentWayorder) != typeid(WayOrderTransport)) {
-        return;
-    }
-
-    auto typeData = ui_WaypointTaskWidget.waypointTaskComboBox->currentData(); 
-
-    if(!typeData.isValid()) {
-        return;
-    }
-
-    int type = typeData.toInt();
-
-    if(type != OT_TRANSPORT) {
-        return;
-    }
-
     auto cargoTypeData = ui_WaypointTaskWidget.cargoTypeComboBox->currentData(); 
 
     if(!cargoTypeData.isValid()) {
@@ -227,32 +185,24 @@ void WaypointTaskWidget::cargoTypeChanged(int row)
 
     int cargoType = cargoTypeData.toInt();
 
-    auto action = dynamic_cast<const WayOrderTransport*>(currentWayorder)->GetAction(cargoType);
-
-    std::cout << "setTransportOrder cargoType=" << cargoType << " action=" << action << std::endl;
+    auto action = actions[cargoType-FUEL];
 
     int index = ui_WaypointTaskWidget.actionComboBox->findData(action);
 
-    std::cout << "setTransportOrder index=" << index << std::endl;
-
     ui_WaypointTaskWidget.actionComboBox->setCurrentIndex(index);
+
+    if(WayOrderTransport::HasValue(action)) {
+      ui_WaypointTaskWidget.valueEdit->setEnabled(true);
+      ui_WaypointTaskWidget.valueEdit->setText(tr("%0").arg(values[cargoType-FUEL]));
+    }
+    else {
+      ui_WaypointTaskWidget.valueEdit->setEnabled(false);
+      ui_WaypointTaskWidget.valueEdit->setText("");
+    }
 }
 
-void WaypointTaskWidget::actionChanged(int row)
+void WaypointTaskWidget::actionActivated(int row)
 {
-    std::cout << "WaypointTaskWidget::actionChanged " << row  << std::endl;
-    auto typeData = ui_WaypointTaskWidget.waypointTaskComboBox->currentData(); 
-
-    if(!typeData.isValid()) {
-        return;
-    }
-
-    int type = typeData.toInt();
-
-    if(type != OT_TRANSPORT) {
-        return;
-    }
-
     auto cargoTypeData = ui_WaypointTaskWidget.cargoTypeComboBox->currentData(); 
 
     if(!cargoTypeData.isValid()) {
@@ -269,23 +219,58 @@ void WaypointTaskWidget::actionChanged(int row)
 
     int action = actionData.toInt();
 
-    int index = ui_WaypointTaskWidget.cargoTypeComboBox->findData(cargoType);
-    ui_WaypointTaskWidget.cargoTypeComboBox->setItemData(index, action != TRANSFER_NOORDER ? QBrush(Qt::green) : QVariant(), Qt::ForegroundRole);
+    if(action >= TRANSFER_NOORDER && action <= TRANSFER_DROPNLOAD) {
 
-    std::unique_ptr<WayOrderTransport> newOrder;
+        if(WayOrderTransport::HasValue((TransferType)action)) {
+          ui_WaypointTaskWidget.valueEdit->setEnabled(true);
+          ui_WaypointTaskWidget.valueEdit->setText(tr("%0").arg(values[cargoType-FUEL]));
+        }
+        else {
+          ui_WaypointTaskWidget.valueEdit->setEnabled(false);
+          ui_WaypointTaskWidget.valueEdit->setText("");
+        }
 
-    if(typeid(*currentWayorder) == typeid(WayOrderTransport)) {
-        newOrder.reset(new WayOrderTransport(*dynamic_cast<const WayOrderTransport*>(currentWayorder)));
+        actions[cargoType-FUEL] = (TransferType)action;
+        updateState();
+        emit waypointTaskTransport(actions, values);
     }
-    else {
-        newOrder.reset(new WayOrderTransport(const_cast<Location*>(currentWayorder->GetLocation())));
+}
+
+void WaypointTaskWidget::valueChanged(const QString &text)
+{
+    auto cargoTypeData = ui_WaypointTaskWidget.cargoTypeComboBox->currentData(); 
+
+    if(!cargoTypeData.isValid()) {
+        return;
     }
 
-    std::cout << "WaypointTaskWidget::actionChanged cargoType=" << cargoType << " action=" << action << std::endl;
+    int cargoType = cargoTypeData.toInt();
 
-    newOrder->SetType(OT_TRANSPORT);
-    newOrder->SetAction(cargoType, (TransferType)action);
-    emit wayorderChanged(newOrder.release());
+    auto actionData = ui_WaypointTaskWidget.actionComboBox->currentData();
+
+    if(!actionData.isValid()) {
+        return;
+    }
+
+    int action = actionData.toInt();
+
+    if(action >= TRANSFER_NOORDER && action <= TRANSFER_DROPNLOAD) {
+        if(!text.isEmpty()) {
+          if(action == TRANSFER_FILLPER || action == TRANSFER_WAITPER
+            || action == TRANSFER_SETTOPER)
+          {
+              values[cargoType-FUEL] = std::min(100, std::max(0, text.toInt()));
+          }
+          else {
+              values[cargoType-FUEL] = std::max(0, text.toInt());
+          }
+        }
+        else {
+          values[cargoType-FUEL] = 0;
+        }
+        updateState();
+        emit waypointTaskTransport(actions, values);
+    }
 }
 
 };

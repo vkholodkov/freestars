@@ -204,11 +204,18 @@ bool ShipDesignOrder::DoUndo()
 
 TiXmlNode * ShipDesignOrder::WriteNode(TiXmlNode * node) const
 {
-  const Ship *ship = mPlayer->GetShipDesign(mSlot);
 
 	TiXmlElement *sdnode = new TiXmlElement("ShipDesign");
   sdnode->SetAttribute("IDNumber", mSlot);
-  ship->WriteNode(sdnode, false, true, false);
+
+  const Ship *ship = mPlayer->GetShipDesign(mSlot);
+
+  if(ship != nullptr) {
+    ship->WriteNode(sdnode, false, true, false);
+  }
+  else {
+    sdnode->SetAttribute("delete", true);
+  }
 
   node->LinkEndChild(sdnode);
 
@@ -222,11 +229,18 @@ bool BaseDesignOrder::DoUndo()
 
 TiXmlNode * BaseDesignOrder::WriteNode(TiXmlNode * node) const
 {
-  const Ship *ship = mPlayer->GetBaseDesign(mSlot);
 
 	TiXmlElement *sdnode = new TiXmlElement("BaseDesign");
   sdnode->SetAttribute("IDNumber", mSlot);
-  ship->WriteNode(sdnode, false, true, false);
+
+  const Ship *ship = mPlayer->GetBaseDesign(mSlot);
+
+  if(ship != nullptr) {
+    ship->WriteNode(sdnode, false, true, false);
+  }
+  else {
+    sdnode->SetAttribute("delete", true);
+  }
 
   node->LinkEndChild(sdnode);
 
@@ -249,7 +263,7 @@ TiXmlNode * SplitMergeOrder::WriteNode(TiXmlNode * node) const
 
   if(mDesign != nullptr) {
       TiXmlElement * ship = new TiXmlElement("Ship");
-      AddLong(ship, "Design", mPlayer->GetShipNumber(mDesign) + 1);
+      AddLong(ship, "Design", mPlayer->GetShipNumber(mDesign));
       AddLong(ship, "Number", mNumber);
       AddLong(ship, "Damaged", mDamaged);
       splitMerge->LinkEndChild(ship);

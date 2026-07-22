@@ -33,8 +33,6 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 namespace FreeStars {
 
-Cost Ship::mUpCost;
-
 Ship::Ship(Game *game)
 	: mGame(game)
 {
@@ -72,7 +70,6 @@ Ship::~Ship()
 
 void Ship::Cleanup()
 {
-	mUpCost.Cleanup();
 }
 
 void Ship::ResetDefaults()
@@ -334,66 +331,105 @@ const Component * Ship::GetGate() const
 	return NULL;
 }
 
-const Cost & Ship::GetCost(const Player * owner, const Ship * from /*=NULL*/, const Planet * planet /*=NULL*/) const
+const Cost Ship::GetGrossCost(const Player *owner) const {
+
+  Cost cost = mHull->GetCost(owner);
+
+  // loop through slots on the ship
+  for (unsigned int i = 0; i < mSlots.size(); ++i) {
+    if (mSlots[i].GetComp() != NULL) {
+      cost += mSlots[i].GetComp()->GetCost(owner) * mSlots[i].GetCount();
+    }
+  }
+
+  if (IsGift()) {
+    for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
+      cost[ct] = long(CVCost[ct] * Rules::GetConstant("GiftPercent") + .5);
+  }
+
+	return cost;
+}
+
+const Cost Ship::GetUpgradeCostSameHull(const Player *owner, const Ship *from, const Planet *planet) const
 {
-	bool upgrade = from != NULL;
-	bool sameHull = false;
-	if (planet == NULL || from == NULL)	upgrade = false;
-	if (!(mHull->GetType() | CT_BASE))	upgrade = false;
-	if (upgrade && mHull == from->mHull)
-		sameHull = true;
+  Cost upgradeCost;
+
+  // loop through slots on the ship
+  for (unsigned int i = 0; i < mSlots.size(); ++i) {
+    int number;
+    if (mSlots[i].GetComp() != NULL) {
+      if (mSlots[i].GetComp() == from->mSlots[i].GetComp()) {
+        /*
+         * Same hull, identical components in the slot
+         * need to pay only for the difference
+         */
+        number = mSlots[i].GetCount() - from->mSlots[i].GetCount();
+
+        if (number > 0) {
+          /*
+           * Difference is positive, pay for it
+           */
+          upgradeCost += mSlots[i].GetComp()->GetCost(owner) * number;
+        } else if (number < 0) {
+          /*
+           * Difference is negative, scrap the old components and see what's recovered
+           */
+          Cost c;
+          c = mSlots[i].GetComp()->GetCost(owner);
+          ScrapRecover(c, -number, planet);
+          upgradeCost -= c;
+        }
+      }
+      else {
+        /*
+         * Same hull, different components in the slot
+         */
+
+        // Install the new component
+        upgradeCost += mSlots[i].GetComp()->GetCost(owner) * mSlots[i].GetCount();
+
+        if(from->mSlots[i].GetComp() != NULL) {
+          // Scrap the old stuff
+          Cost c;
+          c = from->mSlots[i].GetComp()->GetCost(owner);
+          ScrapRecover(c, from->mSlots[i].GetCount(), planet);
+          upgradeCost -= c;
+        }
+      }
+    }
+  }
+
+  return upgradeCost;
+}
+
+const Cost Ship::GetUpgradeCostDifferentHulls(const Player *owner, const Ship *from, const Planet *planet) const
+{
+  /*
+   * If different hulls, scrap the old ship and recover costs
+   */
+  Cost upgradeCost = this->GetGrossCost(owner);
+
+  Cost fr = from->GetGrossCost(owner);
+  ScrapRecover(fr, 1, planet);
+  upgradeCost -= fr;
+
+  return upgradeCost;
+}
+
+const Cost Ship::GetCost(const Player * owner, const Ship * from /*=NULL*/, const Planet * planet /*=NULL*/) const
+{
+  if(from != nullptr && planet != nullptr && (mHull->GetType() & CT_BASE) && (from->mHull->GetType() & CT_BASE)) {
+    if(mHull == from->mHull) {
+      return this->GetUpgradeCostSameHull(owner, from, planet);
+    }
+    else {
+      return this->GetUpgradeCostDifferentHulls(owner, from, planet);
+    }
+  } 
 
 	if (ReCost <= owner->GetLastTechGainPhase()) {
-		const_cast<Ship *>(this)->ReCost = mGame->GetTurnPhase();
-		if (!sameHull) {
-			const_cast<Ship *>(this)->CVCost = mHull->GetCost(owner);
-		} else
-			mUpCost.Zero();
-
-		// loop through slots on the ship
-		int number;
-		for (unsigned int i = 0; i < mSlots.size(); ++i) {
-			if (mSlots[i].GetComp() != NULL) {
-				if (sameHull && mSlots[i].GetComp() == from->mSlots[i].GetComp())
-					number = mSlots[i].GetCount() - from->mSlots[i].GetCount();
-				else
-					number = mSlots[i].GetCount();
-
-				if (number > 0) {
-					if (sameHull)
-						mUpCost += mSlots[i].GetComp()->GetCost(owner) * number;
-					else
-						const_cast<Ship *>(this)->CVCost += mSlots[i].GetComp()->GetCost(owner) * number;
-				} else if (number < 0) {
-					Cost c;
-					c = mSlots[i].GetComp()->GetCost(owner);
-					ScrapRecover(c, -number, planet);
-					mUpCost -= c;
-				}
-
-				if (sameHull && mSlots[i].GetComp() != from->mSlots[i].GetComp() && from->mSlots[i].GetComp() != NULL) {
-					mUpCost += mSlots[i].GetComp()->GetCost(owner) * mSlots[i].GetCount();
-
-					Cost c;
-					c = from->mSlots[i].GetComp()->GetCost(owner);
-					ScrapRecover(c, from->mSlots[i].GetCount(), planet);
-					mUpCost -= c;
-				}
-			}
-		}
-
-		if (IsGift()) {
-			for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
-				const_cast<Ship *>(this)->CVCost[ct] = long(CVCost[ct] * Rules::GetConstant("GiftPercent") + .5);
-		}
-	}
-
-	if (upgrade && !sameHull) {
-		mUpCost = CVCost;
-		Cost fr = from->GetCost(owner);
-		ScrapRecover(fr, 1, planet);
-		mUpCost -= fr;
-		return mUpCost;
+		ReCost = mGame->GetTurnPhase();
+		CVCost = this->GetGrossCost(owner);
 	}
 
 	return CVCost;
@@ -404,7 +440,7 @@ void Ship::ScrapRecover(Cost & c, int number, const Planet * planet) const
 	if (number == 0) {
 		c.Zero();
 	} else {
-		c.SetResources(long(c.GetResources() * number * (Rules::ScrapResource(planet) + 1.0) / 2.0));
+		c.SetResources(long(c.GetResources() * number * Rules::ScrapResource(planet)));
 		c.SetCrew(c.GetCrew() * number);	// 100% crew recovery
 		for (CargoType ct = 0; ct < Rules::MaxMinType; ++ct)
 			c[ct] = long(c[ct] * number * Rules::ScrapRecover(planet, false));
@@ -437,6 +473,66 @@ void Ship::Upgrade(const Player * player)
 	}
 
 	ResetDefaults();
+}
+
+std::vector<long> Ship::GetComponentSubtypeScores() const {
+  std::vector<long> scores(Component::GetNumSubtypes(), 0);
+
+	for (auto slot : mSlots) {
+		if (slot.GetComp() != NULL) {
+      long ValueType = slot.GetComp()->GetValueType();
+      long score = Component::GetScore(slot.GetComp(), ValueType);
+
+      if(scores[ValueType] < score) {
+        scores[ValueType] = score;
+      }
+    }
+	}
+
+  return scores;
+}
+
+bool Ship::IsUpgrade(const Ship *other) const {
+
+  if((mHull->GetType() & CT_BASE) && (other->mHull->GetType() & CT_BASE)) {
+    if(mHull == other->mHull) {
+#if 0
+      for (unsigned int i = 0; i < mSlots.size(); ++i) {
+        int number;
+        if (mSlots[i].GetComp() != NULL) {
+          if (mSlots[i].GetComp() == from->mSlots[i].GetComp()) {
+            /*
+             * Same hull, identical components in the slot
+             */
+            number = mSlots[i].GetCount() - from->mSlots[i].GetCount();
+
+            if (number > 0) {
+            } else if (number < 0) {
+            }
+          }
+          else {
+            /*
+             * Same hull, different components in the slot
+             */
+            if(from->mSlots[i].GetComp() != NULL) {
+              // Scrap the old stuff
+              Cost c;
+              c = from->mSlots[i].GetComp()->GetCost(owner);
+              ScrapRecover(c, from->mSlots[i].GetCount(), planet);
+              upgradeCost -= c;
+            }
+          }
+        }
+      }
+#endif
+    }
+    else {
+      // Money talks
+      //return this->GetGrossCost(owner) > from->GetGrossCost(owner);
+    }
+  }
+
+  return false;
 }
 
 bool operator==(const Ship & s1, const Ship & s2)

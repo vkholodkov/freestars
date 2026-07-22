@@ -256,7 +256,7 @@ const string Fleet::GetName(const Player * viewer) const
 			}
 		}
 
-		str = MostShips->GetName();
+		str = MostShips == nullptr ? "Fleet" : MostShips->GetName();
 		if (str.empty()) {
 			str = MostShips->GetHull()->GetName();
 			for (int i = 0; i < Rules::GetConstant("MaxShipDesigns"); ++i) {
@@ -581,9 +581,15 @@ void Fleet::Colonize()
 	}
 
 	if (target->GetPopulation() > 0) {
-		Message * mess = NCGetOwner()->AddMessage("Colonization failed - world occupied", this);
-		mess->AddItem("World being colonized", target);
-		mess->AddItem("Owner", target->GetOwner());
+    if(target->GetOwner() == GetOwner()) {
+      Message * mess = NCGetOwner()->AddMessage("Colonization failed - already colonized", this);
+      mess->AddItem("World being colonized", target);
+    }
+    else {
+      Message * mess = NCGetOwner()->AddMessage("Colonization failed - world occupied", this);
+      mess->AddItem("World being colonized", target);
+      mess->AddItem("Owner", target->GetOwner());
+    }
 		return;
 	}
 
@@ -660,7 +666,7 @@ void Fleet::Scrap(bool colonize)
 	int URGain = 0;
 	// calc resources
 	if (!colonize && planet) {
-		int percent = Rules::ScrapResource(planet);
+		auto percent = Rules::ScrapResource(planet);
 		if (percent > 0) {
 			long temp = GetCost().GetResources() * percent;
 			planet->AddScrapRes(temp);
@@ -693,7 +699,7 @@ void Fleet::Scrap(bool colonize)
 	}
 
 	// send message to the planet owner and give tech
-	if (!colonize && planet)
+	if (!colonize && planet && planet->HasOwner())
 	{
 		str2.erase();
 		if (planet->GetOwner() != GetOwner()) {

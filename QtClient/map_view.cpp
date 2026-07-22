@@ -361,10 +361,27 @@ void MapView::populationPlanetDrawer(QPainter &painter, const Planet *planet, co
         return;
     }
 
+    const int diameter = 10;
+    const int diameter2 = 8;
     int hab = player->HabFactor(planet);
 
-    fillCircle(painter, pos, 2 + (8 * planet->GetDisplayPop()) / planet->GetMaxPop(),
-        hab > 0 ? Qt::green : Qt::red);
+    QPainterPath path, patho;
+
+    double ratio = planet->GetMaxPop() ? std::min(1.2, (double)planet->GetDisplayPop() / planet->GetMaxPop()) : 0.1;
+    if(hab > 0) {
+        path.addEllipse(pos, diameter * ratio, diameter * ratio);
+        painter.fillPath(path, QBrush(Qt::darkGreen));
+
+        patho.addEllipse(pos, diameter2 * ratio, diameter2 * ratio);
+        painter.fillPath(patho, QBrush(Qt::green));
+    }
+    else {
+        path.addEllipse(pos, diameter * ratio, diameter * ratio);
+        painter.fillPath(path, QBrush(Qt::darkRed));
+
+        patho.addEllipse(pos, diameter2 * ratio, diameter2 * ratio);
+        painter.fillPath(patho, QBrush(Qt::red));
+    }
 }
 
 void MapView::noInfoPlanetDrawer(QPainter &painter, const Planet*, const QPoint &pos)

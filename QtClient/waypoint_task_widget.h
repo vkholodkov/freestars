@@ -24,23 +24,26 @@ public:
     ~WaypointTaskWidget();
 
 signals:
-    void wayorderChanged(WayOrder*);
+    void waypointTaskChanged(OrderType);
+    void waypointTaskTransport(std::vector<TransferType>, std::vector<long>);
 
 public slots:
     void setWayorder(const WayOrder*);
     void clearWayorder();
 
 private slots:
-    void waypointTaskChanged(int);
-    void cargoTypeChanged(int);
-    void actionChanged(int);
+    void waypointTaskActivated(int);
+    void cargoTypeActivated(int);
+    void actionActivated(int);
+    void valueChanged(const QString&);
 
 private:
     void setTransportOrder(const WayOrderTransport*);
     void updateState();
 
     Ui_WaypointTaskWidget ui_WaypointTaskWidget;
-    const WayOrder *currentWayorder;
+    std::vector<TransferType> actions;
+    std::vector<long> values;
 };
 
 };

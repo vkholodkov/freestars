@@ -33,6 +33,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #define FreeStars_Galaxy_h
 
 #include <deque>
+#include <functional>
 
 using namespace std;
 
@@ -47,6 +48,8 @@ class TempFleet;
 class SpaceObject;
 class CargoHolder;
 class Game;
+
+typedef function<void (const Planet&)> ConstPlanetVisitor;
 
 /**
  * The galaxy.
@@ -96,6 +99,12 @@ public:
 	 * @returns The number of planets that match the criteria.
 	 */
 	int GetPlanetsWithin(const Location * l, double range) const;
+
+  void VisitPlanets(ConstPlanetVisitor visitor) const {
+    for_each(mPlanets.begin(), mPlanets.end(), [&](const Planet *planet) {
+        visitor(*planet);
+    });
+  }
 
 	void AddInvasion(Planet * planet);
 	void ResolveInvasions();

@@ -123,7 +123,7 @@ deque<ProdOrder *> ProdOrder::ParseNode(const TiXmlNode * node, Planet * planet,
 				mess->AddLong("", type);
 				continue;
 			}
-			po = new POBase(type-1);
+			po = new POBase(type);
 			po->CheckPartials(planet, child, TrustPartials);
 		} else if (stricmp(child->Value(), "Factories") == 0) {
 			num = GetLong(child->FirstChild("Number"));
@@ -620,7 +620,7 @@ POBase::~POBase()
 TiXmlNode * POBase::WriteNode(TiXmlNode * node) const
 {
 	TiXmlElement POB("Base");
-	AddLong(&POB, "Design", Type+1);
+	AddLong(&POB, "Design", Type);
 	ProdOrder::WriteNode(&POB);
 	node->InsertEndChild(POB);
 
@@ -682,7 +682,7 @@ void POBase::Built(Planet * planet, long number)
 	assert(number == 1);
 	planet->SetBaseNumber(Type);
 	Message * mess = planet->NCGetOwner()->AddMessage("Base built", planet);
-	mess->AddLong("BaseDesign", Type+1);
+	mess->AddLong("BaseDesign", Type);
 }
 
 

@@ -179,15 +179,18 @@ bool Planet::ParseNode(const TiXmlNode * node, Creation *creation, bool TrustInp
 	if (GetOwner() != NULL) {
 		child1 = node->FirstChild("BaseDesign");
 		if (child1) {
-			mBaseDesign = GetLong(child1) - 1;
-			if (mBaseDesign < -1 || mBaseDesign > Rules::GetConstant("MaxBaseDesigns")) {
+			mBaseDesign = GetLong(child1);
+			if (mBaseDesign != BASE_DESIGN_NONE && (mBaseDesign < 0 || mBaseDesign > Rules::GetConstant("MaxBaseDesigns"))) {
 				Message * mess = mGame->AddMessage("Error: Invalid value on Planet");
 				mess->AddItem("", this);
 				mess->AddLong("BaseDesign", mBaseDesign);
 				return false;
 			}
+      if(!mBaseDesign) {
+        mBaseDesign = BASE_DESIGN_NONE;
+      }
 		} else if ((mHomeWorld || bSecond) && creation != NULL) {
-			mBaseDesign = -2;	// special value to allow placement later
+			mBaseDesign = BASE_DESIGN_PLACEHOLDER;	// special value to allow placement later
 		} else
 			mBaseDesign = BASE_DESIGN_NONE;
 
@@ -251,7 +254,7 @@ bool Planet::ParseNode(const TiXmlNode * node, Creation *creation, bool TrustInp
 		mArtifactType = ARTI_NONE;
 		mArtifactAmount = 0;
 	} else {
-		mBaseDesign = -1;
+		mBaseDesign = BASE_DESIGN_NONE;
 		mBaseDamage = 0;
 		mScanner = false;
 		mDefenses = 0;
@@ -316,7 +319,7 @@ TiXmlNode * Planet::WriteNode(TiXmlNode * node, const Player * viewer) const
 		}
 
 		if (SeenBy(viewer) & SEEN_HULL)
-			AddLong(node, "BaseDesign", mBaseDesign+1);
+			AddLong(node, "BaseDesign", mBaseDesign);
 
 		if (SeenBy(viewer) & SEEN_ORDERS) {
 			AddLong(node, "BaseDamage", mBaseDamage);
@@ -439,6 +442,17 @@ void Planet::ResolveInvasion()
 	if (mInvasions.empty())
 		return;
 
+  if(mInvasions.size() == 1 && GetOwner() == NULL) {
+    /*
+     * No really an invasion, it's a colonization attempt
+     */
+    Invasion &invasion = mInvasions.front();
+		invasion.mess = invasion.player->AddMessage("Take planet", this);
+    TakePlanet(invasion.player, invasion.amount);
+    mInvasions.clear();
+    return;
+  }
+
 	long AttackStr = 0;
 	Invasion * MaxAttack = NULL;
 	Invasion * MaxAttack2 = NULL;
@@ -504,23 +518,30 @@ void Planet::ResolveInvasion()
 
 		// Send message to everyone
 		for (iter = mInvasions.begin(); iter != mInvasions.end(); ++iter) {
-			if (MaxAttack->amount > 100) {
+			if (MaxAttack->amount > Rules::PopEQ1kT) {
 				iter->mess->AddItem("Captured by", MaxAttack->player);
 				iter->mess->AddLong("Survivors", MaxAttack->amount);
 			} else
 				iter->mess->AddItem("No survivors", (const Player *)NULL);
 		}
 		if (GetOwner() != NULL) {
-			if (MaxAttack->amount > 100) {
+			if (MaxAttack->amount > Rules::PopEQ1kT) {
 				omess->AddItem("Captured by", MaxAttack->player);
 				omess->AddLong("Survivors", MaxAttack->amount);
 			} else
 				omess->AddItem("No survivors", (const Player *)NULL);
 		}
+
+    if (MaxAttack->amount > Rules::PopEQ1kT)
+      TakePlanet(const_cast<Player *>(MaxAttack->player), MaxAttack->amount);
+    else if(GetOwner() != NULL) {
+      TakePlanet(NULL, 0); // No one survived
+    }
 	} else {	// if (ration > 1.0)
 		// defenders win
 		// calculate survivors
 		int survivors = long(GetPopulation() * (1.0 - double(AttackStr)/DefenseValue));
+    assert(survivors >= 0);
 		mPopulation = survivors;
 		// Send message to everyone
 		for (iter = mInvasions.begin(); iter != mInvasions.end(); ++iter) {
@@ -535,12 +556,10 @@ void Planet::ResolveInvasion()
 			omess->AddLong("Survivors", survivors);
 		} else if (omess)
 			omess->AddItem("No survivors", (const Player *)NULL);
-	}
 
-	if (MaxAttack->amount > Rules::PopEQ1kT)
-		TakePlanet(const_cast<Player *>(MaxAttack->player), MaxAttack->amount);
-	else {
-		TakePlanet(NULL, 0);
+    if(survivors <= Rules::PopEQ1kT) {
+      TakePlanet(NULL, 0); // No one survived
+    }
 	}
 
 	mInvasions.clear();	// Done, delete everything about invasions on this planet
@@ -556,21 +575,36 @@ void Planet::TakePlanet(Player * invader, long amount)
 
 			TechType tt;
 			int i;
+      long field;
+      Message *mess;
 			switch (mArtifactType) {
 			case ARTI_NONE:
 				break;
 			case ARTI_ALL:
 				for (tt = 0; tt < Rules::MaxTechType; ++tt)
 					invader->GainTech(mArtifactAmount, tt);
+        mess = invader->AddMessage("Artifact discovery", this);
+        mess->AddItem("Tech field", "Each");
+        mess->AddLong("Amount", mArtifactAmount);
 				break;
 			case ARTI_RANDTYPE:
-				invader->GainTech(mArtifactAmount, Random(Rules::MaxTechType));
+        field = Random(Rules::MaxTechType);
+				invader->GainTech(mArtifactAmount, field);
+        mess = invader->AddMessage("Artifact discovery", this);
+        mess->AddItem("Tech field", Rules::GetTechName(field));
+        mess->AddLong("Amount", mArtifactAmount);
 				break;
 			case ARTI_RANDSPLIT:
 				for (i = 0; i < Rules::MaxTechType * 2; ++i)
 					invader->GainTech(mArtifactAmount / Rules::MaxTechType / 2, Random(Rules::MaxTechType));
+        mess = invader->AddMessage("Artifact discovery", this);
+        mess->AddItem("Tech field", "Various");
+        mess->AddLong("Amount", mArtifactAmount);
 			default:
 				invader->GainTech(mArtifactAmount, mArtifactType);
+        mess = invader->AddMessage("Artifact discovery", this);
+        mess->AddItem("Tech field", Rules::GetTechName(mArtifactType));
+        mess->AddLong("Amount", mArtifactAmount);
 				break;
 			}
 
@@ -669,7 +703,7 @@ double Planet::GetMaxTachyon() const
 void Planet::SetBaseNumber(long n)
 {
 	mBaseDesign = n;
-	if (mBaseDesign >= 0) {
+	if (mBaseDesign > 0) {
 		mBaseDamage = min(mBaseDamage, GetBaseDesign()->GetArmor(GetOwner()) - 1L);
 		NCGetOwner()->IncrementBaseBuilt(n);
 	}
@@ -1065,7 +1099,7 @@ void Planet::CreateRandom(Creation * c)
 	// preplant artifacts
 	if (mGame->GetRandomEvents() | RE_ARTIFACT && Randodd(Rules::GetFloat("ArtifactOdds"))) {
 		mArtifactAmount = Random(Rules::GetConstant("ArtifactMin"), Rules::GetConstant("ArtifactMax"));
-		mArtifactType = Random(Rules::MaxTechType);
+		mArtifactType = Random(ARTI_RANDSPLIT, ARTI_NONE);
 	}
 
 	mName = c->GetNextName(mGame->GetGalaxy());
@@ -1085,7 +1119,7 @@ void Planet::CreateHW(const Player * player, const Creation *creation)
 		mContains[i] = Rules::GetHWStartMinerals(i, creation);
 	}
 
-	mBaseDesign = -2;	// allow this world to have a base
+	mBaseDesign = BASE_DESIGN_PLACEHOLDER;	// allow this world to have a base
 	mArtifactType = ARTI_NONE;
 	mArtifactAmount = 0;
 	mHomeWorld = true;
@@ -1158,7 +1192,7 @@ void Planet::CreateSecondWorld(const Planet *HW, const Creation *creation)
 	for (i = 0; i < Rules::MaxHabType; ++i)
 		mHabStart[i] = Rules::GetSecondHab(i, HW->GetOwner());
 
-	mBaseDesign = -2;	// allow this world to have a base
+	mBaseDesign = BASE_DESIGN_PLACEHOLDER;	// allow this world to have a base
 	mArtifactType = ARTI_NONE;
 	mArtifactAmount = 0;
 }

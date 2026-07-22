@@ -34,10 +34,13 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 
 #include <string>
 #include <list>
+#include <vector>
 
 #include "Slot.h"
 #include "Cost.h"
 #include "MessageSink.h"
+
+#undef CACHE_COSTS
 
 namespace FreeStars {
 class Component;
@@ -77,7 +80,7 @@ public:
 	bool IsValidDesign(const Player * player) const;
 	
 	long TechLevel(TechType tech) const;
-	const Cost & GetCost(const Player * owner, const Ship * from =NULL, const Planet * planet =NULL) const;
+	const Cost GetCost(const Player * owner, const Ship * from =NULL, const Planet * planet =NULL) const;
 	
 	string GetName() const					{ return mName; }
 	void SetName(const string &Name) { mName = Name; }
@@ -177,11 +180,16 @@ public:
 	void SetCannotBuild(const Component * comp)	{ mCannotBuild = comp; }
 	const Component * GetCannotBuild() const	{ return mCannotBuild; }
 	void SlotsUpdated() { ResetDefaults(); }
+  bool IsUpgrade(const Ship*) const; // True if the ship is upgrade of the other
 
 	friend bool operator==(const Ship & s1, const Ship & s2);
 
 private:
 	void ResetDefaults();
+  std::vector<long> GetComponentSubtypeScores() const;
+  const Cost GetGrossCost(const Player*) const;
+  const Cost GetUpgradeCostSameHull(const Player*, const Ship*, const Planet*) const;
+  const Cost GetUpgradeCostDifferentHulls(const Player*, const Ship*, const Planet*) const;
 	Game *mGame;
 	std::string mName;
 	long mGraphicNumber;
@@ -190,7 +198,7 @@ private:
 	deque<Slot> mSlots;
 	const Hull * mHull;			///< The hull to use.
 	long mBuilt;			///< Number of ships of this design that you've had.
-	long ReCost;			///< Turn phase costs were last recalculated.
+  mutable long ReCost;                    ///< Turn phase costs were last recalculated.
 	void ScrapRecover(Cost & c, int number, const Planet * planet) const;
 
 	deque<bool> mSeenDesign;	///< Who has seen this design this turn.
@@ -200,9 +208,8 @@ private:
 
 	const Component * mCannotBuild;	///< for starting ships
 
-	static Cost mUpCost;
 	// Calculated values
-	Cost CVCost;			///< cost in minerals, resources, and crew(note normal rules don't have a crew cost)
+	mutable Cost CVCost;			///< cost in minerals, resources, and crew(note normal rules don't have a crew cost)
 
 	long CVFuelCapacity;
 	long CVFuelGeneration;

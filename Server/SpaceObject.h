@@ -82,6 +82,7 @@ public:
 
 	const Player * GetOwner() const	{ return mOwner; } ///< Get owner of object.
 	Player * NCGetOwner() const		{ return mOwner; } ///< Get owner of object.
+  bool HasOwner() const { return GetOwner() != nullptr; }
 
 	virtual const string GetName(const Player *) const	{ string s; return s; }
 	virtual long SeenBy(const Player * p) const;

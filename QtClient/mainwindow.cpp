@@ -518,19 +518,19 @@ void MainWindow::closeAllViews() {
 
 void MainWindow::activateTab(int index)
 {
+    viewModeMapper->disconnect();
+    viewRaceAction->disconnect();
+    submitTurnAction->disconnect();
+    shipDesignAction->disconnect();
+    researchAction->disconnect();
+    battlePlansAction->disconnect();
+    playerRelationsAction->disconnect();
+
     if(index >= 0) {
         GameView *gameView = dynamic_cast<GameView*>(tabWidget->widget(index));
 
         if(gameView != NULL) {
             MapView *mapView = gameView->getMapView();
-
-            viewModeMapper->disconnect();
-
-            submitTurnAction->disconnect();
-            shipDesignAction->disconnect();
-            researchAction->disconnect();
-            battlePlansAction->disconnect();
-            playerRelationsAction->disconnect();
 
             connect(viewRaceAction, SIGNAL(triggered()), gameView, SLOT(viewRaceDialog()));
 
@@ -550,7 +550,7 @@ void MainWindow::activateTab(int index)
             shipDesignAction->setEnabled(true);
             researchAction->setEnabled(true);
             battlePlansAction->setEnabled(true);
-            playerRelationsAction->setEnabled(true);
+            playerRelationsAction->setEnabled(gameView->getGame()->NumberPlayers() > 1);
 
             return;
         }

@@ -45,6 +45,12 @@ void MessageFormatter::VisitPlayer(const std::string &desc, const Player *other)
     if(desc == "Owner") {
         result = result.arg(other->GetPluralName().c_str());
     }
+    else if(desc == "Captured by") {
+        result.append(QObject::tr("Despite serious resistance the planet was captured by %0").arg(other->GetPluralName().c_str()));
+    }
+    else if(desc == "Defender holds") {
+        result.append(QObject::tr("Despite stiff aggression the planet remains is hands of %0").arg(other->GetPluralName().c_str()));
+    }
     else {
         result = result.arg(other->GetSingleName().c_str());
     }
@@ -53,7 +59,7 @@ void MessageFormatter::VisitPlayer(const std::string &desc, const Player *other)
 void MessageFormatter::VisitNumber(const std::string &desc, long l) const {
 
     if(desc == "BaseDesign") {
-        auto design = player->GetBaseDesign(l-1);
+        auto design = player->GetBaseDesign(l);
 
         if(design != nullptr) {
             result = result.arg(design->GetName().c_str());
@@ -77,6 +83,17 @@ void MessageFormatter::VisitFloat(const std::string &desc, double d) const {
 }
 
 void MessageFormatter::VisitString(const std::string &desc, const std::string &str) const {
+    if(desc == "Tech field") {
+        if(str == "Each") {
+            result = result.arg(QObject::tr("each field"));
+            return;
+        }
+        else if(str == "Various") {
+            result = result.arg(QObject::tr("various fields"));
+            return;
+        }
+    }
+
     result = result.arg(QString(str.c_str()));
 }
 

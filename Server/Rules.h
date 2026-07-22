@@ -107,7 +107,7 @@ public:
 
 	static TechType TechFleet(const Player * player, const Fleet * fleet);
 	static double ScrapRecover(const Planet * planet, bool colonize);
-	static long ScrapResource(const Planet * planet);
+	static double ScrapResource(const Planet * planet);
 	static bool TechScrap(const Planet * planet);
 	static TechType TechInvasion(Player * invader, const Player * owner);
 	static bool Stealable(CargoType ct);

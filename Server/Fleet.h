@@ -349,5 +349,7 @@ private:
 	deque<long> CVMineAmount;
 	deque<long> CVRadiation;
 };
+typedef function<void (Fleet&)> FleetVisitor;
+typedef function<void (const Fleet&)> ConstFleetVisitor;
 }
 #endif // !defined(FreeStars_Fleet_h)

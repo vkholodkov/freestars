@@ -275,9 +275,9 @@ void ShipDesignDialog::setComponent1(int index)
 
 void ShipDesignDialog::populateExistingDesigns(int designMode, bool initial)
 {
-    int start = designMode == SDDDM_SHIPS ? 1 : 0;
+    int start = 1;
     int max = designMode == SDDDM_SHIPS ? Rules::GetConstant("MaxShipDesigns") 
-        : Rules::GetConstant("MaxBaseDesigns") + 1;
+        : Rules::GetConstant("MaxBaseDesigns");
 
     for (long i = start ; i != max ; i++) {
         const Ship *ship = designMode == SDDDM_SHIPS ? player->GetShipDesign(i) : player->GetBaseDesign(i);
@@ -523,7 +523,9 @@ void ShipDesignDialog::editDesign()
     Ship *ship = reinterpret_cast<Ship*>(userData.toULongLong());
 
     if(ship != NULL) {
-        if(ship->GetNumberBuilt() != 0) {
+        int active = currentDesignMode == SDDDM_SHIPS ? player->GetActiveShips(ship) : player->GetActiveBases(ship);
+
+        if(active > 0) {
             copyDesign(ship);
         }
         else {
@@ -537,18 +539,30 @@ void ShipDesignDialog::deleteDesign()
     if (currentViewMode != SDDVM_EXISTING)
         return;
 
-    QVariant userData = chooseDesignBox->itemData(chooseDesignBox->currentIndex());
+    int index = chooseDesignBox->currentIndex();
+    QVariant userData = chooseDesignBox->itemData(index);
 
-    Ship *ship = reinterpret_cast<Ship*>(userData.toULongLong());
+    Ship *design = reinterpret_cast<Ship*>(userData.toULongLong());
 
-    if(ship != NULL) {
-        int built = ship->GetNumberBuilt();
+    if(design != NULL) {
+        int active = currentDesignMode == SDDDM_SHIPS ? player->GetActiveShips(design) : player->GetActiveBases(design);
 
-        if(built == 0 || QMessageBox::question(this, tr("Delete Design"), tr("You currently " \
-                "have %0 %1s. If you delete this design these ships will be destroyed. " \
-                "Are you sure?").arg(built).arg(ship->GetName().c_str()), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        QString shipsBases = currentDesignMode == SDDDM_SHIPS ? tr("ships") : tr("bases");
+
+        if(active == 0 || QMessageBox::question(this, tr("Delete Design"), tr("You currently " \
+                "have %0 %1s. If you delete this design these %2 will be destroyed. " \
+                "Are you sure?").arg(active).arg(design->GetName().c_str()).arg(shipsBases), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            std::cout << "delete design " << ship->GetName() << std::endl;
+            long slot = currentDesignMode == SDDDM_SHIPS ? player->GetShipNumber(design) : player->GetBaseDesignNumber(design);
+
+            if(currentDesignMode == SDDDM_SHIPS) {
+                player->DeleteShipDesign(slot);
+            }
+            else {
+                player->DeleteBaseDesign(slot);
+            }
+
+            chooseDesignBox->removeItem(index);
         }
     }
 }
@@ -723,12 +737,15 @@ void ShipDesignDialog::saveDesign()
     ship->SetName(name.toStdString());
 
     int index = chooseDesignBox->currentIndex();
+    QVariant userData = chooseDesignBox->itemData(index);
+    Ship *design = reinterpret_cast<Ship*>(userData.toULongLong());
+    long slot = currentDesignMode == SDDDM_SHIPS ? player->GetShipNumber(design) : player->GetBaseDesignNumber(design);
 
     if(currentDesignMode == SDDDM_SHIPS) {
-        player->SetShipDesign(index + 1, ship);
+        player->SetShipDesign(slot, ship);
     }
     else {
-        player->SetBaseDesign(index, ship);
+        player->SetBaseDesign(slot, ship);
     }
 
     shipBeingEdited.release();

@@ -32,6 +32,7 @@ Email Elliott at 9jm0tjj02@sneakemail.com
 #include "Creation.h"
 #include "Order.h"
 #include "MineFieldType.h"
+#include "Fleet.h"
 
 #if defined(_DEBUG) && defined(DEBUG_NEW)
 #define new DEBUG_NEW
@@ -69,10 +70,13 @@ Player::~Player()
 	for (i = 0; i < mDefaultQ.size(); ++i)
 		delete mDefaultQ[i];
 
-	for (i = 0; i < mFleets.size(); ++i)
-		delete mFleets[i];
+	for (auto fleet : mFleets)
+		delete fleet;
 
 	mFleets.clear();
+
+	for (auto goneFleet : mGoneFleets)
+		delete goneFleet;
 
 	for (i = 0; i < mShipDesigns.size(); ++i)
 		delete mShipDesigns[i];
@@ -303,7 +307,7 @@ Fleet * Player::GetFleetCreate(unsigned long n, const CargoHolder &loc)
 
 const Ship * Player::GetShipDesign(unsigned long n) const
 {
-	if (this == NULL || n <= 0 || n > mShipDesigns.size())
+	if (n <= 0 || n > mShipDesigns.size())
 		return NULL;
 
 	return mShipDesigns[n-1];
@@ -311,10 +315,10 @@ const Ship * Player::GetShipDesign(unsigned long n) const
 
 const Ship * Player::GetBaseDesign(unsigned long n) const
 {
-	if (n < 0 || n >= mBaseDesigns.size())
+	if (n <= 0 || n > mBaseDesigns.size())
 		return NULL;
 
-	return mBaseDesigns[n];
+	return mBaseDesigns[n-1];
 }
 
 void Player::SetShipDesign(unsigned long n, Ship *ship)
@@ -329,16 +333,16 @@ void Player::SetShipDesign(unsigned long n, Ship *ship)
     mShipDesigns[n-1] = ship;
 }
 
-void Player::SetBaseDesign(unsigned long n, Ship *ship)
+void Player::SetBaseDesign(unsigned long n, Ship *design)
 {
-	if(n >= mBaseDesigns.size())
+	if(n <= 0 || n > mBaseDesigns.size())
 		return;
 
-  if (mBaseDesigns[n-1] != ship && mWriteXFile)
+  if (mBaseDesigns[n-1] != design && mWriteXFile)
     AddOrder(new BaseDesignOrder(this, n));
 
-    delete mBaseDesigns[n];
-	mBaseDesigns[n] = ship;
+    delete mBaseDesigns[n-1];
+	mBaseDesigns[n-1] = design;
 }
 
 void Player::DeleteFleet(Fleet * gone)
@@ -351,7 +355,8 @@ void Player::DeleteFleet(Fleet * gone)
 	game->RemoveAlsoHere(gone);
 	game->StoreMessageLocation(gone);	// make any messages referring to this fleet point to it's last location
 	mFleets[gone->GetID()-1] = NULL;
-	delete gone;
+
+  mGoneFleets.push_back(gone);
 }
 
 bool Player::TransferFleet(const Fleet * from)
@@ -872,8 +877,12 @@ void Player::ParseOrders(const TiXmlNode * orders)
 			}
 
 			child = node->FirstChild("Ship");
-			if (child == NULL)
+			if (child == NULL) {
 				ffrom->MergeTo(fto);
+
+        if (mWriteXFile)
+          AddOrder(new SplitMergeOrder(this, ffrom, fto));
+      }
 
 			for (; child; child = child->NextSibling("Ship"))
 			{
@@ -941,28 +950,40 @@ void Player::ParseOrders(const TiXmlNode * orders)
 		} else if (stricmp(node->Value(), "ShipDesign") == 0) {
 			int num;
 			node->ToElement()->Attribute("IDNumber", &num);
+      bool del = node->ToElement()->Attribute("delete") != nullptr;
 			if (num < 0 || num >= Rules::GetConstant("MaxShipDesigns")) {
 				Message * mess = AddMessage("Error: Invalid ship design number");
 				mess->AddLong("", num);
 			} else {
-        std::unique_ptr<Ship> ship(new Ship(GetGame()));
-        if(ship->ParseNode(node, this, false)) {
-          SetShipDesign(num, ship.get());
-          ship.release();
+        if(!del) {
+          std::unique_ptr<Ship> ship(new Ship(GetGame()));
+          if(ship->ParseNode(node, this, false)) {
+            SetShipDesign(num, ship.get());
+            ship.release();
+          }
+        }
+        else {
+          DeleteShipDesign(num);
         }
 			}
 
 		} else if (stricmp(node->Value(), "BaseDesign") == 0) {
 			int num;
 			node->ToElement()->Attribute("IDNumber", &num);
-			if (num < 0 || num >= Rules::GetConstant("MaxBaseDesigns")) {
+      bool del = node->ToElement()->Attribute("delete") != nullptr;
+			if (num <= 0 || num > Rules::GetConstant("MaxBaseDesigns")) {
 				Message * mess = AddMessage("Error: Invalid base design number");
 				mess->AddLong("", num);
 			} else {
-        std::unique_ptr<Ship> base(new Ship(GetGame()));
-        if(base->ParseNode(node, this, false)) {
-          SetBaseDesign(num, base.get());
-          base.release();
+        if(!del) {
+          std::unique_ptr<Ship> base(new Ship(GetGame()));
+          if(base->ParseNode(node, this, false)) {
+            SetBaseDesign(num, base.get());
+            base.release();
+          }
+        }
+        else {
+          DeleteBaseDesign(num);
         }
 			}
 
@@ -1131,6 +1152,7 @@ void Player::SplitAll(Fleet *fleet)
     Stack *s = fleet->GetStack(j);
     int count = s->GetCount();
 
+    // Leave one ship in the first stack out
     for(int k = j == 0 ? 1 : 0 ; k < count ; k++) { 
 
       long newID = -1;
@@ -1159,6 +1181,10 @@ void Player::SplitAll(Fleet *fleet)
 void Player::MergeFromTo(Fleet *fleet, Fleet *to)
 {
     fleet->MergeTo(to);
+
+    if(fleet->IsEmpty()) {
+        DeleteFleet(fleet);
+    }
 
     if (mWriteXFile)
       AddOrder(new SplitMergeOrder(this, fleet, to));
@@ -1513,9 +1539,9 @@ void Player::AddStartShips(const RacialTrait * rt, int i, Planet * planet, bool 
 		if (upgrade->GetHull()->GetHullType() & HC_BASE) {
 			design = GetExistingBaseDesign(upgrade);
 			if (design == NULL) {
-				for (designNumber = 0; designNumber < mBaseDesigns.size(); ++designNumber) {
-					if (mBaseDesigns[designNumber] == NULL) {
-						mBaseDesigns[designNumber] = upgrade;
+				for (designNumber = 1; designNumber <= mBaseDesigns.size(); ++designNumber) {
+					if (mBaseDesigns[designNumber-1] == NULL) {
+						mBaseDesigns[designNumber-1] = upgrade;
 						break;
 					}
 				}
@@ -1527,9 +1553,9 @@ void Player::AddStartShips(const RacialTrait * rt, int i, Planet * planet, bool 
 		} else {
 			design = GetExistingDesign(upgrade);
 			if (design == NULL) {
-				for (designNumber = 0; designNumber < mBaseDesigns.size(); ++designNumber) {
-					if (mShipDesigns[designNumber] == NULL) {
-						mShipDesigns[designNumber] = upgrade;
+				for (designNumber = 1; designNumber <= mShipDesigns.size(); ++designNumber) {
+					if (mShipDesigns[designNumber-1] == NULL) {
+						mShipDesigns[designNumber-1] = upgrade;
 						break;
 					}
 				}
@@ -1548,10 +1574,10 @@ void Player::AddStartShips(const RacialTrait * rt, int i, Planet * planet, bool 
 				planet->SetBaseNumber(designNumber);
 		} else {
 			if (HomeWorld && rt->GetStartCount(i) > 0)
-				BuildShips(planet, designNumber+1, rt->GetStartCount(i));
+				BuildShips(planet, designNumber, rt->GetStartCount(i));
 
 			if (!HomeWorld && rt->GetStart2ndCount(i) > 0)
-				BuildShips(planet, designNumber+1, rt->GetStart2ndCount(i));
+				BuildShips(planet, designNumber, rt->GetStart2ndCount(i));
 		}
 	}
 }
@@ -1585,7 +1611,31 @@ long Player::GetFreeShipDesignSlot() const {
 
 long Player::GetFreeBaseDesignSlot() const {
     deque<Ship*>::const_iterator i = find(mBaseDesigns.begin(), mBaseDesigns.end(), (Ship*)NULL);
-    return i != mBaseDesigns.end() ? i - mBaseDesigns.begin() : -1;
+    return i != mBaseDesigns.end() ? i - mBaseDesigns.begin() + 1 : -1;
+}
+
+long Player::GetActiveShips(const Ship *design) const {
+    long result = 0;
+    for(auto fleet : mFleets) {
+      if(fleet) {
+        fleet->VisitStacks([&](const Stack &stack) {
+          if(stack.GetDesign() == design) {
+            result += stack.GetCount();
+          }
+        });
+      }
+    }
+    return result;
+}
+
+long Player::GetActiveBases(const Ship *design) const {
+    long result = 0;
+    VisitOwnPlanets([&](const Planet &planet) {
+      if(planet.GetBaseDesign() == design) {
+        result++;
+      }
+    });
+    return result;
 }
 
 void Player::PlaceHW(Planet * planet)
@@ -2169,6 +2219,22 @@ SpaceObject * Player::GetPatrolTarget(const Fleet * persuer, double * range) con
 	}
 
 	return Result;
+}
+
+void Player::VisitFleets(ConstFleetVisitor visitor) const {
+  for(auto fleet : mFleets) {
+    if(fleet != nullptr) {
+      visitor(*fleet);
+    }
+  }
+}
+
+void Player::VisitOwnPlanets(ConstPlanetVisitor visitor) const {
+    game->GetGalaxy()->VisitPlanets([=](const Planet &planet) {
+        if(planet.GetOwner() == this) {
+            visitor(planet);
+        }
+    });
 }
 
 Fleet * Player::FleetFactory()

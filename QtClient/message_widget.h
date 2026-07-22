@@ -27,6 +27,7 @@ public:
 
 signals:
     void selectionChanged(const SpaceObject*);
+    void openResearchDialog();
 
 private slots:
     void gotoClicked();
@@ -41,6 +42,7 @@ private:
     std::vector<Message*> messages;
     unsigned currentMessage;
     const SpaceObject *context;
+    bool isResearch;
 };
 
 };

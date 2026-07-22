@@ -111,7 +111,6 @@ void FleetWaypointsWidget::wayorderAdded(const Location *location)
 
 void FleetWaypointsWidget::wayorderSelected(int row)
 {
-    std::cout << "FleetWaypointsWidget::wayorderSelected " << row << std::endl;
     if(row >= 0 && row < orders.size()) {
         auto order = orders[row];
         auto speed = order->GetSpeed();
@@ -156,7 +155,6 @@ void FleetWaypointsWidget::wayorderSelected(int row)
         ui_FleetWaypointsWidget.travelTimeLabel->show();
         ui_FleetWaypointsWidget.travelTimeValueLabel->show();
 
-        std::cout << "FleetWaypointsWidget::selectWayorder " << row << std::endl;
         emit selectWayorder(orders[row]);
     }
     else {
@@ -173,13 +171,41 @@ void FleetWaypointsWidget::wayorderSelected(int row)
     }
 }
 
-void FleetWaypointsWidget::changeWayorder(WayOrder *order)
+void FleetWaypointsWidget::setWaypointTask(OrderType type)
 {
     int row = waypointListBox->currentRow();
 
     if(row >= 0 && row < orders.size()) {
-        delete orders[row];
-        orders[row] = order;
+        if(typeid(*orders[row]) != typeid(WayOrder)) {
+            std::unique_ptr<WayOrder> wo(new WayOrder(const_cast<Location*>(orders[row]->GetLocation())));
+            wo->SetSpeed(orders[row]->GetSpeed());
+            delete orders[row];
+            orders[row] = wo.release();
+        }
+        orders[row]->SetType(type);
+        changeWayorderList();
+    }
+}
+
+void FleetWaypointsWidget::setWaypointTaskTransport(std::vector<TransferType> actions, std::vector<long> values)
+{
+    int row = waypointListBox->currentRow();
+
+    if(row >= 0 && row < orders.size()) {
+        if(typeid(*orders[row]) != typeid(WayOrderTransport)) {
+            std::unique_ptr<WayOrderTransport> wo(new WayOrderTransport(const_cast<Location*>(orders[row]->GetLocation())));
+            wo->SetSpeed(orders[row]->GetSpeed());
+            delete orders[row];
+            orders[row] = wo.release();
+        }
+
+        auto order = dynamic_cast<WayOrderTransport*>(orders[row]);
+
+        for(int i = FUEL ; i != Rules::MaxMinType ; i++) {
+            order->SetAction(i, actions[i-FUEL]);
+            order->SetValue(i, values[i-FUEL]);
+        }
+
         changeWayorderList();
     }
 }

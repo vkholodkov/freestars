@@ -32,6 +32,11 @@ FleetCompositionWidget::FleetCompositionWidget(const Player *_player, QWidget *p
     this->addWidget(widget);
 }
 
+FleetCompositionWidget::~FleetCompositionWidget()
+{
+    delete ui_FleetCompositionWidget.fleetCompositionView->model();
+}
+
 void FleetCompositionWidget::setFleet(const Fleet *_fleet)
 {
     // Switch model

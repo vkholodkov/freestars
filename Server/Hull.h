@@ -64,6 +64,7 @@ public:
 	long GetCargoTop() const	{ return mCargoTop; }
 	long GetCargoWidth() const	{ return mCargoWidth; }
 	long GetCargoHeight() const	{ return mCargoHeight; }
+  bool IsUpgrade(const Hull*) const;
 
 protected:
 	// display settings

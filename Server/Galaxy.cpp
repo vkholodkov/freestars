@@ -337,7 +337,7 @@ void Galaxy::DoBombing()
 			continue;
 			
 		// Check if Planet has a Starbase
-		if((*target_planet)->GetBaseNumber() != -1)
+		if((*target_planet)->GetBaseNumber() != BASE_DESIGN_NONE)
 			continue;
 			
 		Bombing bom(*(*target_planet));

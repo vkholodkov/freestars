@@ -13,6 +13,7 @@ namespace FreeStars {
 MessageLocationExtractor::MessageLocationExtractor(const Player *_player, std::function<void (const Location*)> _f)
     : player(_player)
     , f(_f)
+    , mIsResearch(false)
 {
 }
 
@@ -39,6 +40,9 @@ void MessageLocationExtractor::VisitFloat(const std::string &desc, double d) con
 }
 
 void MessageLocationExtractor::VisitString(const std::string &desc, const std::string &str) const {
+    if(desc == "Tech field") {
+        mIsResearch = true;
+    }
 }
 
 void MessageLocationExtractor::VisitXMLNode(const std::string &desc, const TiXmlNode *node) const {

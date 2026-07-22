@@ -177,6 +177,7 @@ public:
 	bool WouldBeBuildable(const Player*, long, long) const;
 
 	static const Component * Upgrade(const Player * player);
+  static size_t GetNumSubtypes() { return Subtypes.size(); }
 
 private:
 	void init();

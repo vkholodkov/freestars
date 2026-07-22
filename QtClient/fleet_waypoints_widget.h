@@ -31,7 +31,8 @@ signals:
     void clearSelection();
 
 public slots:
-    void changeWayorder(WayOrder*);
+    void setWaypointTask(OrderType);
+    void setWaypointTaskTransport(std::vector<TransferType>, std::vector<long>);
 
 private slots:
     void setRepeatOrders(int);

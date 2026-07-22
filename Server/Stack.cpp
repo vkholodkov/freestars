@@ -93,7 +93,7 @@ bool Stack::ParseNode(const TiXmlNode * node, Player * owner)
 
 void Stack::WriteNode(TiXmlNode * node, const Player * owner, const Player * viewer) const
 {
-	AddLong(node, "ShipDesign", owner->GetShipNumber(mShip)+1);
+	AddLong(node, "ShipDesign", owner->GetShipNumber(mShip));
 	AddLong(node, "ShipCount", mShips);
 	if (mDamaged > 0 && viewer == NULL || viewer == owner) {
 		AddLong(node, "Damaged", mDamaged);

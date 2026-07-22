@@ -136,13 +136,7 @@ public:
 	SpaceObject * GetPatrolTarget(const Fleet * persuer, int range) const;
 
   VictoryConditions *GetVictoryConditions() const { return VC.get(); };
-  void VisitTopObjects(ConstTopObjectVisitor visitor) const {
-    for_each(mTopObjects.begin(), mTopObjects.end(), [&](const deque<SpaceObject*> *list) {
-        if(list != nullptr) {
-            visitor(*list);
-        }
-    });
-  }
+  void VisitTopObjects(ConstTopObjectVisitor visitor) const;
 
 	virtual Component * ObjectFactory(const Component *);
 	virtual Player * ObjectFactory(const Player *, int PlayerNumber);
