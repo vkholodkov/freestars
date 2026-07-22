@@ -92,6 +92,7 @@ protected:
 	OrderType mOrder;
 
 	friend class WayOrderList;
+	friend class Fleet;
 };
 
 /**

@@ -292,6 +292,11 @@ bool WayOrderList::ParseNode(const TiXmlNode * node, Player * player, Game *game
 		if (wo != NULL) {
 			wo->mSpeed = speed;
 			orders.push_back(wo);
+    }
+    else if(orders.empty()) {
+      unique_ptr<WayOrder> wo(new WayOrder(loc, fmo));
+      orders.push_back(wo.get());
+      wo.release();
 		} else if (fmo && loc) {
 			delete loc;
 		}

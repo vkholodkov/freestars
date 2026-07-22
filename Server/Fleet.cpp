@@ -393,17 +393,22 @@ void Fleet::ClearWaypoint()
 	case OT_MERGE:
 	case OT_TRANSFER:
 	case OT_TRANSPORT:
-		mOrders[0]->SetType(OT_NONE);
+    {
+      std::unique_ptr<WayOrder> wo(new WayOrder(static_cast<const WayOrder&>(*mOrders[0])));
+      wo->SetType(OT_NONE);
+      delete mOrders[0];
+      mOrders[0] = wo.release();
+    }
 		break;
 	case OT_REMOTEMINE:
 		break;
 	case OT_SCRAP:
 		break;
 	case OT_ROUTE:
-		if (mOrders.size() < 2)
-			SetNextRoute(InOrbit());
+    if (mOrders.size() < 2)
+      SetNextRoute(InOrbit());
 
-		mOrders[0]->SetType(OT_NONE);
+    mOrders[0]->SetType(OT_NONE);
 		break;
 	case OT_LAYMINE:
 		// decrement # of years
@@ -557,10 +562,16 @@ void Fleet::ProcessTransport(bool load, bool dunnage)
 		return;
 
 	for (int i = FUEL; i < Rules::MaxMinType; ++i) {
-		if (load)
-			ProcessLoad(dest, i, order->GetAction(i), order->GetValue(i), dunnage);
-		else
-			ProcessUnload(dest, i, order->GetAction(i), order->GetValue(i));
+		if (load) {
+      if(order->GetAction(i) != TRANSFER_NOORDER) {
+        ProcessLoad(dest, i, order->GetAction(i), order->GetValue(i), dunnage);
+      }
+    }
+		else {
+      if(order->GetAction(i) != TRANSFER_NOORDER) {
+        ProcessUnload(dest, i, order->GetAction(i), order->GetValue(i));
+      }
+    }
 	}
 }
 
@@ -948,9 +959,11 @@ bool Fleet::Move()
 	if (GetFuel() < long(fuelU * dist +.5)) {
 		double fdist = GetFuel() / fuelU;
 		if (int(fdist) < int(dist)) {
-			mOrders[1]->SetSpeed(GetMinFreeSpeed());	// for next turn
+      auto speed = GetMinFreeSpeed();
+			mOrders[1]->SetSpeed(speed);	// for next turn
 			Message * mess = NCGetOwner()->AddMessage("Out of fuel, slowing down");
 			mess->AddItem("", this);
+			mess->AddLong("Speed", speed);
 			MoveToward(this, &dest, &mPX, &mPY, long(fdist + .5));
 			dist = Distance(mPX, mPY);
 		}

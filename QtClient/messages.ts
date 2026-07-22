@@ -100,6 +100,10 @@
             <translation type="unfinished">%0 has been ordered to colonize %1, but it has already been populated. %1 is currently occupied by %2.</translation>
         </message>
         <message>
+            <source>Out of fuel, slowing down</source>
+            <translation type="unfinished">%0 has run out of fuel. It has reduced its speed to warp factor %1</translation>
+        </message>
+        <message>
             <source>Remote Terraform cannot improve hab</source>
             <translation type="unfinished">%1 is currently unable to improve the value of %0 beyond %2%</translation>
         </message>
